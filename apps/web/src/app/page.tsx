@@ -1,4 +1,4 @@
-import { canSomewhere, type MeResponse } from '@slotwise/shared';
+import { canSomewhere, type InstituteDto, type MeResponse } from '@slotwise/shared';
 import { Alert, Button, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
@@ -29,17 +29,22 @@ export default async function HomePage({
   const me = await api<MeResponse>('/me');
 
   if (!me.ok) {
+    const publicInfo = me.status === 403 ? await api<InstituteDto>('/institute') : null;
+    const instituteName = publicInfo?.ok ? publicInfo.data.name : slug;
     const problem =
       me.status === 403
         ? {
-            title: tProblems('noAccessTitle', { institute: slug }),
+            title: tProblems('noAccessTitle', { institute: instituteName }),
             body: tProblems('noAccessBody'),
           }
         : me.status === 404
           ? { title: tProblems('notFoundTitle'), body: tProblems('notFoundBody') }
           : { title: tProblems('unavailableTitle'), body: me.message };
     return (
-      <PageShell email={session.user.email}>
+      <PageShell
+        instituteName={publicInfo?.ok ? instituteName : undefined}
+        email={session.user.email}
+      >
         <Problem title={problem.title} body={problem.body}>
           <p className="text-sm text-muted-foreground">
             {tCommon('signedInAs', { email: session.user.email ?? '' })}
