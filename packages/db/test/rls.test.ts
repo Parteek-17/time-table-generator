@@ -1,8 +1,8 @@
 /**
  * Proves row-level security isolates institutes at the database level, even for raw SQL.
  * Needs a migrated Postgres: `docker compose up -d && pnpm db:migrate`.
- *   DATABASE_URL      owner role (creates fixtures)
- *   APP_DATABASE_URL  restricted slotwise_app role (what the API uses)
+ *   OWNER_DATABASE_URL  owner role (creates fixtures)
+ *   APP_DATABASE_URL    restricted slotwise_app role (what the API uses)
  */
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -14,11 +14,11 @@ try {
   // CI passes the URLs as environment variables.
 }
 
-const ownerUrl = process.env.DATABASE_URL;
+const ownerUrl = process.env.OWNER_DATABASE_URL;
 const appUrl = process.env.APP_DATABASE_URL;
 if (!ownerUrl || !appUrl) {
   throw new Error(
-    'DATABASE_URL and APP_DATABASE_URL must be set (copy packages/db/.env.example to .env, then start Postgres with `docker compose up -d`).',
+    'OWNER_DATABASE_URL and APP_DATABASE_URL must be set (copy packages/db/.env.example to .env, then start Postgres with `docker compose up -d`).',
   );
 }
 

@@ -12,7 +12,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("OWNER_DATABASE_URL")
 }
 
 enum InstituteType {
