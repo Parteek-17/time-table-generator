@@ -39,3 +39,7 @@ Thumbs.db
 
 # coverage
 coverage/
+
+# Claude Code local settings (launch.json is shared)
+.claude/*
+!.claude/launch.json
