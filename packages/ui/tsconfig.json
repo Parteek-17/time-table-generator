@@ -1,0 +1,9 @@
+{
+  "extends": "@slotwise/config/tsconfig/nextjs.json",
+  "compilerOptions": {
+    "plugins": [],
+    "incremental": false,
+    "types": []
+  },
+  "include": ["src"]
+}
