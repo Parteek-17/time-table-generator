@@ -1,0 +1,29 @@
+{
+  "name": "slotwise",
+  "private": true,
+  "packageManager": "pnpm@10.34.7",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "env:init": "node scripts/init-env.mjs",
+    "dev": "turbo run dev --filter=@slotwise/web --filter=@slotwise/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "db:generate": "pnpm --filter @slotwise/db generate",
+    "db:migrate": "pnpm --filter @slotwise/db migrate",
+    "db:deploy": "pnpm --filter @slotwise/db deploy:migrations",
+    "db:seed": "pnpm --filter @slotwise/db seed",
+    "db:reset": "pnpm --filter @slotwise/db reset",
+    "db:validate": "pnpm --filter @slotwise/db validate"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10",
+    "turbo": "2.11.10",
+    "typescript": "6.0.3"
+  }
+}
