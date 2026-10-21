@@ -8,7 +8,14 @@ export const API_JWT_AUDIENCE = 'slotwise-api';
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/;
 
 /** Subdomains that are never institute slugs. */
-export const RESERVED_SUBDOMAINS: readonly string[] = ['www', 'app', 'api', 'admin', 'mail', 'static'];
+export const RESERVED_SUBDOMAINS: readonly string[] = [
+  'www',
+  'app',
+  'api',
+  'admin',
+  'mail',
+  'static',
+];
 
 export function isValidSlug(slug: string): boolean {
   return SLUG_PATTERN.test(slug) && !RESERVED_SUBDOMAINS.includes(slug);
@@ -20,7 +27,10 @@ export function isValidSlug(slug: string): boolean {
  *   parseInstituteSlug('demo.slotwise.app', 'slotwise.app') → 'demo'
  *   parseInstituteSlug('localhost:3000', 'localhost') → null
  */
-export function parseInstituteSlug(host: string | null | undefined, rootDomain: string): string | null {
+export function parseInstituteSlug(
+  host: string | null | undefined,
+  rootDomain: string,
+): string | null {
   if (!host) return null;
   const hostname = host.split(':')[0]!.toLowerCase();
   const root = rootDomain.split(':')[0]!.toLowerCase();

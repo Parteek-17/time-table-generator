@@ -1,4 +1,9 @@
-import { ASSIGNABLE_ROLES, INSTITUTE_WIDE_READS, ROLE_PERMISSIONS, type Action } from './permissions';
+import {
+  ASSIGNABLE_ROLES,
+  INSTITUTE_WIDE_READS,
+  ROLE_PERMISSIONS,
+  type Action,
+} from './permissions';
 import type { Role, ScopeType } from './roles';
 
 /** One scoped role held by a user: (user, role, scope_type, scope_id). */
@@ -16,7 +21,8 @@ export interface AuthUser {
   memberships: readonly MembershipGrant[];
 }
 
-export type ResourceType = 'institute' | 'department' | 'membership' | 'invite' | 'audit_log' | 'timetable';
+export type ResourceType =
+  'institute' | 'department' | 'membership' | 'invite' | 'audit_log' | 'timetable';
 
 /** What the action is performed on. Always located inside one institute. */
 export interface Resource {

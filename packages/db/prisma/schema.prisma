@@ -1,0 +1,232 @@
+// Phase 0 schema: institutes, departments, users (+ Auth.js tables), memberships,
+// invites and the audit log.
+//
+// Tenant tables (departments, memberships, invites, audit_logs) carry institute_id and
+// are protected by Postgres row-level security; see migrations/*_row_level_security.
+// Conventions: uuid ids, snake_case tables and columns, soft delete via deleted_at /
+// revoked_at (never hard-delete master data).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InstituteType {
+  college
+  university
+
+  @@map("institute_type")
+}
+
+/// Mirrors ROLES in packages/shared/src/auth/roles.ts.
+enum Role {
+  platform_admin
+  university_admin
+  institute_admin
+  hod
+  timetable_coordinator
+  exam_coordinator
+  faculty
+  student
+
+  @@map("role")
+}
+
+/// Mirrors SCOPE_TYPES in packages/shared/src/auth/roles.ts.
+enum ScopeType {
+  platform
+  university
+  institute
+  department
+  section
+
+  @@map("scope_type")
+}
+
+// ---------------------------------------------------------------------------
+// Global tables (no institute_id, no RLS)
+// ---------------------------------------------------------------------------
+
+model Institute {
+  id                 String        @id @default(uuid()) @db.Uuid
+  name               String
+  /// Subdomain: <slug>.slotwise.app
+  slug               String        @unique
+  type               InstituteType @default(college)
+  /// IANA timezone, e.g. Asia/Kolkata.
+  timezone           String        @default("Asia/Kolkata")
+  /// Set for colleges affiliated to a university (which is itself an Institute).
+  parentUniversityId String?       @map("parent_university_id") @db.Uuid
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+  deletedAt          DateTime?     @map("deleted_at")
+
+  parentUniversity   Institute?   @relation("Affiliation", fields: [parentUniversityId], references: [id])
+  affiliatedColleges Institute[]  @relation("Affiliation")
+  departments        Department[]
+  memberships        Membership[]
+  invites            Invite[]
+  auditLogs          AuditLog[]
+
+  @@map("institutes")
+}
+
+/// One person, across all institutes. Auth.js reads and writes this table.
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  /// Always stored lower-case.
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts        Account[]
+  sessions        Session[]
+  memberships     Membership[] @relation("MembershipUser")
+  invitesSent     Invite[]     @relation("InviteSentBy")
+  invitesAccepted Invite[]     @relation("InviteAcceptedBy")
+  auditLogs       AuditLog[]
+
+  @@map("users")
+}
+
+// Auth.js (next-auth v5) adapter tables. Field names are fixed by @auth/prisma-adapter.
+
+model Account {
+  userId            String  @map("user_id") @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id") @db.Uuid
+  expires      DateTime
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Tenant tables (institute_id + row-level security)
+// ---------------------------------------------------------------------------
+
+/// Minimal department for Phase 0 so roles can be scoped to one (see ADR 0003).
+model Department {
+  id          String    @id @default(uuid()) @db.Uuid
+  instituteId String    @map("institute_id") @db.Uuid
+  name        String
+  /// Short code shown in lists, e.g. CSE.
+  code        String
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  @@unique([instituteId, code])
+  @@index([instituteId])
+  @@map("departments")
+}
+
+/// (user, role, scope_type, scope_id). Revoking sets revoked_at; rows are never deleted.
+model Membership {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  role        Role
+  scopeType   ScopeType @map("scope_type")
+  /// Institute id (university/institute scope), department id, or section id. Null for platform.
+  scopeId     String?   @map("scope_id") @db.Uuid
+  /// Null only for platform scope.
+  instituteId String?   @map("institute_id") @db.Uuid
+  createdById String?   @map("created_by_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  revokedAt   DateTime? @map("revoked_at")
+  revokedById String?   @map("revoked_by_id") @db.Uuid
+
+  user      User       @relation("MembershipUser", fields: [userId], references: [id])
+  institute Institute? @relation(fields: [instituteId], references: [id])
+
+  @@index([userId])
+  @@index([instituteId])
+  @@map("memberships")
+}
+
+model Invite {
+  id           String    @id @default(uuid()) @db.Uuid
+  instituteId  String    @map("institute_id") @db.Uuid
+  /// Always stored lower-case.
+  email        String
+  role         Role
+  scopeType    ScopeType @map("scope_type")
+  scopeId      String?   @map("scope_id") @db.Uuid
+  /// SHA-256 of the token in the invite link. The raw token is never stored.
+  tokenHash    String    @unique @map("token_hash")
+  expiresAt    DateTime  @map("expires_at")
+  acceptedAt   DateTime? @map("accepted_at")
+  acceptedById String?   @map("accepted_by_id") @db.Uuid
+  cancelledAt  DateTime? @map("cancelled_at")
+  invitedById  String    @map("invited_by_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  institute  Institute @relation(fields: [instituteId], references: [id])
+  invitedBy  User      @relation("InviteSentBy", fields: [invitedById], references: [id])
+  acceptedBy User?     @relation("InviteAcceptedBy", fields: [acceptedById], references: [id])
+
+  @@index([instituteId, email])
+  @@map("invites")
+}
+
+/// Append-only. The app role may insert and read, never update or delete.
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  /// e.g. invite.created, invite.accepted, membership.revoked
+  action      String
+  targetType  String   @map("target_type")
+  targetId    String?  @map("target_id")
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+  actor     User?     @relation(fields: [actorUserId], references: [id])
+
+  @@index([instituteId, createdAt])
+  @@map("audit_logs")
+}

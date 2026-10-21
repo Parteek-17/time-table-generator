@@ -17,11 +17,13 @@ export const noInlineRoleChecks = {
       'error',
       {
         selector: `BinaryExpression[operator=/^[!=]==?$/] > Literal[value=/^(${ROLE_NAMES})$/]`,
-        message: 'Do not compare role strings inline. Use can(user, action, resource) from @slotwise/shared.',
+        message:
+          'Do not compare role strings inline. Use can(user, action, resource) from @slotwise/shared.',
       },
       {
         selector: `SwitchCase > Literal[value=/^(${ROLE_NAMES})$/]`,
-        message: 'Do not switch on role strings inline. Use can(user, action, resource) from @slotwise/shared.',
+        message:
+          'Do not switch on role strings inline. Use can(user, action, resource) from @slotwise/shared.',
       },
     ],
   },

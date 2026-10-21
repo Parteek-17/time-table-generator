@@ -14,7 +14,13 @@ export const ROLES = [
 ] as const;
 export type Role = (typeof ROLES)[number];
 
-export const SCOPE_TYPES = ['platform', 'university', 'institute', 'department', 'section'] as const;
+export const SCOPE_TYPES = [
+  'platform',
+  'university',
+  'institute',
+  'department',
+  'section',
+] as const;
 export type ScopeType = (typeof SCOPE_TYPES)[number];
 
 /** Which scope types each role may be granted at. */

@@ -1,0 +1,44 @@
+{
+  "name": "@slotwise/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Prisma schema, migrations (incl. row-level security), seed and tenant-scoped client helper.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "postinstall": "prisma generate",
+    "generate": "prisma generate",
+    "build": "prisma generate && tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch --preserveWatchOutput",
+    "migrate": "prisma migrate dev",
+    "deploy:migrations": "prisma migrate deploy",
+    "reset": "prisma migrate reset --force --skip-seed && pnpm seed",
+    "seed": "tsx prisma/seed.ts",
+    "validate": "prisma validate",
+    "studio": "prisma studio",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@prisma/client": "6.19.3"
+  },
+  "devDependencies": {
+    "@slotwise/config": "workspace:*",
+    "@types/node": "24.19.2",
+    "eslint": "9.39.5",
+    "prisma": "6.19.3",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "4.1.12"
+  }
+}

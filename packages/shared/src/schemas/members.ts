@@ -18,7 +18,8 @@ export const createInviteSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['scopeType'],
-        message: 'This role cannot be given at that level. Pick a department or the whole institute.',
+        message:
+          'This role cannot be given at that level. Pick a department or the whole institute.',
       });
     }
     if (value.scopeType === 'department' && !value.departmentId) {
