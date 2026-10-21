@@ -9,6 +9,7 @@ import { HealthController } from './health/health.controller';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
 import { MailService } from './mail/mail.service';
+import { InstituteController } from './me/institute.controller';
 import { MeController } from './me/me.controller';
 import { MembersController } from './members/members.controller';
 import { MembersService } from './members/members.service';
@@ -21,6 +22,7 @@ export class AppModule {
       module: AppModule,
       controllers: [
         HealthController,
+        InstituteController,
         MeController,
         DepartmentsController,
         MembersController,

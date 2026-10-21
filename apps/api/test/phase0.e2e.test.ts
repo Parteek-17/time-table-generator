@@ -96,6 +96,12 @@ describe('tenancy', () => {
     expect(res.status).toBe(401);
   });
 
+  it('the institute name is public, for the sign-in page', async () => {
+    const res = await as(null, a.institute.slug).get('/institute');
+    expect(res.status).toBe(200);
+    expect(res.body.name).toBe(a.institute.name);
+  });
+
   it('health needs no institute or sign-in', async () => {
     const res = await request(app.getHttpServer()).get('/health');
     expect(res.status).toBe(200);

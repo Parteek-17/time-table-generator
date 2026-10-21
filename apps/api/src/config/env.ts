@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  /** API_PORT wins over PORT so a PORT meant for the web app (e.g. in `pnpm dev`) is ignored. */
+  API_PORT: z.coerce.number().int().positive().optional(),
+  /** Set by Railway/Render in production. */
   PORT: z.coerce.number().int().positive().default(4000),
   DATABASE_URL: z.string().min(1),
   API_JWT_SECRET: z.string().min(32, 'API_JWT_SECRET must be at least 32 characters'),
