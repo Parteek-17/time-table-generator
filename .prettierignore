@@ -5,3 +5,4 @@ dist
 coverage
 services/solver
 packages/db/prisma/migrations
+CLAUDE.md

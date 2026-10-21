@@ -85,17 +85,28 @@ docs/           Specs, ADRs, constraint definitions
 
 Monorepo managed with **pnpm workspaces + Turborepo**.
 
-## Commands (fill in as they are created)
+## Commands
 
 ```bash
-pnpm install              # install all workspaces
-pnpm dev                  # web + api in watch mode
-pnpm db:migrate           # prisma migrate dev
-pnpm db:seed              # seed sample institute (GNDEC-style CSE department, fictional data)
-pnpm test                 # all TS tests
+docker compose up -d      # Postgres 16, Redis 7, Mailpit (inbox: http://localhost:8025)
+pnpm install              # install all workspaces; creates missing .env files from .env.example
+pnpm dev                  # web (http://demo.localhost:3000) + api (:4000) in watch mode
+pnpm build                # build everything
+pnpm db:migrate           # prisma migrate dev (local)
+pnpm db:deploy            # prisma migrate deploy (hosted DBs, owner URL)
+pnpm db:seed              # seed "Demo Institute of Engineering" (fictional), safe to re-run
+pnpm db:reset             # drop, migrate and seed the local DB
+pnpm db:validate          # prisma validate
+pnpm test                 # can() unit tests, RLS tests, API e2e tests (needs migrated Postgres)
 pnpm lint && pnpm typecheck
+pnpm format               # prettier (format:check in CI)
 cd services/solver && uv run pytest
+cd services/solver && uv run uvicorn slotwise_solver.main:app --reload   # solver on :8000
 ```
+
+Database roles: `OWNER_DATABASE_URL` (packages/db) is for migrations and the seed only;
+apps use `DATABASE_URL` = restricted `slotwise_app` role so row-level security applies
+(docs/adr/0002-tenancy-and-rls.md). Deployment: docs/deployment.md.
 
 ## Data model essentials
 
