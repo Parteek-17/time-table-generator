@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    name: Lint, typecheck, test (TypeScript)
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:16.15-alpine
+        env:
+          POSTGRES_USER: slotwise
+          POSTGRES_PASSWORD: slotwise
+          POSTGRES_DB: slotwise
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U slotwise -d slotwise"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      # Owner role: migrations, seed and test fixtures.
+      OWNER_DATABASE_URL: postgresql://slotwise:slotwise@localhost:5432/slotwise
+      TEST_OWNER_DATABASE_URL: postgresql://slotwise:slotwise@localhost:5432/slotwise
+      # Restricted app role: what the API and web use (RLS applies).
+      APP_DATABASE_URL: postgresql://slotwise_app:slotwise_app@localhost:5432/slotwise
+      DATABASE_URL: postgresql://slotwise_app:slotwise_app@localhost:5432/slotwise
+      API_JWT_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      AUTH_SECRET: ci-only-auth-secret-0123456789abcdef0123456789
+      API_URL: http://localhost:4000
+      EMAIL_SERVER: smtp://localhost:1025
+      EMAIL_FROM: 'Slotwise <no-reply@slotwise.test>'
+      TURBO_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prisma schema is valid
+        run: pnpm db:validate
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Create restricted app role
+        run: psql "$OWNER_DATABASE_URL" -v ON_ERROR_STOP=1 -f infra/postgres/init/01-app-role.sql
+      - name: Apply migrations
+        run: pnpm db:deploy
+      - name: Unit, RLS and API tests
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+
+  solver:
+    name: Solver (Python)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: services/solver
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.13.4'
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest
