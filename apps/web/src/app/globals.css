@@ -1,0 +1,73 @@
+@import 'tailwindcss';
+
+/* Scan shared components for class names. */
+@source '../../../../packages/ui/src';
+
+:root {
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.2 0.01 260);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--foreground);
+  --muted: oklch(0.96 0.005 260);
+  --muted-foreground: oklch(0.45 0.02 260);
+  --primary: oklch(0.48 0.2 264);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.01 260);
+  --secondary-foreground: var(--foreground);
+  --destructive: oklch(0.53 0.21 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --success: oklch(0.55 0.15 150);
+  --border: oklch(0.9 0.01 260);
+  --input: oklch(0.82 0.01 260);
+  --ring: oklch(0.48 0.2 264);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.17 0.01 260);
+    --foreground: oklch(0.96 0 0);
+    --card: oklch(0.21 0.01 260);
+    --muted: oklch(0.26 0.01 260);
+    --muted-foreground: oklch(0.75 0.01 260);
+    --primary: oklch(0.7 0.15 264);
+    --primary-foreground: oklch(0.17 0.01 260);
+    --secondary: oklch(0.28 0.01 260);
+    --destructive: oklch(0.65 0.2 27);
+    --destructive-foreground: oklch(0.17 0.01 260);
+    --success: oklch(0.7 0.15 150);
+    --border: oklch(0.32 0.01 260);
+    --input: oklch(0.4 0.01 260);
+    --ring: oklch(0.7 0.15 264);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+}

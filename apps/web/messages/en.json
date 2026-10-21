@@ -1,0 +1,104 @@
+{
+  "common": {
+    "appName": "Slotwise",
+    "signOut": "Sign out",
+    "goHome": "Go to home",
+    "signedInAs": "Signed in as {email}",
+    "skipToContent": "Skip to main content"
+  },
+  "roles": {
+    "platform_admin": "Platform admin",
+    "university_admin": "University admin",
+    "institute_admin": "Institute admin",
+    "hod": "Head of department",
+    "timetable_coordinator": "Timetable coordinator",
+    "exam_coordinator": "Exam coordinator",
+    "faculty": "Faculty",
+    "student": "Student"
+  },
+  "landing": {
+    "title": "Open your institute’s Slotwise address",
+    "body": "Each institute has its own address, like demo.slotwise.app. Ask your admin for yours.",
+    "devHint": "Trying it locally? Open the sample institute:"
+  },
+  "home": {
+    "welcome": "Welcome, {name}",
+    "roleAt": "{role} at {institute}",
+    "roleAtScope": "{role} ({scope}) at {institute}",
+    "joined": "You’ve joined {institute}.",
+    "nextStepsTitle": "What you can do",
+    "members": "Members",
+    "membersHint": "Invite people and give them roles.",
+    "timetableSoon": "Your timetable will appear here once it’s published."
+  },
+  "problems": {
+    "noAccessTitle": "You don’t have access to {institute} yet",
+    "noAccessBody": "Ask your institute admin to invite you. If you were invited, open the link in the invite email.",
+    "notFoundTitle": "We couldn’t find this institute",
+    "notFoundBody": "Check the address and try again.",
+    "unavailableTitle": "Something went wrong"
+  },
+  "signIn": {
+    "title": "Sign in to {institute}",
+    "titleGeneric": "Sign in to Slotwise",
+    "subtitle": "We’ll email you a link. No password needed.",
+    "email": "Email",
+    "emailPlaceholder": "you@college.edu",
+    "sendLink": "Email me a sign-in link",
+    "sending": "Sending…",
+    "or": "or",
+    "google": "Continue with Google",
+    "invalidEmail": "Enter a valid email address.",
+    "errorVerification": "That sign-in link has expired or was already used. Ask for a new one below.",
+    "errorDefault": "We couldn’t sign you in. Please try again."
+  },
+  "checkEmail": {
+    "title": "Check your email",
+    "body": "We sent you a sign-in link. Open it on this device to continue.",
+    "devHint": "Running locally? Your emails are in Mailpit:",
+    "tryAgain": "Use a different email"
+  },
+  "members": {
+    "title": "Members",
+    "subtitle": "People who can use Slotwise at {institute}.",
+    "inviteTitle": "Invite someone",
+    "email": "Email",
+    "role": "Role",
+    "where": "Where",
+    "wholeInstitute": "Whole institute",
+    "chooseRole": "Choose a role",
+    "chooseDepartment": "Choose a department",
+    "send": "Send invite",
+    "sending": "Sending…",
+    "invited": "Invite sent to {email}.",
+    "invitedNoEmail": "Invite saved, but the email could not be sent. Share this link with {email}:",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "listTitle": "People ({count})",
+    "you": "you",
+    "remove": "Remove",
+    "removeLabel": "Remove {name} as {role}",
+    "removed": "Removed {name} as {role}.",
+    "undo": "Undo",
+    "restored": "Restored.",
+    "pendingTitle": "Waiting to accept ({count})",
+    "expires": "Link works until {date}",
+    "cancel": "Cancel invite",
+    "cancelLabel": "Cancel the invite for {email}",
+    "cancelled": "Invite cancelled.",
+    "empty": "No one yet. Invite your first colleague above.",
+    "noPermission": "You can’t give roles here. Ask your institute admin."
+  },
+  "invite": {
+    "title": "You’re invited",
+    "body": "Join {institute} as {role} ({scope}).",
+    "signInToAccept": "Sign in with {email} to accept.",
+    "wrongAccount": "This invite is for {invited}, but you’re signed in as {current}. Sign out and sign in with {invited}.",
+    "accept": "Accept invite",
+    "accepting": "Joining…",
+    "invalid": "This invite link is not valid. Ask for a new one.",
+    "accepted": "This invite has already been used.",
+    "expired": "This invite has expired. Ask your admin for a new one.",
+    "cancelled": "This invite was cancelled. Ask your admin for a new one."
+  }
+}
