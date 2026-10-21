@@ -4,7 +4,7 @@ import {
   ROLE_PERMISSIONS,
   type Action,
 } from './permissions';
-import type { Role, ScopeType } from './roles';
+import { ROLES, type Role, type ScopeType } from './roles';
 
 /** One scoped role held by a user: (user, role, scope_type, scope_id). */
 export interface MembershipGrant {
@@ -85,4 +85,39 @@ export function belongsToInstitute(
     instituteId: institute.id,
     universityId: institute.parentUniversityId ?? null,
   });
+}
+
+/**
+ * True if the user may perform the action on at least one thing in this institute
+ * (the institute itself, or one of their own departments/sections). For role-granting
+ * actions, any grantable role counts. Used to decide whether to show a page or route
+ * at all; the exact resource is still checked with can() before acting.
+ */
+export function canSomewhere(
+  user: AuthUser,
+  action: Action,
+  institute: { id: string; parentUniversityId?: string | null },
+): boolean {
+  const base: Resource = {
+    type: 'institute',
+    instituteId: institute.id,
+    universityId: institute.parentUniversityId ?? null,
+  };
+  const candidates: Resource[] = [base];
+  for (const grant of user.memberships) {
+    if (grant.instituteId !== institute.id || !grant.scopeId) continue;
+    if (grant.scopeType === 'department') candidates.push({ ...base, departmentId: grant.scopeId });
+    if (grant.scopeType === 'section') candidates.push({ ...base, sectionId: grant.scopeId });
+  }
+  const roles: readonly (Role | undefined)[] = ROLE_ASSIGNMENT_ACTIONS.includes(action)
+    ? ROLES
+    : [undefined];
+  return candidates.some((resource) =>
+    roles.some((role) => can(user, action, role ? { ...resource, role } : resource)),
+  );
+}
+
+/** Roles this user may grant at the given place (for the invite form). */
+export function assignableRoles(user: AuthUser, resource: Omit<Resource, 'role'>): Role[] {
+  return ROLES.filter((role) => can(user, 'member.invite', { ...resource, role }));
 }

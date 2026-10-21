@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { MembershipGrant } from '../auth/can';
 import { INVITABLE_SCOPE_TYPES, ROLES, isScopeAllowedForRole } from '../auth/roles';
 
 export const roleSchema = z.enum(ROLES);
@@ -52,6 +53,7 @@ export interface InstituteDto {
   slug: string;
   type: 'college' | 'university';
   timezone: string;
+  parentUniversityId: string | null;
 }
 
 export interface MeResponse {
@@ -59,8 +61,8 @@ export interface MeResponse {
   institute: InstituteDto;
   /** Memberships in this institute (plus platform/university ones that reach it). */
   memberships: MembershipDto[];
-  /** Convenience flags for showing or hiding UI. The API re-checks on every call. */
-  abilities: { manageMembers: boolean };
+  /** Raw grants, so the web can call can() to show or hide UI. The API re-checks every call. */
+  grants: MembershipGrant[];
 }
 
 export interface MemberDto {

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { belongsToInstitute, can, type AuthUser, type MembershipGrant } from './can';
+import {
+  assignableRoles,
+  belongsToInstitute,
+  can,
+  canSomewhere,
+  type AuthUser,
+  type MembershipGrant,
+} from './can';
 
 const INST_A = 'inst-a';
 const INST_B = 'inst-b';
@@ -278,5 +285,27 @@ describe('belongsToInstitute()', () => {
     expect(belongsToInstitute(studentA, { id: INST_A })).toBe(true);
     expect(belongsToInstitute(hodCse, { id: INST_A })).toBe(true);
     expect(belongsToInstitute(hodCse, { id: INST_B })).toBe(false);
+  });
+});
+
+describe('canSomewhere() and assignableRoles()', () => {
+  it('a hod can view members somewhere (their department), a student cannot', () => {
+    expect(canSomewhere(hodCse, 'member.view', { id: INST_A })).toBe(true);
+    expect(canSomewhere(hodCse, 'member.invite', { id: INST_A })).toBe(true);
+    expect(canSomewhere(studentA, 'member.view', { id: INST_A })).toBe(false);
+    expect(canSomewhere(facultyCse, 'member.invite', { id: INST_A })).toBe(false);
+  });
+
+  it('nobody can act somewhere in an institute they do not belong to', () => {
+    expect(canSomewhere(hodCse, 'member.view', { id: INST_B })).toBe(false);
+    expect(canSomewhere(instituteAdminA, 'member.invite', { id: INST_B })).toBe(false);
+  });
+
+  it('lists the roles each user may hand out', () => {
+    const cse = { type: 'invite', instituteId: INST_A, departmentId: CSE } as const;
+    expect(assignableRoles(hodCse, cse)).toEqual(['timetable_coordinator', 'faculty', 'student']);
+    expect(assignableRoles(hodCse, { ...cse, departmentId: ECE })).toEqual([]);
+    expect(assignableRoles(instituteAdminA, cse)).toContain('hod');
+    expect(assignableRoles(instituteAdminA, cse)).not.toContain('platform_admin');
   });
 });
