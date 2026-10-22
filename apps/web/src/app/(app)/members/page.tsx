@@ -11,7 +11,6 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
-import { PageShell } from '@/components/page-shell';
 import { Problem } from '@/components/problem';
 import { api } from '@/lib/api';
 import { InviteForm } from './invite-form';
@@ -32,11 +31,7 @@ export default async function MembersPage() {
   const user: AuthUser = { id: me.data.user.id, memberships: grants };
   const place = { id: institute.id, parentUniversityId: institute.parentUniversityId };
   if (!canSomewhere(user, 'member.view', place)) {
-    return (
-      <PageShell instituteName={institute.name} email={me.data.user.email}>
-        <Problem title={t('title')} body={t('noPermission')} />
-      </PageShell>
-    );
+    return <Problem title={t('title')} body={t('noPermission')} />;
   }
 
   const canInvite = canSomewhere(user, 'member.invite', place);
@@ -47,7 +42,7 @@ export default async function MembersPage() {
   ]);
 
   return (
-    <PageShell instituteName={institute.name} email={me.data.user.email}>
+    <>
       <div>
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
         <p className="text-muted-foreground">{t('subtitle', { institute: institute.name })}</p>
@@ -80,6 +75,6 @@ export default async function MembersPage() {
           <Problem title={members.message} />
         )}
       </section>
-    </PageShell>
+    </>
   );
 }

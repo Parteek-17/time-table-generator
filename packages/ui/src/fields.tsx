@@ -24,3 +24,29 @@ export function Label({ className, ...props }: ComponentProps<'label'>) {
 export function FieldError({ className, ...props }: ComponentProps<'p'>) {
   return <p className={cn('text-sm text-destructive', className)} {...props} />;
 }
+
+export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
+  return (
+    <textarea
+      className={cn(
+        'flex min-h-28 w-full rounded-lg border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring aria-[invalid=true]:border-destructive',
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+/** Native checkbox with a 24px box: easy to tap, works with every screen reader. */
+export function Checkbox({ className, ...props }: Omit<ComponentProps<'input'>, 'type'>) {
+  return (
+    <input
+      type="checkbox"
+      className={cn(
+        'size-6 shrink-0 rounded border-input accent-primary focus-visible:ring-2 focus-visible:ring-ring',
+        className,
+      )}
+      {...props}
+    />
+  );
+}

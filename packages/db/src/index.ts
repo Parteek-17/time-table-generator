@@ -15,6 +15,11 @@ export type {
 
 export type TxClient = Prisma.TransactionClient;
 
+export { buildSampleInstitute, type SampleSummary } from './sample/build';
+export { SAMPLE_INSTITUTE, PLANNED_GAPS } from './sample/data';
+export { loadReadinessSnapshot } from './readiness-snapshot';
+export { purgeInstitute, TENANT_TABLES_DELETE_ORDER } from './purge';
+
 /** Who and where a database call is for. Drives row-level security. */
 export interface TenantContext {
   /** Institute the request is about; null means no tenant rows are visible. */

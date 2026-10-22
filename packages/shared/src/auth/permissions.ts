@@ -12,6 +12,29 @@ export const ACTIONS = [
   'timetable.view',
   'timetable.edit',
   'timetable.publish',
+  // Phase 1: institute master data (docs/adr/0008-master-data-permissions.md)
+  /** Read any master data: departments, programmes, schemes, cohorts, faculty, rooms, calendar. */
+  'masterdata.view',
+  /** Sessions, terms, cohort start windows, promoting batches. */
+  'term.manage',
+  /** Holidays, calendar windows, extra working days, bell schedules. */
+  'calendar.manage',
+  /** Buildings and rooms. */
+  'infrastructure.manage',
+  /** Programmes, branches, scheme versions, courses. */
+  'academics.manage',
+  /** Batches, cohorts, sections, sub-groups, elective sections, students. */
+  'cohort.manage',
+  'faculty.manage',
+  /** Faculty members may do this for their own record only (SELF_ONLY_ACTIONS). */
+  'faculty.availability.edit',
+  /** Teaching assignments (subject distribution) and subject mentors. */
+  'teaching.manage',
+  'fixed_slot.manage',
+  'timetable_scope.manage',
+  /** Start an Excel/CSV import. Each row is checked again with the action for its kind. */
+  'import.run',
+  'readiness.view',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
@@ -23,10 +46,26 @@ export const INSTITUTE_WIDE_READS: readonly Action[] = [
   'institute.view',
   'department.view',
   'timetable.view',
+  'masterdata.view',
+  'readiness.view',
 ];
 
+/**
+ * Actions that some roles may only perform on their own record: the resource's ownerUserId
+ * must be the user. Other roles holding the action use their scope as usual.
+ */
+export const SELF_ONLY_ACTIONS: Readonly<Partial<Record<Role, readonly Action[]>>> = {
+  faculty: ['faculty.availability.edit'],
+};
+
 const ALL: readonly Action[] = ACTIONS;
-const READ_ONLY: readonly Action[] = ['institute.view', 'department.view', 'timetable.view'];
+/** What every staff member may read. Students never read master data. */
+const READ_ONLY: readonly Action[] = [
+  'institute.view',
+  'department.view',
+  'timetable.view',
+  'masterdata.view',
+];
 
 /** Role → actions. Where an action applies is decided by the membership's scope. */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Action[]>> = {
@@ -42,10 +81,26 @@ export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Action[]>> = {
     'audit.view',
     'timetable.edit',
     'timetable.publish',
+    'academics.manage',
+    'cohort.manage',
+    'faculty.manage',
+    'faculty.availability.edit',
+    'teaching.manage',
+    'import.run',
+    'readiness.view',
   ],
-  timetable_coordinator: [...READ_ONLY, 'timetable.edit', 'timetable.publish'],
+  timetable_coordinator: [
+    ...READ_ONLY,
+    'timetable.edit',
+    'timetable.publish',
+    'teaching.manage',
+    'fixed_slot.manage',
+    'timetable_scope.manage',
+    'import.run',
+    'readiness.view',
+  ],
   exam_coordinator: READ_ONLY,
-  faculty: READ_ONLY,
+  faculty: [...READ_ONLY, 'faculty.availability.edit'],
   student: ['institute.view', 'timetable.view'],
 };
 

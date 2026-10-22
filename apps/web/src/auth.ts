@@ -49,7 +49,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
     // @auth/prisma-adapter's types target @prisma/client generally; ours is the same client.
     adapter: PrismaAdapter(prisma()),
     providers,
-    session: { strategy: 'database' },
+    // Stay signed in for about a semester; each visit (at most once a day) restarts the count.
+    session: { strategy: 'database', maxAge: 180 * 24 * 60 * 60, updateAge: 24 * 60 * 60 },
     trustHost: true,
     pages: { signIn: '/sign-in', verifyRequest: '/check-email', error: '/sign-in' },
     callbacks: {

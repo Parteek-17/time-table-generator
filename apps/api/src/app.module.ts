@@ -1,14 +1,17 @@
 import { Module, type DynamicModule } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { AuditService } from './audit/audit.service';
+import { AcademicsModule } from './academics/academics.module';
 import { AuthGuard } from './auth/auth.guard';
-import { ENV, type Env } from './config/env';
-import { PrismaService } from './db/prisma.service';
-import { DepartmentsController } from './departments/departments.controller';
+import { CalendarModule } from './calendar/calendar.module';
+import { CohortsModule } from './cohorts/cohorts.module';
+import type { Env } from './config/env';
+import { CoreModule } from './core/core.module';
+import { FacultyModule } from './faculty/faculty.module';
 import { HealthController } from './health/health.controller';
+import { InfrastructureModule } from './infrastructure/infrastructure.module';
+import { InstituteModule } from './institute/institute.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
-import { MailService } from './mail/mail.service';
 import { InstituteController } from './me/institute.controller';
 import { MeController } from './me/me.controller';
 import { MembersController } from './members/members.controller';
@@ -20,19 +23,23 @@ export class AppModule {
   static forRoot(env: Env): DynamicModule {
     return {
       module: AppModule,
+      imports: [
+        CoreModule.forRoot(env),
+        InstituteModule,
+        AcademicsModule,
+        CohortsModule,
+        FacultyModule,
+        InfrastructureModule,
+        CalendarModule,
+      ],
       controllers: [
         HealthController,
         InstituteController,
         MeController,
-        DepartmentsController,
         MembersController,
         InvitesController,
       ],
       providers: [
-        { provide: ENV, useValue: env },
-        PrismaService,
-        AuditService,
-        MailService,
         MembersService,
         InvitesService,
         // Order matters: sign-in first, then institute + membership + permission.

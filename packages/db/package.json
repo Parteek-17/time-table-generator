@@ -30,7 +30,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@prisma/client": "6.19.3"
+    "@prisma/client": "6.19.3",
+    "@slotwise/shared": "workspace:*"
   },
   "devDependencies": {
     "@slotwise/config": "workspace:*",

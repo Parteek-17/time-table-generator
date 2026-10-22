@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { PrismaClient } from '@slotwise/db';
+import { PrismaClient, purgeInstitute } from '@slotwise/db';
 import { API_JWT_AUDIENCE, API_JWT_ISSUER, type Role } from '@slotwise/shared';
 import { SignJWT } from 'jose';
 import { AppModule } from '../src/app.module';
@@ -103,12 +103,10 @@ export class Fixtures {
   }
 
   async cleanup(): Promise<void> {
-    const where = { instituteId: { in: this.instituteIds } };
-    await this.owner.auditLog.deleteMany({ where });
-    await this.owner.invite.deleteMany({ where });
     await this.owner.membership.deleteMany({ where: { userId: { in: this.userIds } } });
-    await this.owner.department.deleteMany({ where });
-    await this.owner.institute.deleteMany({ where: { id: { in: this.instituteIds } } });
+    for (const id of this.instituteIds) {
+      await purgeInstitute(this.owner, id, { includeInstitute: true });
+    }
     await this.owner.user.deleteMany({ where: { id: { in: this.userIds } } });
     await this.owner.$disconnect();
   }
