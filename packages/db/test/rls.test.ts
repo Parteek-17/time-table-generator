@@ -6,7 +6,13 @@
  */
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { PrismaClient, withTenant } from '../src/index';
+import {
+  buildSampleInstitute,
+  PrismaClient,
+  purgeInstitute,
+  TENANT_TABLES_DELETE_ORDER,
+  withTenant,
+} from '../src/index';
 
 try {
   process.loadEnvFile('.env');
@@ -76,15 +82,14 @@ beforeAll(async () => {
       data: { instituteId: inst.id, name: 'Test Dept', code: `T${suffix}` },
     });
   }
-});
+  // Phase 1 master data in institute A, so every tenant table has rows to hide from B.
+  await owner.$transaction((tx) => buildSampleInstitute(tx, instA.id), { timeout: 120_000 });
+}, 180_000);
 
 afterAll(async () => {
-  const instituteIds = [ids.instA, ids.instB].filter(Boolean);
-  await owner.auditLog.deleteMany({ where: { instituteId: { in: instituteIds } } });
-  await owner.invite.deleteMany({ where: { instituteId: { in: instituteIds } } });
-  await owner.membership.deleteMany({ where: { instituteId: { in: instituteIds } } });
-  await owner.department.deleteMany({ where: { instituteId: { in: instituteIds } } });
-  await owner.institute.deleteMany({ where: { id: { in: instituteIds } } });
+  for (const id of [ids.instA, ids.instB].filter(Boolean)) {
+    await purgeInstitute(owner, id, { includeInstitute: true });
+  }
   await owner.user.deleteMany({ where: { id: { in: [ids.userA, ids.userB].filter(Boolean) } } });
   await Promise.all([owner.$disconnect(), app.$disconnect()]);
 });
@@ -171,6 +176,60 @@ describe('row-level security (as slotwise_app)', () => {
         (tx) => tx.$executeRaw`DELETE FROM audit_logs`,
       ),
     ).rejects.toThrow(/permission denied/);
+  });
+
+  it('every table with institute_id has row-level security and a policy', async () => {
+    const tables = await owner.$queryRaw<{ table: string; rls: boolean; policies: number }[]>`
+      SELECT c.relname AS table, c.relrowsecurity AS rls,
+             (SELECT count(*)::int FROM pg_policies p WHERE p.tablename = c.relname) AS policies
+        FROM pg_class c
+        JOIN pg_namespace n ON n.oid = c.relnamespace AND n.nspname = 'public'
+       WHERE c.relkind = 'r'
+         AND EXISTS (SELECT 1 FROM information_schema.columns col
+                      WHERE col.table_schema = 'public' AND col.table_name = c.relname
+                        AND col.column_name = 'institute_id')
+       ORDER BY c.relname`;
+    expect(tables.length).toBeGreaterThan(40);
+    const unprotected = tables.filter((t) => !t.rls || t.policies === 0).map((t) => t.table);
+    expect(unprotected).toEqual([]);
+    // purgeInstitute() must know every tenant table, or tests leave rows behind.
+    expect([...TENANT_TABLES_DELETE_ORDER].sort()).toEqual(tables.map((t) => t.table).sort());
+  });
+
+  it("no tenant table shows another institute's rows, even to raw SQL", async () => {
+    const leaks: string[] = [];
+    let filled = 0;
+    for (const table of TENANT_TABLES_DELETE_ORDER) {
+      const [own, other] = await withTenant(app, { instituteId: ids.instA, userId: null }, (tx) =>
+        Promise.all([
+          tx.$queryRawUnsafe<{ n: number }[]>(`SELECT count(*)::int AS n FROM "${table}"`),
+          tx.$queryRawUnsafe<{ n: number }[]>(
+            `SELECT count(*)::int AS n FROM "${table}" WHERE institute_id <> $1::uuid`,
+            ids.instA,
+          ),
+        ]),
+      );
+      const fromB = await withTenant(app, { instituteId: ids.instB, userId: null }, (tx) =>
+        tx.$queryRawUnsafe<{ n: number }[]>(
+          `SELECT count(*)::int AS n FROM "${table}" WHERE institute_id = $1::uuid`,
+          ids.instA,
+        ),
+      );
+      if (own[0]!.n > 0) filled++;
+      // memberships also shows the user's own rows elsewhere (userId is null here).
+      if (other[0]!.n > 0 || fromB[0]!.n > 0) leaks.push(table);
+    }
+    expect(leaks).toEqual([]);
+    // The sample fills most tables, so the check above is not vacuous.
+    expect(filled).toBeGreaterThan(30);
+  });
+
+  it('cannot create master data in another institute', async () => {
+    await expect(
+      withTenant(app, { instituteId: ids.instA, userId: ids.userA }, (tx) =>
+        tx.building.create({ data: { instituteId: ids.instB, name: `Evil ${suffix}` } }),
+      ),
+    ).rejects.toThrow(/row-level security/);
   });
 
   it('turning row security off is refused', async () => {
