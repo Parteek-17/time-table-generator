@@ -12,6 +12,21 @@ const envSchema = z.object({
   EMAIL_FROM: z.string().min(1),
   WEB_URL_TEMPLATE: z.string().includes('{slug}').default('http://{slug}.localhost:3000'),
   INVITE_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  /** BullMQ (apps/api/src/queue). The path picks the Redis database, e.g. redis://host:6379/3. */
+  REDIS_URL: z.string().url().default('redis://localhost:6379'),
+  /** Python solver (services/solver). Called from jobs only, never inside a request. */
+  SOLVER_URL: z.string().url().default('http://localhost:8000'),
+  /** S3-compatible storage for imports and generated PDFs. Local dev: MinIO (docker compose). */
+  S3_ENDPOINT: z.string().url().optional(),
+  S3_REGION: z.string().default('us-east-1'),
+  S3_BUCKET: z.string().optional(),
+  S3_ACCESS_KEY_ID: z.string().optional(),
+  S3_SECRET_ACCESS_KEY: z.string().optional(),
+  /** MinIO needs path-style URLs (http://host:9000/bucket/key). */
+  S3_FORCE_PATH_STYLE: z
+    .enum(['true', 'false', '1', '0'])
+    .default('false')
+    .transform((v) => v === 'true' || v === '1'),
 });
 
 export type Env = z.infer<typeof envSchema>;
