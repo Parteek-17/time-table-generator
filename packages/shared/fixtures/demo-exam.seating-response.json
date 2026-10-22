@@ -1,0 +1,1517 @@
+{
+  "version": "solver-seating.v1",
+  "requestId": "fixture-demo-exam",
+  "status": "INFEASIBLE",
+  "solveSeconds": 0.2,
+  "seats": [
+    {
+      "studentId": "575072e4-ba1e-596d-85c8-5049c759d73f",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 1,
+      "label": "G11-R1-C1"
+    },
+    {
+      "studentId": "25d3e6a1-1265-5028-9d3f-d413687317a5",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 2,
+      "label": "G11-R1-C2"
+    },
+    {
+      "studentId": "eb160a17-5dbe-522c-a022-f3162a893001",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 3,
+      "label": "G11-R1-C3"
+    },
+    {
+      "studentId": "70260bb8-6f3b-5772-9ec9-7574d7df8744",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 4,
+      "label": "G11-R1-C4"
+    },
+    {
+      "studentId": "8eb628ec-5569-5648-9217-1411b1f549e5",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 5,
+      "label": "G11-R1-C5"
+    },
+    {
+      "studentId": "852bfac5-81be-5cf3-899d-d046184204a8",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 1,
+      "column": 6,
+      "label": "G11-R1-C6"
+    },
+    {
+      "studentId": "0465f9f0-40d7-50b4-8bfb-988c8d519346",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 1,
+      "label": "G11-R2-C1"
+    },
+    {
+      "studentId": "8966e9e8-7fdc-5129-a57f-00bdb04e833c",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 2,
+      "label": "G11-R2-C2"
+    },
+    {
+      "studentId": "2d9ac76c-9bf2-537e-88dc-37fbe52b6c74",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 3,
+      "label": "G11-R2-C3"
+    },
+    {
+      "studentId": "6323ff58-edd7-5230-a60a-cc3e4159c810",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 4,
+      "label": "G11-R2-C4"
+    },
+    {
+      "studentId": "e242f108-504e-52a4-8300-9c054bd63c83",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 5,
+      "label": "G11-R2-C5"
+    },
+    {
+      "studentId": "de40cf9f-2278-5c5f-b538-cda02dc209de",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 2,
+      "column": 6,
+      "label": "G11-R2-C6"
+    },
+    {
+      "studentId": "916c1854-e7fa-5f73-a92f-3ab479f7b6d6",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 1,
+      "label": "G11-R3-C1"
+    },
+    {
+      "studentId": "addff80b-8b23-5078-a1c7-f84ff8ac58c2",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 2,
+      "label": "G11-R3-C2"
+    },
+    {
+      "studentId": "5b0e6bd3-dd5b-50a4-90c3-c5c9f684ad61",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 3,
+      "label": "G11-R3-C3"
+    },
+    {
+      "studentId": "a11ccb30-67df-5463-8bc5-60aefce2100e",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 4,
+      "label": "G11-R3-C4"
+    },
+    {
+      "studentId": "b0401e80-477f-5ba3-9db5-6952dcc97a12",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 5,
+      "label": "G11-R3-C5"
+    },
+    {
+      "studentId": "079b36fe-8031-5d9a-8e2b-f3049a2ef3aa",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 3,
+      "column": 6,
+      "label": "G11-R3-C6"
+    },
+    {
+      "studentId": "e34ce3aa-be0b-5983-9582-79368897550e",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 1,
+      "label": "G11-R4-C1"
+    },
+    {
+      "studentId": "d48da553-6e22-5575-ba62-a7cf97b8d45d",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 2,
+      "label": "G11-R4-C2"
+    },
+    {
+      "studentId": "ffd68398-aaf2-5add-8b9f-56228df5a32c",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 3,
+      "label": "G11-R4-C3"
+    },
+    {
+      "studentId": "e8ab9a24-044c-5270-8cda-664da9f5728e",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 4,
+      "label": "G11-R4-C4"
+    },
+    {
+      "studentId": "639f577b-5ae6-54f0-a7aa-0d120c5f1d98",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 5,
+      "label": "G11-R4-C5"
+    },
+    {
+      "studentId": "fcac4235-b5a3-5edf-b33a-34eb0ca17aeb",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 4,
+      "column": 6,
+      "label": "G11-R4-C6"
+    },
+    {
+      "studentId": "46eb676b-4793-5b70-96b3-d21ead583b5e",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 1,
+      "label": "G11-R5-C1"
+    },
+    {
+      "studentId": "70fab4be-cfa0-56af-a22b-52cddede452f",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 2,
+      "label": "G11-R5-C2"
+    },
+    {
+      "studentId": "9b7157b5-49a5-59c6-8f64-a8b033b95205",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 3,
+      "label": "G11-R5-C3"
+    },
+    {
+      "studentId": "ab8cac9b-c803-5a3e-8e22-87a0c4cec7bf",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 4,
+      "label": "G11-R5-C4"
+    },
+    {
+      "studentId": "b059bdde-3ca8-5afa-ba0e-774bd217f4e7",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 5,
+      "label": "G11-R5-C5"
+    },
+    {
+      "studentId": "c673abc7-35d3-5c75-a201-51eb0b9f59f8",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 5,
+      "column": 6,
+      "label": "G11-R5-C6"
+    },
+    {
+      "studentId": "e4f35e3c-6daa-504f-9ecb-765545a833b2",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 1,
+      "label": "G11-R6-C1"
+    },
+    {
+      "studentId": "a46d7744-abee-5ffb-8eff-cb2eabfcf56b",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 2,
+      "label": "G11-R6-C2"
+    },
+    {
+      "studentId": "a01d3ad9-ecd9-57d7-a665-5f16d695b082",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 3,
+      "label": "G11-R6-C3"
+    },
+    {
+      "studentId": "6b80c5ec-a1a3-5776-a87f-ae97135d2949",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 4,
+      "label": "G11-R6-C4"
+    },
+    {
+      "studentId": "180327de-1fc6-5d80-9cc6-4bfc5f12aeb7",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 5,
+      "label": "G11-R6-C5"
+    },
+    {
+      "studentId": "9e3eba71-b44c-586a-b3db-74d34aa9a868",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 6,
+      "column": 6,
+      "label": "G11-R6-C6"
+    },
+    {
+      "studentId": "44e8a7e7-7dfd-5531-aabc-a9809380d152",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 1,
+      "label": "G11-R7-C1"
+    },
+    {
+      "studentId": "b9225bbd-e26c-5ae9-b5a5-54719f634536",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 2,
+      "label": "G11-R7-C2"
+    },
+    {
+      "studentId": "4987d73f-10a9-52d5-82ef-5b1d2c44f859",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 3,
+      "label": "G11-R7-C3"
+    },
+    {
+      "studentId": "ca41654f-e493-5e03-9fe3-3f0c10b35dc4",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 4,
+      "label": "G11-R7-C4"
+    },
+    {
+      "studentId": "f20e6d1e-9bf4-5053-ae26-340e96078400",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 5,
+      "label": "G11-R7-C5"
+    },
+    {
+      "studentId": "7b253b78-d91d-5be2-99c4-84c5d36bafd4",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 7,
+      "column": 6,
+      "label": "G11-R7-C6"
+    },
+    {
+      "studentId": "d64b11a2-3b0a-51cf-a293-1e83c78171fe",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 1,
+      "label": "G11-R8-C1"
+    },
+    {
+      "studentId": "a9240841-eec8-5060-977d-ac899ff8a569",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 2,
+      "label": "G11-R8-C2"
+    },
+    {
+      "studentId": "236d6372-9544-5ec1-b62f-c1c2b1675f22",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 3,
+      "label": "G11-R8-C3"
+    },
+    {
+      "studentId": "764e2539-e43d-5240-b4a7-2d9a3b52d9c2",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 4,
+      "label": "G11-R8-C4"
+    },
+    {
+      "studentId": "3b73a7d1-cbd8-5142-88ed-e0c2e3afa166",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 5,
+      "label": "G11-R8-C5"
+    },
+    {
+      "studentId": "9e914969-dee1-5894-be14-5964231a87e9",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 8,
+      "column": 6,
+      "label": "G11-R8-C6"
+    },
+    {
+      "studentId": "6b8bbfa1-c3df-51f2-a362-4e67dcaa07e2",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 1,
+      "label": "G11-R9-C1"
+    },
+    {
+      "studentId": "ce310461-7887-573d-9635-0cafe57c9be0",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 2,
+      "label": "G11-R9-C2"
+    },
+    {
+      "studentId": "9c64f891-9265-5b36-939a-a41f0006c9e5",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 3,
+      "label": "G11-R9-C3"
+    },
+    {
+      "studentId": "37cab17c-d8a0-556e-bd08-9e2776e4947c",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 4,
+      "label": "G11-R9-C4"
+    },
+    {
+      "studentId": "14bb2aa3-0730-573d-8202-e37d48ff9d52",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 5,
+      "label": "G11-R9-C5"
+    },
+    {
+      "studentId": "a6b3e116-878e-5ea8-bf7f-5261865efee8",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 9,
+      "column": 6,
+      "label": "G11-R9-C6"
+    },
+    {
+      "studentId": "b3402324-064c-5c7d-aeb0-6dcc55331e33",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 1,
+      "label": "G11-R10-C1"
+    },
+    {
+      "studentId": "e9e86077-64f0-51b1-ac69-e51f6e6081f8",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 2,
+      "label": "G11-R10-C2"
+    },
+    {
+      "studentId": "6db8477e-d353-5d09-a815-e6eefc883bcf",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 3,
+      "label": "G11-R10-C3"
+    },
+    {
+      "studentId": "85946d70-b407-561d-92d7-8daa4803d108",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 4,
+      "label": "G11-R10-C4"
+    },
+    {
+      "studentId": "37409ac1-cd25-584b-a715-b4428845b0d0",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 5,
+      "label": "G11-R10-C5"
+    },
+    {
+      "studentId": "db406bbb-b13e-5827-966d-8e28e4dfc825",
+      "paperId": "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 10,
+      "column": 6,
+      "label": "G11-R10-C6"
+    },
+    {
+      "studentId": "8ee406f1-5c4b-5f11-8935-0b13db7d4d29",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 11,
+      "column": 2,
+      "label": "G11-R11-C2"
+    },
+    {
+      "studentId": "de73f34a-1435-5908-a8e4-b618445d6c9e",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 11,
+      "column": 4,
+      "label": "G11-R11-C4"
+    },
+    {
+      "studentId": "65b94da2-36e4-51fa-89f5-bc46556a52fc",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 11,
+      "column": 6,
+      "label": "G11-R11-C6"
+    },
+    {
+      "studentId": "731206f3-2514-5c90-a5b9-fc265f4ec19d",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 12,
+      "column": 1,
+      "label": "G11-R12-C1"
+    },
+    {
+      "studentId": "a5fa157f-dd8f-5e4c-a168-9b34c28a08ae",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 12,
+      "column": 3,
+      "label": "G11-R12-C3"
+    },
+    {
+      "studentId": "f2eb5489-82cc-5d12-b59c-15aa7edf2d48",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "row": 12,
+      "column": 5,
+      "label": "G11-R12-C5"
+    },
+    {
+      "studentId": "9af4091c-7e72-506f-95a9-0595e9a7845b",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 1,
+      "column": 2,
+      "label": "G12-R1-C2"
+    },
+    {
+      "studentId": "b9002bee-8130-5871-a776-2f7374c96831",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 1,
+      "column": 4,
+      "label": "G12-R1-C4"
+    },
+    {
+      "studentId": "2119afed-3ced-573c-ba58-75e0fdee920b",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 1,
+      "column": 6,
+      "label": "G12-R1-C6"
+    },
+    {
+      "studentId": "b8b8f142-99d0-56ee-9759-635e9621d91e",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 2,
+      "column": 1,
+      "label": "G12-R2-C1"
+    },
+    {
+      "studentId": "a9d79712-bcb9-5f0b-bc6b-d7a0870606bf",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 2,
+      "column": 3,
+      "label": "G12-R2-C3"
+    },
+    {
+      "studentId": "ccfd973a-e38f-549d-a34d-9b0e6f12e26f",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 2,
+      "column": 5,
+      "label": "G12-R2-C5"
+    },
+    {
+      "studentId": "ce64072b-e4b4-5e16-879d-541fbe900d53",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 3,
+      "column": 2,
+      "label": "G12-R3-C2"
+    },
+    {
+      "studentId": "fe4d5c22-a02e-50ba-912e-693eabbe7956",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 3,
+      "column": 4,
+      "label": "G12-R3-C4"
+    },
+    {
+      "studentId": "6b2a9dcf-1c59-5963-8d96-88e42ead2610",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 3,
+      "column": 6,
+      "label": "G12-R3-C6"
+    },
+    {
+      "studentId": "3a632e5c-f146-55ac-8e95-24b96429cd9b",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 4,
+      "column": 1,
+      "label": "G12-R4-C1"
+    },
+    {
+      "studentId": "05a201c2-1fc7-566e-820d-06a461ab8a1d",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 4,
+      "column": 3,
+      "label": "G12-R4-C3"
+    },
+    {
+      "studentId": "8e4346bb-2525-59e9-bb8c-ed22bce4b8fe",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 4,
+      "column": 5,
+      "label": "G12-R4-C5"
+    },
+    {
+      "studentId": "8959e48d-6f1e-5dba-9271-dfcaac2ba85a",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 5,
+      "column": 2,
+      "label": "G12-R5-C2"
+    },
+    {
+      "studentId": "dad6e622-47b7-51c6-aded-85f110be6ef8",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 5,
+      "column": 4,
+      "label": "G12-R5-C4"
+    },
+    {
+      "studentId": "30b3be7e-15ea-556a-880b-47624a46e43b",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 5,
+      "column": 6,
+      "label": "G12-R5-C6"
+    },
+    {
+      "studentId": "0512a39d-2e95-53e9-81d5-5866894fbe42",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 6,
+      "column": 1,
+      "label": "G12-R6-C1"
+    },
+    {
+      "studentId": "7775793e-6c79-52d9-a979-74e9e76ecfd9",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 6,
+      "column": 3,
+      "label": "G12-R6-C3"
+    },
+    {
+      "studentId": "0cf8216d-57b2-56d5-aeac-82439f41979a",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 6,
+      "column": 5,
+      "label": "G12-R6-C5"
+    },
+    {
+      "studentId": "a4bc3e95-264d-587f-b3bd-ceb66e6531a3",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 7,
+      "column": 2,
+      "label": "G12-R7-C2"
+    },
+    {
+      "studentId": "3fe77dea-0e5a-5e93-b725-1e96a86997e5",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 7,
+      "column": 4,
+      "label": "G12-R7-C4"
+    },
+    {
+      "studentId": "2efa5525-2e8a-5600-9276-8d7fbd87a702",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 7,
+      "column": 6,
+      "label": "G12-R7-C6"
+    },
+    {
+      "studentId": "9ec26d2d-56fc-5779-b579-500aa0ba850a",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 8,
+      "column": 1,
+      "label": "G12-R8-C1"
+    },
+    {
+      "studentId": "b04f3f60-88b3-57b3-8381-3b6c552e2efb",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 8,
+      "column": 3,
+      "label": "G12-R8-C3"
+    },
+    {
+      "studentId": "5e051347-4038-517c-b22e-c7050a0308a7",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 8,
+      "column": 5,
+      "label": "G12-R8-C5"
+    },
+    {
+      "studentId": "c28f364c-0397-55b1-b807-238442feb4fe",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 9,
+      "column": 2,
+      "label": "G12-R9-C2"
+    },
+    {
+      "studentId": "fd7a2613-7a6e-5ef1-acbb-64b3258f7a72",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 9,
+      "column": 4,
+      "label": "G12-R9-C4"
+    },
+    {
+      "studentId": "0b57a67b-8435-5997-8c68-bcdf70b6f236",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 9,
+      "column": 6,
+      "label": "G12-R9-C6"
+    },
+    {
+      "studentId": "bd5ed409-d17c-5d25-b05e-5fa8ec9607e0",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 10,
+      "column": 1,
+      "label": "G12-R10-C1"
+    },
+    {
+      "studentId": "25d3e7b2-9823-533e-ab29-887be920e86a",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 10,
+      "column": 3,
+      "label": "G12-R10-C3"
+    },
+    {
+      "studentId": "d27dce07-7467-5485-93cb-8c33b47c40d2",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 10,
+      "column": 5,
+      "label": "G12-R10-C5"
+    },
+    {
+      "studentId": "6a3096d1-c8f0-5d36-aafe-13f968b81e73",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 11,
+      "column": 2,
+      "label": "G12-R11-C2"
+    },
+    {
+      "studentId": "8aaada6a-e399-551f-9287-977bf1426a1e",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 11,
+      "column": 4,
+      "label": "G12-R11-C4"
+    },
+    {
+      "studentId": "8dc3c640-e221-51ea-8f42-ec8844d93809",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 11,
+      "column": 6,
+      "label": "G12-R11-C6"
+    },
+    {
+      "studentId": "a187de0b-dd42-5699-b2a4-3e29b3d3892d",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 12,
+      "column": 1,
+      "label": "G12-R12-C1"
+    },
+    {
+      "studentId": "8dac700d-0387-5a62-bc52-8efb3061f329",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 12,
+      "column": 3,
+      "label": "G12-R12-C3"
+    },
+    {
+      "studentId": "703090f8-a7e8-5e46-a16d-0d670805d794",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "row": 12,
+      "column": 5,
+      "label": "G12-R12-C5"
+    },
+    {
+      "studentId": "b6865d29-0525-5dd1-b94b-3107c8bcd112",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 1,
+      "column": 2,
+      "label": "G13-R1-C2"
+    },
+    {
+      "studentId": "c29af8cb-cd0d-5617-9a98-5e11d07ab668",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 1,
+      "column": 4,
+      "label": "G13-R1-C4"
+    },
+    {
+      "studentId": "a3743f1b-52ce-5e64-9474-2b5024477007",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 1,
+      "column": 6,
+      "label": "G13-R1-C6"
+    },
+    {
+      "studentId": "16741deb-b2c3-5336-ab12-ddbe69fe0b40",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 2,
+      "column": 1,
+      "label": "G13-R2-C1"
+    },
+    {
+      "studentId": "ba25d03e-b76b-5791-bfd7-6a64e1425258",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 2,
+      "column": 3,
+      "label": "G13-R2-C3"
+    },
+    {
+      "studentId": "de9b93d7-8600-5343-b7a8-5b1ab33542ee",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 2,
+      "column": 5,
+      "label": "G13-R2-C5"
+    },
+    {
+      "studentId": "29a7903c-39ed-5fff-82f0-31628ac28a64",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 3,
+      "column": 2,
+      "label": "G13-R3-C2"
+    },
+    {
+      "studentId": "9a901444-2a31-5d61-b567-dcb5d76ad848",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 3,
+      "column": 4,
+      "label": "G13-R3-C4"
+    },
+    {
+      "studentId": "817883af-459b-5985-8f65-b2b85bf5064d",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 3,
+      "column": 6,
+      "label": "G13-R3-C6"
+    },
+    {
+      "studentId": "5e9e1707-9325-5733-a9b1-6246456e97aa",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 4,
+      "column": 1,
+      "label": "G13-R4-C1"
+    },
+    {
+      "studentId": "e7215774-7653-530a-943a-a2c990502de0",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 4,
+      "column": 3,
+      "label": "G13-R4-C3"
+    },
+    {
+      "studentId": "39b78937-39b6-593d-b212-22577071aaed",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 4,
+      "column": 5,
+      "label": "G13-R4-C5"
+    },
+    {
+      "studentId": "b167015b-4681-5a53-9733-579db90d8b94",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 5,
+      "column": 2,
+      "label": "G13-R5-C2"
+    },
+    {
+      "studentId": "e6fba40f-4422-540e-8861-3c0d4b7addfd",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 5,
+      "column": 4,
+      "label": "G13-R5-C4"
+    },
+    {
+      "studentId": "f29ecc44-fdd6-5321-8329-dc4a6166d9cd",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 5,
+      "column": 6,
+      "label": "G13-R5-C6"
+    },
+    {
+      "studentId": "f766e751-8ac5-54e5-999b-6140234b1d03",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 6,
+      "column": 1,
+      "label": "G13-R6-C1"
+    },
+    {
+      "studentId": "2fadfd3e-4b5a-5b32-8c4a-0d0a20517245",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 6,
+      "column": 3,
+      "label": "G13-R6-C3"
+    },
+    {
+      "studentId": "f156e9c5-cfc4-5c47-8da3-b9a7044d8eed",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 6,
+      "column": 5,
+      "label": "G13-R6-C5"
+    },
+    {
+      "studentId": "7edcf2b7-fc72-5180-982d-87a010e5b47a",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 7,
+      "column": 2,
+      "label": "G13-R7-C2"
+    },
+    {
+      "studentId": "6a830d36-dffd-5ef3-b866-f39b266ddea0",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 7,
+      "column": 4,
+      "label": "G13-R7-C4"
+    },
+    {
+      "studentId": "88602601-238f-5bdf-9330-6997ce686b39",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 7,
+      "column": 6,
+      "label": "G13-R7-C6"
+    },
+    {
+      "studentId": "6ee52a5b-2885-513c-a88d-2be087ed58ed",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 8,
+      "column": 1,
+      "label": "G13-R8-C1"
+    },
+    {
+      "studentId": "014c4deb-f37f-5dd3-9d08-49cb206a7fc3",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 8,
+      "column": 3,
+      "label": "G13-R8-C3"
+    },
+    {
+      "studentId": "1565de01-f062-58c7-ae06-85285f8685ab",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 8,
+      "column": 5,
+      "label": "G13-R8-C5"
+    },
+    {
+      "studentId": "c8c694a0-4971-5253-b2dc-324f6ee17efa",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 9,
+      "column": 2,
+      "label": "G13-R9-C2"
+    },
+    {
+      "studentId": "52fda9eb-d394-56af-ac8e-4c6d03c5a440",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 9,
+      "column": 4,
+      "label": "G13-R9-C4"
+    },
+    {
+      "studentId": "e34cc699-e44b-525e-afc4-e31da8a5628f",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 9,
+      "column": 6,
+      "label": "G13-R9-C6"
+    },
+    {
+      "studentId": "17594d4c-f838-5f2e-9f59-93497ccd08c3",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 10,
+      "column": 1,
+      "label": "G13-R10-C1"
+    },
+    {
+      "studentId": "4633ff1d-c520-56d2-9f8f-922058dbc740",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 10,
+      "column": 3,
+      "label": "G13-R10-C3"
+    },
+    {
+      "studentId": "47914bc3-b6ea-5f6b-8df1-4a69b374baf1",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 10,
+      "column": 5,
+      "label": "G13-R10-C5"
+    },
+    {
+      "studentId": "b2caaea2-ed1c-5bc8-a02b-30ec820a9aee",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 11,
+      "column": 2,
+      "label": "G13-R11-C2"
+    },
+    {
+      "studentId": "64f32aae-51e5-5c37-9e85-f270b1f70084",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 11,
+      "column": 4,
+      "label": "G13-R11-C4"
+    },
+    {
+      "studentId": "09cf84f1-f74a-5f26-aae2-59b8b81a7568",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 11,
+      "column": 6,
+      "label": "G13-R11-C6"
+    },
+    {
+      "studentId": "8453dd1e-d064-580e-9f4f-8725a958808b",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 12,
+      "column": 1,
+      "label": "G13-R12-C1"
+    },
+    {
+      "studentId": "726f0384-4c5c-5b30-811f-cf3be1cc0e78",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 12,
+      "column": 3,
+      "label": "G13-R12-C3"
+    },
+    {
+      "studentId": "d9b4234d-fc3f-5859-8525-6861a1afbec7",
+      "paperId": "e60c5ca4-c449-56ee-8dee-e5569f34aaf7",
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "row": 12,
+      "column": 5,
+      "label": "G13-R12-C5"
+    }
+  ],
+  "unseated": [
+    {
+      "studentId": "aadfb647-7fff-5c67-ba63-05a8a096c072",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261139; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "c342c2f3-aa8b-5554-8c63-88cac2fb83ab",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261140; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "0c23cb06-db4b-5778-8dbe-ebe0b446caee",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261141; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "7335c22b-9822-5a8f-bb71-39f7edafba22",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261142; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "20f850d2-6020-5c27-ad8d-342e90431c1b",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261143; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "b3b04ae6-12bb-5cac-ad07-e217a95e8df1",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261144; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "66b5746d-f4ac-5487-953c-bba65cdecff6",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261145; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "b2ec64b5-5b60-54cf-b213-8eaa13295ec4",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261146; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "f2c9bd7e-646f-53a4-a329-a500b783a01b",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261147; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "13155eec-30fd-568a-886b-bcd5ec41305e",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261148; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "108ccd22-f612-5bbb-bae5-6ae700aa1803",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261149; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "c18ada69-ab21-5d7e-9692-c053c71242ba",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261150; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "4bfd3ab2-d39d-538d-83cf-df24f68b3d93",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261151; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "d133fc75-6858-5e9a-99d6-84dc08653d88",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261152; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "d86a9385-df92-5ca2-b2a0-eabff16cbad4",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261153; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "af399ea7-21dd-510b-b403-3a1b6dbd5429",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261154; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "0890b12c-1ee2-5a5d-8152-1098a70ba8ba",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261155; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "9e412401-ed20-5493-8146-af69aae4b544",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261156; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "77ec5fe2-e966-54a4-9c7a-249cbee4dbfa",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261157; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "0fc7711c-152a-5b3a-ace4-7013e442eea1",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261158; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "4968eeed-646b-59e9-b399-882f91f2a36a",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261159; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "925a6e2b-dcd6-5fe6-a32c-32cf207e28d2",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261160; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "2532d7aa-4e0f-56a4-add1-3db932aa7040",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261161; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "aead4263-7e8c-54f1-bf0a-b9f7c8f172f7",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261162; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "7e626e2f-ac48-5181-ae83-911b5fdab3bb",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261163; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "737c386c-4836-5a2a-9351-8ca78a506c10",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261164; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "7b83daa8-2e4d-540e-a594-f73a34e668f6",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261165; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "06130603-029f-590e-a3ca-e4f0827abb9c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261166; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "cc0c19fd-bd31-585d-896a-e6b0cd46cdca",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261167; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "7e2bb3bf-ea82-56b0-bb15-4ab9aeb116f6",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261168; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "aa9cb3df-9f6e-54dd-bda6-8eebb7535406",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261169; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "a9af0dca-ac0d-5a29-95d6-485f6db7969a",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261170; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "57d2525c-116f-5918-856f-19cf3d098e2c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261171; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "388ba6ca-856e-5b05-801c-df5228c0fe19",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261172; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "0517b821-d625-5f81-8472-35c11d44ca52",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261173; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "39151f00-dd7e-5a9d-9afa-617ece36570c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261174; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "24f15e4a-a68a-5576-be77-6b154a66968e",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261175; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "e35c8dab-e16c-5e9d-b072-85417fcdf5d4",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261176; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "9998b9cf-2ab2-5b04-8e95-2767ba2b9fd1",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261177; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "c88e481d-6b78-52f6-9287-c2410fdea87c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261178; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "206e1fea-bb98-58b0-b92c-47ddabafe22e",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261179; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "e251e4ca-786c-5fd1-957a-2f09f23b88e9",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261180; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "6683f8a2-2afd-5e14-b5ca-718b5a9e37f3",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261181; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "a7dfe0b9-0b6e-5934-9741-5885df467c30",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261182; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "1095d1bb-05fd-5fc2-b699-b3325905844c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261183; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "86fb8dca-c1b9-5417-ba51-0ff666fb44b1",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261184; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "fc2356bc-db9e-5d5e-ae1a-9ad10072478d",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261185; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "80df2ed8-412e-5eda-afeb-54e13775c6fe",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261186; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "92757ad8-2b43-57e3-ad10-c7cfb4c60630",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261187; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "94e0b757-8d7d-5c43-ad5d-52c48c0a0624",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261188; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "747ad9f6-f49e-5b83-9624-6a0bdc0a83c3",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261189; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "06ffcb0d-c5bf-56ec-8909-19e8d956ddab",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261190; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "8dd29ff3-86f0-5f59-8197-e90c02eade28",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261191; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "d8942dd6-a558-59d6-9421-eec21fb13496",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261192; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "f0a857b5-5d40-5190-9d48-1e101c1251ba",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261193; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "1be23dcc-66af-56d0-9889-66ed0c40c402",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261194; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "dab5d768-b573-5c92-b91b-7287aadf656f",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261195; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "120b8c36-2ffd-5895-91fc-7f0b6421b599",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261196; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "fe8747df-faf3-57a4-879b-9b1dede4c96b",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261197; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "3748efd8-6a15-5612-a238-1abe68fda982",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261198; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "6c827480-7b94-5759-afcd-ba2f12405361",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261199; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "3b3304d9-ed64-57fc-a8c6-71036a1a81cc",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261200; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "09909393-d52e-52a7-9e94-5ebf34f8b194",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261201; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "0ac3f987-a7bd-5784-a5df-3cdcefc132ea",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261202; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "2636fb62-c1c0-5656-af14-d341213ebd22",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261203; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "6d3fa789-d402-5e7f-9281-ef66ddd5bd9e",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261204; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "10e6eae8-f9c2-5ea0-afd2-37b0ab24c360",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261205; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "e6ef24f0-d143-5a18-972e-aa02b0c2c739",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261206; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "55de66c9-bfb6-53c3-bee1-05b348019ba6",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261207; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "f6bb5f39-fd66-5b27-9190-e50aa753fe90",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261208; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "9dc5e75a-05c9-56be-9b1a-a47ee9e8cad3",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261209; add a hall or reduce the reserve."
+    },
+    {
+      "studentId": "23d70857-f722-533e-9d1b-7a957fbb9a7c",
+      "reason": "not_enough_seats",
+      "message": "No seat left for roll no. 261210; add a hall or reduce the reserve."
+    }
+  ],
+  "halls": [
+    {
+      "hallId": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+      "capacity": 72,
+      "used": 66,
+      "reserved": 2,
+      "paperIds": [
+        "db33a09c-ca9c-5691-a4f0-7eac57980b78",
+        "e60c5ca4-c449-56ee-8dee-e5569f34aaf7"
+      ],
+      "invigilatorIds": [
+        "313b8c9b-6a9d-4fd4-8fa3-e6b10f908781",
+        "978c7475-3347-4821-abc9-970544f91055",
+        "7db8ce56-886a-412d-b129-ea6733676910"
+      ]
+    },
+    {
+      "hallId": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+      "capacity": 72,
+      "used": 36,
+      "reserved": 2,
+      "paperIds": [
+        "e60c5ca4-c449-56ee-8dee-e5569f34aaf7"
+      ],
+      "invigilatorIds": [
+        "2feabb56-d34b-4d33-b0e1-f7255c210df5",
+        "78a6d7fb-1fdc-4323-ab1a-bffd1392803a"
+      ]
+    },
+    {
+      "hallId": "b0480431-d1e9-4f26-ac16-63b89e45be5e",
+      "capacity": 72,
+      "used": 36,
+      "reserved": 2,
+      "paperIds": [
+        "e60c5ca4-c449-56ee-8dee-e5569f34aaf7"
+      ],
+      "invigilatorIds": [
+        "ae64b8e7-5a54-490a-8c27-dce1e40f2ebc"
+      ]
+    }
+  ],
+  "invigilationProblems": []
+}

@@ -1,0 +1,103 @@
+{
+  "contract": "portal-read.v1",
+  "date": "2026-08-10",
+  "timezone": "Asia/Kolkata",
+  "viewer": {
+    "role": "student",
+    "id": "8ee406f1-5c4b-5f11-8935-0b13db7d4d29",
+    "name": "Asha Verma",
+    "groupLabel": "CS B"
+  },
+  "holiday": null,
+  "nextClassId": "f16ec93c-0c60-570f-ab2f-42aa9e1e46c9",
+  "classes": [
+    {
+      "id": "f16ec93c-0c60-570f-ab2f-42aa9e1e46c9",
+      "kind": "regular",
+      "cancelled": false,
+      "cancelReason": null,
+      "startPeriodIndex": 2,
+      "length": 1,
+      "startMinute": 570,
+      "endMinute": 630,
+      "component": "tutorial",
+      "courseCode": "CS203",
+      "courseShortName": "DM",
+      "courseTitle": "Discrete Mathematics",
+      "roomCode": "G12",
+      "withWhom": "Ms. Ishita Grover"
+    },
+    {
+      "id": "41671cc6-a7ab-5cf3-9fe5-b6fd103e08f1",
+      "kind": "regular",
+      "cancelled": true,
+      "cancelReason": "Department seminar",
+      "startPeriodIndex": 3,
+      "length": 1,
+      "startMinute": 630,
+      "endMinute": 690,
+      "component": "lecture",
+      "courseCode": "EC202",
+      "courseShortName": "DE",
+      "courseTitle": "Digital Electronics",
+      "roomCode": "G14",
+      "withWhom": "Ms. Payal Suri"
+    },
+    {
+      "id": "79e98877-733a-5dbd-a725-0761c500aab0",
+      "kind": "regular",
+      "cancelled": false,
+      "cancelReason": null,
+      "startPeriodIndex": 4,
+      "length": 2,
+      "startMinute": 750,
+      "endMinute": 870,
+      "component": "practical",
+      "courseCode": "EC202",
+      "courseShortName": "DE",
+      "courseTitle": "Digital Electronics",
+      "roomCode": "HL-I LAB",
+      "withWhom": "Mr. Rahul Bhalla"
+    },
+    {
+      "id": "5b13bd61-01aa-5841-9088-4758299ad2ed",
+      "kind": "regular",
+      "cancelled": false,
+      "cancelReason": null,
+      "startPeriodIndex": 6,
+      "length": 1,
+      "startMinute": 870,
+      "endMinute": 930,
+      "component": "lecture",
+      "courseCode": "CS202",
+      "courseShortName": "OOP",
+      "courseTitle": "Object Oriented Programming",
+      "roomCode": "G12",
+      "withWhom": "Ms. Tanvi Bhatia"
+    },
+    {
+      "id": "f1c61b4a-349c-54d8-b798-c0445463f746",
+      "kind": "regular",
+      "cancelled": false,
+      "cancelReason": null,
+      "startPeriodIndex": 7,
+      "length": 1,
+      "startMinute": 930,
+      "endMinute": 990,
+      "component": "lecture",
+      "courseCode": "CS201",
+      "courseShortName": "DS",
+      "courseTitle": "Data Structures",
+      "roomCode": "S211",
+      "withWhom": "Mr. Vikram Toor"
+    }
+  ],
+  "changes": [
+    {
+      "kind": "cancelled",
+      "message": "EC202 DE at 10:30 is cancelled: Department seminar",
+      "classId": "41671cc6-a7ab-5cf3-9fe5-b6fd103e08f1"
+    }
+  ],
+  "examSeat": null
+}

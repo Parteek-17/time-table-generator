@@ -6,3 +6,6 @@ coverage
 services/solver
 packages/db/prisma/migrations
 CLAUDE.md
+
+# generated (pnpm fixtures:build, pnpm contracts:schemas)
+packages/shared/fixtures

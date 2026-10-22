@@ -2,17 +2,47 @@
   "name": "@slotwise/shared",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared domain types, zod schemas, roles and the can() authorization function.",
+  "description": "Shared domain types, zod schemas, roles, can(), feature flags and the contracts between streams.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./contracts": {
+      "types": "./dist/contracts/index.d.ts",
+      "default": "./dist/contracts/index.js"
+    },
+    "./timetable": {
+      "types": "./dist/timetable/index.d.ts",
+      "default": "./dist/timetable/index.js"
+    },
+    "./reschedule": {
+      "types": "./dist/reschedule/index.d.ts",
+      "default": "./dist/reschedule/index.js"
+    },
+    "./portal": {
+      "types": "./dist/portal/index.d.ts",
+      "default": "./dist/portal/index.js"
+    },
+    "./exams": {
+      "types": "./dist/exams/index.d.ts",
+      "default": "./dist/exams/index.js"
+    },
+    "./platform": {
+      "types": "./dist/platform/index.d.ts",
+      "default": "./dist/platform/index.js"
+    },
+    "./fixtures": {
+      "types": "./dist/fixtures/index.d.ts",
+      "default": "./dist/fixtures/index.js"
+    },
+    "./fixtures/*.json": "./fixtures/*.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "fixtures"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

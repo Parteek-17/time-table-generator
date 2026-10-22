@@ -1,0 +1,926 @@
+{
+  "contract": "timetable-read.v1",
+  "version": {
+    "id": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+    "termId": "a4e56987-6aee-419f-acd9-00028a1bcaf3",
+    "scopeId": null,
+    "number": 1,
+    "status": "published",
+    "publishedAt": "2026-07-20T10:00:00.000Z",
+    "publishedById": null,
+    "validFrom": "2026-07-27",
+    "validTo": null
+  },
+  "slots": [
+    {
+      "id": "f16ec93c-0c60-570f-ab2f-42aa9e1e46c9",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 1,
+      "startPeriodIndex": 2,
+      "length": 1,
+      "startMinute": 570,
+      "endMinute": 630,
+      "assignmentId": "0e14b723-c2e4-43f6-9e55-3fb167474828",
+      "component": "tutorial",
+      "course": {
+        "id": "4a98bfc4-0c19-4ff7-aa37-d761bb7a7f7f",
+        "code": "CS203",
+        "shortName": "DM",
+        "title": "Discrete Mathematics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "049998aa-1d7a-452f-97fa-2b61d120ee2e",
+          "name": "Ms. Ishita Grover",
+          "shortCode": "IG"
+        }
+      ],
+      "room": {
+        "id": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+        "code": "G12"
+      }
+    },
+    {
+      "id": "41671cc6-a7ab-5cf3-9fe5-b6fd103e08f1",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 1,
+      "startPeriodIndex": 3,
+      "length": 1,
+      "startMinute": 630,
+      "endMinute": 690,
+      "assignmentId": "1cbd8aec-6e3a-4f2b-9059-13bbca290dd1",
+      "component": "lecture",
+      "course": {
+        "id": "733d64d4-90fd-4435-9401-90b07160eff7",
+        "code": "EC202",
+        "shortName": "DE",
+        "title": "Digital Electronics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "dc164200-61b6-41d9-96c8-3e9a04e071b9",
+          "name": "Ms. Payal Suri",
+          "shortCode": "PS"
+        }
+      ],
+      "room": {
+        "id": "2fcee10e-1cb1-410c-8ee9-267cad0b9c4f",
+        "code": "G14"
+      }
+    },
+    {
+      "id": "79e98877-733a-5dbd-a725-0761c500aab0",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 1,
+      "startPeriodIndex": 4,
+      "length": 2,
+      "startMinute": 750,
+      "endMinute": 870,
+      "assignmentId": "4bf4eaec-2f79-4f23-84f2-483b21b948f5",
+      "component": "practical",
+      "course": {
+        "id": "733d64d4-90fd-4435-9401-90b07160eff7",
+        "code": "EC202",
+        "shortName": "DE",
+        "title": "Digital Electronics"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "826107a0-8735-491d-9e88-d4df3b80bd52",
+        "name": "CS B-B1"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "22a02f7c-f970-4a7c-b278-df3f4b94946a",
+          "name": "Mr. Rahul Bhalla",
+          "shortCode": "RB"
+        }
+      ],
+      "room": {
+        "id": "6e9c5fed-745e-4d89-a1a7-0bc2d0a3022b",
+        "code": "HL-I LAB"
+      }
+    },
+    {
+      "id": "5b13bd61-01aa-5841-9088-4758299ad2ed",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 1,
+      "startPeriodIndex": 6,
+      "length": 1,
+      "startMinute": 870,
+      "endMinute": 930,
+      "assignmentId": "38df3257-bc81-46ed-823a-c2a2809d0171",
+      "component": "lecture",
+      "course": {
+        "id": "f44db46d-e9f4-468d-8b97-c8323b9fa75a",
+        "code": "CS202",
+        "shortName": "OOP",
+        "title": "Object Oriented Programming"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "35eadac7-f074-4e2b-be12-154461689f63",
+          "name": "Ms. Tanvi Bhatia",
+          "shortCode": "TB"
+        }
+      ],
+      "room": {
+        "id": "b1b6c7a6-8865-4607-9dcf-8a491f561444",
+        "code": "G12"
+      }
+    },
+    {
+      "id": "f1c61b4a-349c-54d8-b798-c0445463f746",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 1,
+      "startPeriodIndex": 7,
+      "length": 1,
+      "startMinute": 930,
+      "endMinute": 990,
+      "assignmentId": "bef0954e-f95d-46d9-a5a8-146dcf77ac52",
+      "component": "lecture",
+      "course": {
+        "id": "9f1973dd-48da-4e98-a8f9-fb0fdbab5456",
+        "code": "CS201",
+        "shortName": "DS",
+        "title": "Data Structures"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "9f900d77-812d-47a0-9d0a-761f99655b8f",
+          "name": "Mr. Vikram Toor",
+          "shortCode": "VT"
+        }
+      ],
+      "room": {
+        "id": "f8748675-7537-411c-bad6-50e5bbf26451",
+        "code": "S211"
+      }
+    },
+    {
+      "id": "d07d4c3f-4890-5a62-8305-882cb9c6cd58",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 2,
+      "startPeriodIndex": 2,
+      "length": 1,
+      "startMinute": 570,
+      "endMinute": 630,
+      "assignmentId": "1cbd8aec-6e3a-4f2b-9059-13bbca290dd1",
+      "component": "lecture",
+      "course": {
+        "id": "733d64d4-90fd-4435-9401-90b07160eff7",
+        "code": "EC202",
+        "shortName": "DE",
+        "title": "Digital Electronics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "dc164200-61b6-41d9-96c8-3e9a04e071b9",
+          "name": "Ms. Payal Suri",
+          "shortCode": "PS"
+        }
+      ],
+      "room": {
+        "id": "64683a7c-0715-4104-923a-145cd7134970",
+        "code": "G16"
+      }
+    },
+    {
+      "id": "6d542e3a-36f1-5dff-8b8a-8f48543651ba",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 2,
+      "startPeriodIndex": 4,
+      "length": 1,
+      "startMinute": 750,
+      "endMinute": 810,
+      "assignmentId": "bef0954e-f95d-46d9-a5a8-146dcf77ac52",
+      "component": "lecture",
+      "course": {
+        "id": "9f1973dd-48da-4e98-a8f9-fb0fdbab5456",
+        "code": "CS201",
+        "shortName": "DS",
+        "title": "Data Structures"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "9f900d77-812d-47a0-9d0a-761f99655b8f",
+          "name": "Mr. Vikram Toor",
+          "shortCode": "VT"
+        }
+      ],
+      "room": {
+        "id": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+        "code": "G11"
+      }
+    },
+    {
+      "id": "cb8cdb18-463e-52f7-b725-195fca73eb73",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 2,
+      "startPeriodIndex": 5,
+      "length": 1,
+      "startMinute": 810,
+      "endMinute": 870,
+      "assignmentId": "7d96eb45-fd2c-44d0-9791-d941804e2865",
+      "component": "lecture",
+      "course": {
+        "id": "d810cf11-6359-44f4-9771-88dc021d3d1c",
+        "code": "AS202",
+        "shortName": "COI",
+        "title": "Constitution of India"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "2feabb56-d34b-4d33-b0e1-f7255c210df5",
+          "name": "Mr. Chetan Walia",
+          "shortCode": "CW"
+        }
+      ],
+      "room": {
+        "id": "0012002f-b232-4657-94b4-b49b5d368476",
+        "code": "S214"
+      }
+    },
+    {
+      "id": "6a2a4944-c934-52f4-8b36-b7968c640dd8",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 2,
+      "startPeriodIndex": 6,
+      "length": 1,
+      "startMinute": 870,
+      "endMinute": 930,
+      "assignmentId": "38df3257-bc81-46ed-823a-c2a2809d0171",
+      "component": "lecture",
+      "course": {
+        "id": "f44db46d-e9f4-468d-8b97-c8323b9fa75a",
+        "code": "CS202",
+        "shortName": "OOP",
+        "title": "Object Oriented Programming"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "35eadac7-f074-4e2b-be12-154461689f63",
+          "name": "Ms. Tanvi Bhatia",
+          "shortCode": "TB"
+        }
+      ],
+      "room": {
+        "id": "54e86200-3765-42dc-a70a-0aec2786b28d",
+        "code": "S213"
+      }
+    },
+    {
+      "id": "81608967-ac15-54ab-b575-18cdf26cdc0e",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 2,
+      "startPeriodIndex": 7,
+      "length": 2,
+      "startMinute": 930,
+      "endMinute": 1050,
+      "assignmentId": "3123b112-068b-417a-9ece-44993adf317e",
+      "component": "practical",
+      "course": {
+        "id": "f44db46d-e9f4-468d-8b97-c8323b9fa75a",
+        "code": "CS202",
+        "shortName": "OOP",
+        "title": "Object Oriented Programming"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "826107a0-8735-491d-9e88-d4df3b80bd52",
+        "name": "CS B-B1"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "c780a121-56e0-465b-8818-a28c7eb32c75",
+          "name": "Mr. Karan Malhotra",
+          "shortCode": "KM"
+        }
+      ],
+      "room": {
+        "id": "dd2f2868-afc3-41d6-aa1c-6ea7a956ad84",
+        "code": "SL-III LAB"
+      }
+    },
+    {
+      "id": "0ab74919-93cf-50ac-b4e7-4911f29ff5b2",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 1,
+      "length": 1,
+      "startMinute": 510,
+      "endMinute": 570,
+      "assignmentId": "0a187e78-37db-4597-9f6f-30304d29c29b",
+      "component": "lecture",
+      "course": {
+        "id": "2e4a1995-0678-414e-be70-e266e244d3df",
+        "code": "AS201",
+        "shortName": "Maths-III",
+        "title": "Engineering Mathematics-III"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "8bd4a638-4c5f-42a3-b677-637debc64ee3",
+          "name": "Dr. Meera Iyer",
+          "shortCode": "MI"
+        }
+      ],
+      "room": {
+        "id": "54e86200-3765-42dc-a70a-0aec2786b28d",
+        "code": "S213"
+      }
+    },
+    {
+      "id": "7048af7c-8ccf-58dc-bfc2-77bb0f628fa1",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 2,
+      "length": 1,
+      "startMinute": 570,
+      "endMinute": 630,
+      "assignmentId": "9f586c19-3806-4ccc-9d7b-9be2a43af8b3",
+      "component": "tutorial",
+      "course": {
+        "id": "2e4a1995-0678-414e-be70-e266e244d3df",
+        "code": "AS201",
+        "shortName": "Maths-III",
+        "title": "Engineering Mathematics-III"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "2baebc9b-5177-4941-b077-9647f8c4ea46",
+          "name": "Ms. Bhavna Arya",
+          "shortCode": "BA"
+        }
+      ],
+      "room": {
+        "id": "255253a9-b80b-4772-8b96-4d40e061ff17",
+        "code": "S212"
+      }
+    },
+    {
+      "id": "51729119-1f7e-58c0-8386-22a81a1cb9ab",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 4,
+      "length": 1,
+      "startMinute": 750,
+      "endMinute": 810,
+      "assignmentId": "cac3e57a-20fc-4868-bee8-c34ef42a8564",
+      "component": "lecture",
+      "course": {
+        "id": "4a98bfc4-0c19-4ff7-aa37-d761bb7a7f7f",
+        "code": "CS203",
+        "shortName": "DM",
+        "title": "Discrete Mathematics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "73338075-9df5-4735-ab46-c231b46f7b7f",
+          "name": "Mr. Dev Chawla",
+          "shortCode": "DC"
+        }
+      ],
+      "room": {
+        "id": "255253a9-b80b-4772-8b96-4d40e061ff17",
+        "code": "S212"
+      }
+    },
+    {
+      "id": "9865e5ed-fad5-5cd2-ad98-f6003169da12",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 5,
+      "length": 1,
+      "startMinute": 810,
+      "endMinute": 870,
+      "assignmentId": "7d96eb45-fd2c-44d0-9791-d941804e2865",
+      "component": "lecture",
+      "course": {
+        "id": "d810cf11-6359-44f4-9771-88dc021d3d1c",
+        "code": "AS202",
+        "shortName": "COI",
+        "title": "Constitution of India"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "2feabb56-d34b-4d33-b0e1-f7255c210df5",
+          "name": "Mr. Chetan Walia",
+          "shortCode": "CW"
+        }
+      ],
+      "room": {
+        "id": "255253a9-b80b-4772-8b96-4d40e061ff17",
+        "code": "S212"
+      }
+    },
+    {
+      "id": "a4357b2f-3b3f-56b5-b2c6-07dc1f74e49e",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 6,
+      "length": 2,
+      "startMinute": 870,
+      "endMinute": 990,
+      "assignmentId": "75bed435-4a72-4f68-ac03-aafb757976c5",
+      "component": "practical",
+      "course": {
+        "id": "733d64d4-90fd-4435-9401-90b07160eff7",
+        "code": "EC202",
+        "shortName": "DE",
+        "title": "Digital Electronics"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "82732337-78c9-4aa8-a4ea-2957d7141187",
+        "name": "CS B-B2"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "22a02f7c-f970-4a7c-b278-df3f4b94946a",
+          "name": "Mr. Rahul Bhalla",
+          "shortCode": "RB"
+        }
+      ],
+      "room": {
+        "id": "2c06bcd7-26b7-48a5-b3ba-ff9440e736cd",
+        "code": "HL-II LAB"
+      }
+    },
+    {
+      "id": "a557cf66-29d5-5ff6-a4df-f065d3be6295",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 3,
+      "startPeriodIndex": 8,
+      "length": 1,
+      "startMinute": 990,
+      "endMinute": 1050,
+      "assignmentId": "bef0954e-f95d-46d9-a5a8-146dcf77ac52",
+      "component": "lecture",
+      "course": {
+        "id": "9f1973dd-48da-4e98-a8f9-fb0fdbab5456",
+        "code": "CS201",
+        "shortName": "DS",
+        "title": "Data Structures"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "9f900d77-812d-47a0-9d0a-761f99655b8f",
+          "name": "Mr. Vikram Toor",
+          "shortCode": "VT"
+        }
+      ],
+      "room": {
+        "id": "f8748675-7537-411c-bad6-50e5bbf26451",
+        "code": "S211"
+      }
+    },
+    {
+      "id": "b819b735-5dbd-5c82-baf6-e81e1a6732b0",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 4,
+      "startPeriodIndex": 1,
+      "length": 1,
+      "startMinute": 510,
+      "endMinute": 570,
+      "assignmentId": "0a187e78-37db-4597-9f6f-30304d29c29b",
+      "component": "lecture",
+      "course": {
+        "id": "2e4a1995-0678-414e-be70-e266e244d3df",
+        "code": "AS201",
+        "shortName": "Maths-III",
+        "title": "Engineering Mathematics-III"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "8bd4a638-4c5f-42a3-b677-637debc64ee3",
+          "name": "Dr. Meera Iyer",
+          "shortCode": "MI"
+        }
+      ],
+      "room": {
+        "id": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+        "code": "G11"
+      }
+    },
+    {
+      "id": "24377cc1-31e9-551b-9088-506f1e803f2a",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 4,
+      "startPeriodIndex": 2,
+      "length": 2,
+      "startMinute": 570,
+      "endMinute": 690,
+      "assignmentId": "392df0e5-9c64-466a-873e-d3e98ca6014b",
+      "component": "practical",
+      "course": {
+        "id": "9f1973dd-48da-4e98-a8f9-fb0fdbab5456",
+        "code": "CS201",
+        "shortName": "DS",
+        "title": "Data Structures"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "82732337-78c9-4aa8-a4ea-2957d7141187",
+        "name": "CS B-B2"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "8c3ea259-8831-46f2-a1ee-6b09bc93d2c2",
+          "name": "Ms. Nidhi Kapoor",
+          "shortCode": "NK"
+        },
+        {
+          "id": "9216184e-7898-40eb-be90-21278cc34c5d",
+          "name": "Mr. Om Pathak",
+          "shortCode": "OP"
+        }
+      ],
+      "room": {
+        "id": "dd2f2868-afc3-41d6-aa1c-6ea7a956ad84",
+        "code": "SL-III LAB"
+      }
+    },
+    {
+      "id": "6498ddd9-7b50-50e8-9820-1d9446c7eb63",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 4,
+      "startPeriodIndex": 4,
+      "length": 1,
+      "startMinute": 750,
+      "endMinute": 810,
+      "assignmentId": "cac3e57a-20fc-4868-bee8-c34ef42a8564",
+      "component": "lecture",
+      "course": {
+        "id": "4a98bfc4-0c19-4ff7-aa37-d761bb7a7f7f",
+        "code": "CS203",
+        "shortName": "DM",
+        "title": "Discrete Mathematics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "73338075-9df5-4735-ab46-c231b46f7b7f",
+          "name": "Mr. Dev Chawla",
+          "shortCode": "DC"
+        }
+      ],
+      "room": {
+        "id": "255253a9-b80b-4772-8b96-4d40e061ff17",
+        "code": "S212"
+      }
+    },
+    {
+      "id": "373d8125-9829-521c-9c7b-fdd2da6bca21",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 4,
+      "startPeriodIndex": 7,
+      "length": 2,
+      "startMinute": 930,
+      "endMinute": 1050,
+      "assignmentId": "c24b5a19-6210-4d3d-8933-f7a23bd099ad",
+      "component": "practical",
+      "course": {
+        "id": "f44db46d-e9f4-468d-8b97-c8323b9fa75a",
+        "code": "CS202",
+        "shortName": "OOP",
+        "title": "Object Oriented Programming"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "82732337-78c9-4aa8-a4ea-2957d7141187",
+        "name": "CS B-B2"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "c780a121-56e0-465b-8818-a28c7eb32c75",
+          "name": "Mr. Karan Malhotra",
+          "shortCode": "KM"
+        }
+      ],
+      "room": {
+        "id": "1657dde8-e519-4f89-af16-6cf714f37fb3",
+        "code": "SL-IV LAB"
+      }
+    },
+    {
+      "id": "8b1ced55-f44e-52f2-ac65-45be2b7f113b",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 5,
+      "startPeriodIndex": 1,
+      "length": 1,
+      "startMinute": 510,
+      "endMinute": 570,
+      "assignmentId": "0a187e78-37db-4597-9f6f-30304d29c29b",
+      "component": "lecture",
+      "course": {
+        "id": "2e4a1995-0678-414e-be70-e266e244d3df",
+        "code": "AS201",
+        "shortName": "Maths-III",
+        "title": "Engineering Mathematics-III"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "8bd4a638-4c5f-42a3-b677-637debc64ee3",
+          "name": "Dr. Meera Iyer",
+          "shortCode": "MI"
+        }
+      ],
+      "room": {
+        "id": "f69ffb07-e8dd-4d38-bc2b-7c9d6a8532f9",
+        "code": "G11"
+      }
+    },
+    {
+      "id": "991cef4a-078a-5962-941f-4f878b22a1d4",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 5,
+      "startPeriodIndex": 2,
+      "length": 1,
+      "startMinute": 570,
+      "endMinute": 630,
+      "assignmentId": "1cbd8aec-6e3a-4f2b-9059-13bbca290dd1",
+      "component": "lecture",
+      "course": {
+        "id": "733d64d4-90fd-4435-9401-90b07160eff7",
+        "code": "EC202",
+        "shortName": "DE",
+        "title": "Digital Electronics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "dc164200-61b6-41d9-96c8-3e9a04e071b9",
+          "name": "Ms. Payal Suri",
+          "shortCode": "PS"
+        }
+      ],
+      "room": {
+        "id": "64683a7c-0715-4104-923a-145cd7134970",
+        "code": "G16"
+      }
+    },
+    {
+      "id": "df33015e-2417-5fb0-bd19-f438de79c903",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 5,
+      "startPeriodIndex": 4,
+      "length": 1,
+      "startMinute": 750,
+      "endMinute": 810,
+      "assignmentId": "cac3e57a-20fc-4868-bee8-c34ef42a8564",
+      "component": "lecture",
+      "course": {
+        "id": "4a98bfc4-0c19-4ff7-aa37-d761bb7a7f7f",
+        "code": "CS203",
+        "shortName": "DM",
+        "title": "Discrete Mathematics"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "73338075-9df5-4735-ab46-c231b46f7b7f",
+          "name": "Mr. Dev Chawla",
+          "shortCode": "DC"
+        }
+      ],
+      "room": {
+        "id": "f8748675-7537-411c-bad6-50e5bbf26451",
+        "code": "S211"
+      }
+    },
+    {
+      "id": "e9feb2c5-6da9-5e6c-b108-1765bd4f7b93",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 5,
+      "startPeriodIndex": 5,
+      "length": 2,
+      "startMinute": 810,
+      "endMinute": 930,
+      "assignmentId": "7006d809-26f6-45d9-9973-cf56b88cf530",
+      "component": "practical",
+      "course": {
+        "id": "9f1973dd-48da-4e98-a8f9-fb0fdbab5456",
+        "code": "CS201",
+        "shortName": "DS",
+        "title": "Data Structures"
+      },
+      "target": {
+        "kind": "subgroup",
+        "id": "826107a0-8735-491d-9e88-d4df3b80bd52",
+        "name": "CS B-B1"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "8c3ea259-8831-46f2-a1ee-6b09bc93d2c2",
+          "name": "Ms. Nidhi Kapoor",
+          "shortCode": "NK"
+        },
+        {
+          "id": "ccee0ac8-5c7b-47ea-9561-feec9c7e47c2",
+          "name": "Ms. Ria Thakur",
+          "shortCode": "RT"
+        }
+      ],
+      "room": {
+        "id": "dd2f2868-afc3-41d6-aa1c-6ea7a956ad84",
+        "code": "SL-III LAB"
+      }
+    },
+    {
+      "id": "2daa0b8b-5c9a-52b3-83cf-0d107429eacc",
+      "versionId": "9219e2d2-cea5-50e1-adba-fe21d69da2b0",
+      "weekday": 5,
+      "startPeriodIndex": 8,
+      "length": 1,
+      "startMinute": 990,
+      "endMinute": 1050,
+      "assignmentId": "38df3257-bc81-46ed-823a-c2a2809d0171",
+      "component": "lecture",
+      "course": {
+        "id": "f44db46d-e9f4-468d-8b97-c8323b9fa75a",
+        "code": "CS202",
+        "shortName": "OOP",
+        "title": "Object Oriented Programming"
+      },
+      "target": {
+        "kind": "section",
+        "id": "29430f57-9fca-444a-8700-d6c3e16c5961",
+        "name": "CS B"
+      },
+      "sectionIds": [
+        "29430f57-9fca-444a-8700-d6c3e16c5961"
+      ],
+      "faculty": [
+        {
+          "id": "35eadac7-f074-4e2b-be12-154461689f63",
+          "name": "Ms. Tanvi Bhatia",
+          "shortCode": "TB"
+        }
+      ],
+      "room": {
+        "id": "54e86200-3765-42dc-a70a-0aec2786b28d",
+        "code": "S213"
+      }
+    }
+  ]
+}

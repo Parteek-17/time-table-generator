@@ -4,5 +4,5 @@
     "rootDir": ".",
     "outDir": "dist"
   },
-  "include": ["src", "prisma/seed.ts", "prisma/seed", "prisma.config.ts", "test", "vitest.config.mts"]
+  "include": ["src", "prisma/seed.ts", "prisma/seed", "prisma.config.ts", "scripts", "test", "vitest.config.mts"]
 }
