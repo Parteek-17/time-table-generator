@@ -1,0 +1,6 @@
+// portal.prisma — owned by P5.
+// Add models here. Relations to models in other files go as fields on YOUR models; never edit
+// another file's models — file a request (docs/coordination/requests/). The one exception is
+// the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
+// requires; see docs/coordination/OWNERSHIP.md.
+// Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).

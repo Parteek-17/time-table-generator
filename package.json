@@ -15,6 +15,8 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "check:ownership": "node scripts/check-ownership.mjs",
+    "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
     "db:generate": "pnpm --filter @slotwise/db generate",
     "db:migrate": "pnpm --filter @slotwise/db migrate",
     "db:deploy": "pnpm --filter @slotwise/db deploy:migrations",
