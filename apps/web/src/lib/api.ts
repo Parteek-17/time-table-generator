@@ -29,7 +29,7 @@ function mintApiToken(userId: string): Promise<string> {
 /** Calls the API as the signed-in user, for the institute on this subdomain. Server-side only. */
 export async function api<T>(
   path: string,
-  init: { method?: 'GET' | 'POST' | 'DELETE'; body?: unknown } = {},
+  init: { method?: 'GET' | 'POST' | 'PUT' | 'DELETE'; body?: unknown } = {},
 ): Promise<ApiResult<T>> {
   const [session, slug] = await Promise.all([auth(), getInstituteSlug()]);
   const requestHeaders: Record<string, string> = { accept: 'application/json' };

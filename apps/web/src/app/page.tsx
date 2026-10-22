@@ -4,9 +4,11 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import { AppShell } from '@/components/app-shell';
 import { PageShell } from '@/components/page-shell';
 import { Problem } from '@/components/problem';
 import { api, getInstituteSlug } from '@/lib/api';
+import { getMe } from '@/lib/me';
 import { describeMembership } from '@/lib/labels';
 
 export default async function HomePage({
@@ -56,13 +58,14 @@ export default async function HomePage({
 
   const { user, institute, memberships, grants } = me.data;
   const { joined } = await searchParams;
-  const canManageMembers = canSomewhere({ id: user.id, memberships: grants }, 'member.view', {
-    id: institute.id,
-    parentUniversityId: institute.parentUniversityId,
-  });
+  const place = { id: institute.id, parentUniversityId: institute.parentUniversityId };
+  const authUser = { id: user.id, memberships: grants };
+  const canManageMembers = canSomewhere(authUser, 'member.view', place);
+  const canSetUp = canSomewhere(authUser, 'masterdata.view', place);
+  const shellMe = await getMe();
 
   return (
-    <PageShell instituteName={institute.name} email={user.email}>
+    <AppShell me={shellMe}>
       {joined ? (
         <Alert variant="success">{t('joined', { institute: institute.name })}</Alert>
       ) : null}
@@ -77,6 +80,31 @@ export default async function HomePage({
           ))}
         </ul>
       </div>
+
+      {canSetUp ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('setupTitle')}</CardTitle>
+            <CardDescription>{t('setupHint')}</CardDescription>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(
+                [
+                  ['/programmes', 'setupProgrammes'],
+                  ['/terms', 'setupTerms'],
+                  ['/cohorts', 'setupCohorts'],
+                  ['/faculty', 'setupFaculty'],
+                  ['/rooms', 'setupRooms'],
+                  ['/bell-schedules', 'setupBell'],
+                ] as const
+              ).map(([href, key]) => (
+                <Button key={href} asChild variant="outline" size="sm">
+                  <Link href={href}>{t(key)}</Link>
+                </Button>
+              ))}
+            </div>
+          </CardHeader>
+        </Card>
+      ) : null}
 
       {canManageMembers ? (
         <Card>
@@ -95,7 +123,7 @@ export default async function HomePage({
           </CardHeader>
         </Card>
       )}
-    </PageShell>
+    </AppShell>
   );
 }
 
