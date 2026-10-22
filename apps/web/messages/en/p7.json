@@ -1,0 +1,16 @@
+{
+  "p7": {
+    "marketing": {
+      "title": "Slotwise",
+      "description": "Timetables, rescheduling and exam seating for colleges.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    },
+    "platform": {
+      "title": "Platform",
+      "description": "Institutes, plans and support.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    }
+  }
+}

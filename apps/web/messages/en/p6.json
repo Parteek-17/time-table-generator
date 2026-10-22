@@ -1,0 +1,13 @@
+{
+  "p6": {
+    "nav": {
+      "exams": "Exams"
+    },
+    "placeholder": {
+      "title": "Exams",
+      "description": "Date sheets, seating plans and invigilation duties.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "p2t": {
+    "nav": {
+      "group": "Timetable",
+      "timetables": "Timetables"
+    },
+    "placeholder": {
+      "title": "Timetables",
+      "description": "Generate, adjust and publish class timetables.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    }
+  }
+}
