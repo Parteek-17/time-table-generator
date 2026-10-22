@@ -1,7 +1,8 @@
 # Phase 1 plan: Institute setup
 
 Status: **accepted 2026-10-22** with the recommended defaults for all open questions.
-Progress: 1a done (schema, migrations, seed, shared functions). Decisions are recorded in
+Progress: 1a done (schema, migrations, seed, shared functions); 1b done (CRUD API and
+screens, ADR 0009). Decisions are recorded in
 ADR 0007 (data model) and ADR 0008 (permissions).
 
 Changes made while building 1a:
