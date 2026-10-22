@@ -36,10 +36,13 @@ import {
 } from '@slotwise/shared/contracts';
 import { PrismaClient } from '../src/index';
 
-try {
-  process.loadEnvFile('.env');
-} catch {
-  // No .env file: rely on the environment.
+// .env.local (stream worktree overrides, scripts/stream-env.mjs) wins over .env.
+for (const file of ['.env.local', '.env']) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // No .env file: rely on the environment.
+  }
 }
 
 const OUT = join(__dirname, '..', '..', 'shared', 'fixtures');

@@ -16,13 +16,13 @@ const envSchema = z.object({
   REDIS_URL: z.string().url().default('redis://localhost:6379'),
   /** Python solver (services/solver). Called from jobs only, never inside a request. */
   SOLVER_URL: z.string().url().default('http://localhost:8000'),
-  /** S3-compatible storage for imports and generated PDFs. Local dev: MinIO (docker compose). */
+  /** S3-compatible storage for imports and generated PDFs. Local dev: the compose "storage" service. */
   S3_ENDPOINT: z.string().url().optional(),
   S3_REGION: z.string().default('us-east-1'),
   S3_BUCKET: z.string().optional(),
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
-  /** MinIO needs path-style URLs (http://host:9000/bucket/key). */
+  /** Local S3 servers need path-style URLs (http://host:9000/bucket/key). */
   S3_FORCE_PATH_STYLE: z
     .enum(['true', 'false', '1', '0'])
     .default('false')
@@ -41,11 +41,16 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   return parsed.data;
 }
 
-/** Loads apps/api/.env if present. Real environment variables win. */
+/**
+ * Loads apps/api/.env.local (a stream worktree's ports and databases, scripts/stream-env.mjs)
+ * and then apps/api/.env, if present. Real environment variables win, then .env.local.
+ */
 export function loadDotEnv(): void {
-  try {
-    process.loadEnvFile('.env');
-  } catch {
-    // No .env file (production, CI): use the real environment.
+  for (const file of ['.env.local', '.env']) {
+    try {
+      process.loadEnvFile(file);
+    } catch {
+      // No such file (production, CI): use the real environment.
+    }
   }
 }

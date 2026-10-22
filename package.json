@@ -16,6 +16,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check:ownership": "node scripts/check-ownership.mjs",
+    "stream:env": "node scripts/stream-env.mjs",
+    "stream:worktree": "node scripts/new-worktree.mjs",
     "test:scripts": "node --test \"scripts/**/*.test.mjs\"",
     "db:generate": "pnpm --filter @slotwise/db generate",
     "db:migrate": "pnpm --filter @slotwise/db migrate",
@@ -23,6 +25,7 @@
     "db:seed": "pnpm --filter @slotwise/db seed",
     "db:reset": "pnpm --filter @slotwise/db reset",
     "db:validate": "pnpm --filter @slotwise/db validate",
+    "db:create-stream-dbs": "node scripts/create-stream-dbs.mjs",
     "contracts:schemas": "pnpm --filter @slotwise/shared build && node scripts/contract-schemas.mjs",
     "fixtures:build": "pnpm --filter @slotwise/db fixtures:build"
   },

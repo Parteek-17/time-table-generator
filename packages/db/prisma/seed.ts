@@ -14,10 +14,13 @@ type StreamSeed = (prisma: PrismaClient) => Promise<void>;
 /** Merge order (docs/coordination/MERGE-ORDER.md), after P1. */
 const STREAM_SEEDS = ['p2t', 'p4', 'p6', 'p5', 'p7'] as const;
 
-try {
-  process.loadEnvFile('.env');
-} catch {
-  // No .env file: rely on the environment (CI, hosted DBs).
+// .env.local (stream worktree overrides, scripts/stream-env.mjs) wins over .env.
+for (const file of ['.env.local', '.env']) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // No .env file: rely on the environment (CI, hosted DBs).
+  }
 }
 
 const prisma = new PrismaClient();

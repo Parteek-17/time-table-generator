@@ -15,10 +15,12 @@ import {
   type SampleSummary,
 } from '../src/index';
 
-try {
-  process.loadEnvFile('.env');
-} catch {
-  // CI passes the URLs as environment variables.
+for (const file of ['.env.local', '.env']) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // CI passes the URLs as environment variables.
+  }
 }
 
 const owner = new PrismaClient({ datasources: { db: { url: process.env.OWNER_DATABASE_URL } } });

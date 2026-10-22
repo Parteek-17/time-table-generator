@@ -5,10 +5,13 @@
 import { defineConfig } from 'prisma/config';
 
 // With a config file Prisma no longer loads .env itself.
-try {
-  process.loadEnvFile('.env');
-} catch {
-  // No .env file: rely on the environment (CI, hosted DBs).
+// .env.local (stream worktree overrides, scripts/stream-env.mjs) wins over .env.
+for (const file of ['.env.local', '.env']) {
+  try {
+    process.loadEnvFile(file);
+  } catch {
+    // No .env file: rely on the environment (CI, hosted DBs).
+  }
 }
 
 export default defineConfig({
