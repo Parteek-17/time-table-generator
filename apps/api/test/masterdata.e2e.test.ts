@@ -369,7 +369,9 @@ describe('master data: every write works and is audited', () => {
     );
     const list = (await as(u.admin.id).get(`/faculty?departmentId=${a.cse.id}`))
       .body as FacultyRow[];
-    expect(list.map((f) => [f.shortCode, f.maxPeriodsPerWeek])).toEqual([
+    // Sorted here: the database orders names by its collation, which differs between setups.
+    const limits = list.map((f) => [f.shortCode, f.maxPeriodsPerWeek]).sort();
+    expect(limits).toEqual([
       ['TC', 16],
       ['TD', 16],
     ]);
