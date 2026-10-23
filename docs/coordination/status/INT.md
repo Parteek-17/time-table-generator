@@ -40,4 +40,4 @@ C0 — contracts and scaffolding (`c0/contracts`), ready for review.
 
 ## Last pushed
 
-Not pushed yet.
+`c0/contracts` on 2026-10-22; PR to `main` opened from the GitHub compare page.
