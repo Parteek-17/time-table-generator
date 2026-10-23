@@ -1,0 +1,10 @@
+{
+  "p5": {
+    "placeholder": {
+      "title": "Today",
+      "description": "Your next class, today’s changes and your exam seat.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    }
+  }
+}

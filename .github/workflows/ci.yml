@@ -40,12 +40,20 @@ jobs:
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - uses: actions/checkout@v5
+        with:
+          # check:ownership diffs the branch against the base branch.
+          fetch-depth: 0
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Files stay inside the stream's paths (docs/coordination/OWNERSHIP.md)
+        if: github.event_name == 'pull_request'
+        run: pnpm check:ownership
+      - name: Script tests (ownership checker, stream environments)
+        run: pnpm test:scripts
       - name: Prisma schema is valid
         run: pnpm db:validate
       - run: pnpm format:check

@@ -7,3 +7,4 @@ export * from './domain';
 export * from './schemas/members';
 export * from './schemas/masterdata';
 export * from './schemas/masterdata-dto';
+export * from './flags';

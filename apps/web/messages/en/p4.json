@@ -1,0 +1,13 @@
+{
+  "p4": {
+    "nav": {
+      "reschedule": "Changes and make-ups"
+    },
+    "placeholder": {
+      "title": "Changes and make-ups",
+      "description": "Holidays, events, cancelled classes and make-up periods.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    }
+  }
+}

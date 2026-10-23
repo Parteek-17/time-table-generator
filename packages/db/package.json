@@ -27,7 +27,8 @@
     "studio": "prisma studio",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "fixtures:build": "tsx scripts/build-fixtures.ts"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",

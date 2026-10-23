@@ -38,5 +38,27 @@ services:
       - '1025:1025'
       - '8025:8025'
 
+  # S3-compatible storage for imports and generated PDFs (API: S3_* in apps/api/.env).
+  # RustFS, because MinIO no longer publishes pullable images. API http://localhost:9000,
+  # console http://localhost:9001 (login slotwise / slotwise-dev-storage). The app creates
+  # its bucket on first use. Dev only: single disk, runs as root to own the named volume.
+  storage:
+    image: rustfs/rustfs:1.0.0
+    user: '0:0'
+    environment:
+      RUSTFS_VOLUMES: /data
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: 'true'
+      RUSTFS_ACCESS_KEY: slotwise
+      RUSTFS_SECRET_KEY: slotwise-dev-storage
+      RUSTFS_UNSAFE_BYPASS_DISK_CHECK: 'true'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - storage:/data
+
 volumes:
   pgdata:
+  storage:

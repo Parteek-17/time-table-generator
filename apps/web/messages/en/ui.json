@@ -1,0 +1,29 @@
+{
+  "problems": {
+    "noAccessTitle": "You don’t have access to {institute} yet",
+    "noAccessBody": "Ask your institute admin to invite you. If you were invited, open the link in the invite email.",
+    "notFoundTitle": "We couldn’t find this institute",
+    "notFoundBody": "Check the address and try again.",
+    "unavailableTitle": "Something went wrong"
+  },
+  "common": {
+    "skipToContent": "Skip to main content",
+    "signedInAs": "Signed in as {email}",
+    "signOut": "Sign out"
+  },
+  "nav": {
+    "label": "Main menu",
+    "menu": "Menu"
+  },
+  "ui": {
+    "nav": {
+      "gallery": "UI gallery"
+    },
+    "gallery": {
+      "title": "UI gallery",
+      "description": "Every component of the design system, in light and dark. Development only.",
+      "comingSoon": "Coming soon",
+      "comingSoonBody": "The design system stream fills this page."
+    }
+  }
+}

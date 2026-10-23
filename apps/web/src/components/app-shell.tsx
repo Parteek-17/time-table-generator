@@ -4,44 +4,8 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { signOutAction } from '@/app/actions';
 import type { Me } from '@/lib/me';
-import { AppNav, MobileMenu, type NavGroup } from './app-nav';
-
-/** Navigation for what this user may do here (can() decides; never role names). */
-async function navFor(me: Me): Promise<NavGroup[]> {
-  const t = await getTranslations('nav');
-  const groups: NavGroup[] = [{ items: [{ href: '/', label: t('home') }] }];
-  if (me.may('masterdata.view')) {
-    groups.push({
-      label: t('setup'),
-      items: [
-        { href: '/settings/institute', label: t('institute') },
-        { href: '/departments', label: t('departments') },
-        { href: '/programmes', label: t('programmes') },
-        { href: '/schemes', label: t('schemes') },
-        { href: '/terms', label: t('terms') },
-        { href: '/calendar', label: t('calendar') },
-        { href: '/bell-schedules', label: t('bellSchedules') },
-      ],
-    });
-    groups.push({
-      label: t('people'),
-      items: [
-        { href: '/batches', label: t('batches') },
-        { href: '/cohorts', label: t('cohorts') },
-        { href: '/students', label: t('students') },
-        { href: '/faculty', label: t('faculty') },
-        { href: '/rooms', label: t('rooms') },
-      ],
-    });
-  }
-  const more: NavGroup['items'] = [];
-  if (me.may('faculty.availability.edit'))
-    more.push({ href: '/me/availability', label: t('myAvailability') });
-  if (me.may('member.view')) more.push({ href: '/members', label: t('members') });
-  if (me.may('audit.view')) more.push({ href: '/audit', label: t('audit') });
-  if (more.length > 0) groups.push({ label: t('more'), items: more });
-  return groups;
-}
+import { navFor } from '@/registry/nav';
+import { AppNav, MobileMenu } from './app-nav';
 
 /** Signed-in frame: header, role-aware navigation, main content. Phone first. */
 export async function AppShell({ me, children }: { me: Me; children: ReactNode }) {
