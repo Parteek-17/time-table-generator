@@ -2,7 +2,15 @@
 
 ## Current milestone
 
-C0 — contracts and scaffolding (`c0/contracts`), ready for review.
+C0 — contracts and scaffolding, merged into `main` on 2026-10-23 (`merge(c0): …`). No
+migration: `prisma migrate diff` from the migrations to the split schema is empty. All flags
+stay off.
+
+**Rebase now: P1, UI, P2E, P2T, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once
+`main` is pushed). Contracts, schema files, registries and shared configs are new on `main`.
+
+Known red test on `main`, not from C0: the P1 faculty list sort test
+(`requests/2026-10-23-int-p1-faculty-sort-test.md`).
 
 ## Done
 
@@ -23,6 +31,8 @@ C0 — contracts and scaffolding (`c0/contracts`), ready for review.
 
 ## Blocked by
 
+- P1: `pnpm test` red on `main` until `requests/2026-10-23-int-p1-faculty-sort-test.md` is fixed.
+
 ## New dependencies
 
 - `apps/api`: `bullmq` 6.3.11, `@nestjs/event-emitter` 3.1.0.
@@ -41,3 +51,4 @@ C0 — contracts and scaffolding (`c0/contracts`), ready for review.
 ## Last pushed
 
 `c0/contracts` on 2026-10-22; PR to `main` opened from the GitHub compare page.
+`main` with the C0 merge: not pushed yet.
