@@ -4,3 +4,178 @@
 // the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
 // requires; see docs/coordination/OWNERSHIP.md.
 // Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).
+//
+// Design: docs/adr/0050-timetable-versions-and-slots.md. Slots copy the names they show
+// (course, audience, faculty, room) from the setup snapshot the version was built from, so a
+// published version never changes when master data is edited later. Master-data ids on slots
+// are plain uuids (no foreign keys) for the same reason.
+
+enum TimetableVersionStatus {
+  draft
+  published
+  archived
+
+  @@map("timetable_version_status")
+}
+
+enum SolveJobStatus {
+  queued
+  running
+  succeeded
+  failed
+  cancelled
+
+  @@map("solve_job_status")
+}
+
+/// A setup snapshot (setup-snapshot.v1) a version or solve job was built from. Stored once per
+/// content hash; editing checks (clashes, room fit, limits) run against it.
+model TimetableSnapshot {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  termId      String   @map("term_id") @db.Uuid
+  /// sha256 of the snapshot JSON without generatedAt.
+  hash        String
+  /// SetupSnapshotV1.
+  data        Json
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute          @relation(fields: [instituteId], references: [id])
+  term      Term               @relation(fields: [termId], references: [id])
+  versions  TimetableVersion[]
+  solveJobs SolveJob[]
+
+  @@unique([instituteId, hash])
+  @@index([termId])
+  @@map("timetable_snapshots")
+}
+
+/// One timetable of a term (or of one timetable scope of it). draft → published → archived.
+/// Published and archived versions are immutable; editing a published one makes a new draft
+/// whose parent it is.
+model TimetableVersion {
+  id            String                 @id @default(uuid()) @db.Uuid
+  instituteId   String                 @map("institute_id") @db.Uuid
+  termId        String                 @map("term_id") @db.Uuid
+  /// Timetable scope (P1's TimetableScope), or null for the whole term.
+  scopeId       String?                @map("scope_id") @db.Uuid
+  /// Cohorts the version covers.
+  cohortIds     String[]               @map("cohort_ids") @db.Uuid
+  /// 1, 2, 3 … per (term, scope), set when published.
+  number        Int?
+  status        TimetableVersionStatus @default(draft)
+  /// The version it was copied from (edit of a published version, or re-solve).
+  parentId      String?                @map("parent_id") @db.Uuid
+  snapshotId    String                 @map("snapshot_id") @db.Uuid
+  /// The solve job that produced it, if any.
+  solveJobId    String?                @unique @map("solve_job_id") @db.Uuid
+  /// Solver's sessions without a place (UnplacedSessionV1[]), for the "Not placed" panel.
+  unplaced      Json                   @default("[]")
+  /// Solver score ({ total, breakdown }), if it came from a solve.
+  score         Json?
+  /// User ids (no foreign key: audit-style references).
+  createdById   String                 @map("created_by_id") @db.Uuid
+  publishedById String?                @map("published_by_id") @db.Uuid
+  publishedAt   DateTime?              @map("published_at")
+  archivedAt    DateTime?              @map("archived_at")
+  /// First and last date (inclusive) a published version applies to; validTo null = open.
+  validFrom     DateTime?              @map("valid_from") @db.Date
+  validTo       DateTime?              @map("valid_to") @db.Date
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @updatedAt @map("updated_at")
+
+  institute Institute          @relation(fields: [instituteId], references: [id])
+  term      Term               @relation(fields: [termId], references: [id])
+  scope     TimetableScope?    @relation(fields: [scopeId], references: [id])
+  parent    TimetableVersion?  @relation("VersionParent", fields: [parentId], references: [id])
+  children  TimetableVersion[] @relation("VersionParent")
+  snapshot  TimetableSnapshot  @relation(fields: [snapshotId], references: [id])
+  solveJob  SolveJob?          @relation(fields: [solveJobId], references: [id])
+  slots     TimetableSlot[]
+
+  @@index([instituteId])
+  @@index([termId, status])
+  @@map("timetable_versions")
+}
+
+/// One session of a teaching assignment placed in the week of a version.
+model TimetableSlot {
+  id              String           @id @default(uuid()) @db.Uuid
+  instituteId     String           @map("institute_id") @db.Uuid
+  versionId       String           @map("version_id") @db.Uuid
+  /// `<assignmentId>#<n>` (solver-timetable.v1), unique within a version.
+  sessionId       String           @map("session_id")
+  assignmentId    String           @map("assignment_id") @db.Uuid
+  component       Component
+  courseId        String           @map("course_id") @db.Uuid
+  courseCode      String           @map("course_code")
+  courseShortName String           @map("course_short_name")
+  courseTitle     String           @map("course_title")
+  targetKind      AssignmentTarget @map("target_kind")
+  targetId        String           @map("target_id") @db.Uuid
+  /// e.g. "CS A", "CS A-G1", "ML-1".
+  targetName      String           @map("target_name")
+  /// Regular sections whose students attend (the section, a sub-group's section, or an
+  /// elective section's source sections).
+  sectionIds      String[]         @map("section_ids") @db.Uuid
+  facultyIds      String[]         @map("faculty_ids") @db.Uuid
+  /// [{ id, name, shortCode }] in facultyIds order.
+  faculty         Json
+  roomId          String?          @map("room_id") @db.Uuid
+  roomCode        String?          @map("room_code")
+  /// ISO weekday, 1 = Monday.
+  weekday         Int
+  startPeriod     Int              @map("start_period")
+  /// Consecutive periods (1, or a lab block).
+  length          Int
+  /// Minutes from midnight, from the cohort's bell schedule.
+  startMinute     Int              @map("start_minute")
+  endMinute       Int              @map("end_minute")
+  /// Kept in place by "re-solve the rest".
+  locked          Boolean          @default(false)
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  institute Institute        @relation(fields: [instituteId], references: [id])
+  version   TimetableVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([versionId, sessionId])
+  @@index([versionId, weekday, startPeriod])
+  @@index([instituteId])
+  @@map("timetable_slots")
+}
+
+/// A background solve: snapshot → solver → draft version. Never runs inside an HTTP request.
+model SolveJob {
+  id            String         @id @default(uuid()) @db.Uuid
+  instituteId   String         @map("institute_id") @db.Uuid
+  termId        String         @map("term_id") @db.Uuid
+  scopeId       String?        @map("scope_id") @db.Uuid
+  cohortIds     String[]       @map("cohort_ids") @db.Uuid
+  status        SolveJobStatus @default(queued)
+  /// 0–100.
+  progress      Int            @default(0)
+  /// sha256 of the solver request (snapshot hash + options); same hash = same answer.
+  requestHash   String         @map("request_hash")
+  snapshotId    String?        @map("snapshot_id") @db.Uuid
+  /// The version it was re-solving (locked sessions kept), if any.
+  baseVersionId String?        @map("base_version_id") @db.Uuid
+  /// { solverStatus, placed, unplaced, solveSeconds, scoreTotal }.
+  resultSummary Json?          @map("result_summary")
+  /// Plain-language error for the user.
+  error         String?
+  createdById   String         @map("created_by_id") @db.Uuid
+  createdAt     DateTime       @default(now()) @map("created_at")
+  startedAt     DateTime?      @map("started_at")
+  finishedAt    DateTime?      @map("finished_at")
+
+  institute     Institute          @relation(fields: [instituteId], references: [id])
+  term          Term               @relation(fields: [termId], references: [id])
+  scope         TimetableScope?    @relation(fields: [scopeId], references: [id])
+  snapshot      TimetableSnapshot? @relation(fields: [snapshotId], references: [id])
+  resultVersion TimetableVersion?
+
+  @@index([instituteId])
+  @@index([termId, createdAt])
+  @@map("timetable_solve_jobs")
+}

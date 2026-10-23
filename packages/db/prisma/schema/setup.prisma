@@ -428,6 +428,9 @@ model Term {
   subjectMentors      SubjectMentor[]
   timetableScopes     TimetableScope[]
   importJobs          ImportJob[]
+  timetableSnapshots  TimetableSnapshot[]
+  timetableVersions   TimetableVersion[]
+  solveJobs           SolveJob[]
 
   @@unique([sessionId, kind])
   @@index([instituteId])
@@ -1106,6 +1109,8 @@ model TimetableScope {
   term      Term                   @relation(fields: [termId], references: [id])
   createdBy User                   @relation(fields: [createdById], references: [id])
   cohorts   TimetableScopeCohort[]
+  versions  TimetableVersion[]
+  solveJobs SolveJob[]
 
   @@index([instituteId])
   @@map("timetable_scopes")
