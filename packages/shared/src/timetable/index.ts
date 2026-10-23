@@ -4,3 +4,4 @@
  */
 export * from './slots';
 export * from './read';
+export * from './generate';

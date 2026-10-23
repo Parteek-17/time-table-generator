@@ -152,11 +152,14 @@ model SolveJob {
   termId        String         @map("term_id") @db.Uuid
   scopeId       String?        @map("scope_id") @db.Uuid
   cohortIds     String[]       @map("cohort_ids") @db.Uuid
+  /// { timeLimitSeconds, seed } as asked (GenerateTimetableInput).
+  options       Json           @default("{}")
   status        SolveJobStatus @default(queued)
   /// 0–100.
   progress      Int            @default(0)
-  /// sha256 of the solver request (snapshot hash + options); same hash = same answer.
-  requestHash   String         @map("request_hash")
+  /// sha256 of the solver request (snapshot hash + options); same hash = same answer. Set once
+  /// the worker has the snapshot.
+  requestHash   String?        @map("request_hash")
   snapshotId    String?        @map("snapshot_id") @db.Uuid
   /// The version it was re-solving (locked sessions kept), if any.
   baseVersionId String?        @map("base_version_id") @db.Uuid
