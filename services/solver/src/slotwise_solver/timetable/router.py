@@ -4,16 +4,28 @@ Contract: solver-timetable.v1 (packages/shared/src/contracts/solver-timetable.v1
 Schema in services/solver/contracts/timetable_v1.schema.json).
 """
 
-from fastapi import APIRouter
+from typing import Any
+
+from fastapi import APIRouter, Body
 from fastapi.responses import JSONResponse
+
+from .contract import request_issues
+from .solve import solve
 
 router = APIRouter(prefix="/v1/timetable", tags=["timetable"])
 
 
-@router.post("/solve", status_code=501)
-def solve_timetable() -> JSONResponse:
-    # TODO(phase-2): accept SolverTimetableRequestV1 and solve with OR-Tools CP-SAT.
-    return JSONResponse(
-        status_code=501,
-        content={"error": "not_implemented", "message": "Timetable solving arrives in Phase 2."},
-    )
+# A plain `def`: FastAPI runs it in a worker thread, so a long solve doesn't block /health.
+@router.post("/solve")
+def solve_timetable(body: Any = Body(...)) -> JSONResponse:  # noqa: B008 (FastAPI idiom)
+    issues = request_issues(body)
+    if issues:
+        return JSONResponse(
+            status_code=422,
+            content={
+                "error": "invalid_request",
+                "message": "The request does not match solver-timetable.v1.",
+                "issues": issues[:50],
+            },
+        )
+    return JSONResponse(content=solve(body))
