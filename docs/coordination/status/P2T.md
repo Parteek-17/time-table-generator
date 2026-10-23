@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-2T-b — generate job with mock solver: done (branch `p2t/schema`, based on `c0/contracts`
+2T-c — views and the Generate screen: done (branch `p2t/schema`, based on `c0/contracts`
 until C0 is on `main`; rebase then).
 
 ## Done
@@ -19,20 +19,31 @@ until C0 is on `main`; rebase then).
 - 2T-b: `POST /terms/:termId/timetable/generate` (202, `timetable.edit` for every department of
   the scope's cohorts; a second click follows the running job), `GET /timetable/jobs/:jobId`
   (progress 0–100, plain-language error), `GET /terms/:termId/timetable/jobs`,
-  `GET /terms/:termId/timetable/versions` (drafts included, editors only).
+  `GET /terms/:termId/timetable/versions` (everyone who reads timetables; drafts for editors).
 - BullMQ queue `p2t.solve` (`timetable/jobs/solve.worker.ts`): snapshot (fixture or P1's route,
   called as the coordinator) → stored snapshot → solver (mock or HTTP) → draft version.
   Other scopes' published slots go in as `busySlots` (`busySlotsFrom()` in shared). The worker
   starts with the API, or on first enqueue under tests (CI has no Redis).
+- 2T-c: `/timetable` — term and version pickers, view by section, lab group, teacher or room
+  (kept in the URL), week grid with breaks and spanning lab blocks (md and up), day view on
+  phones (opens on today), draft/older-version notes, loading skeleton, error screen.
+  `/timetable/generate` — classes (timetable group) and search time, progress bar that polls the
+  job, then "Open the draft"; resumes a run after reload. Nav: Timetables for `timetable.view`,
+  Generate for `timetable.edit`.
+- API for the screens: `GET /timetable/versions/:versionId/view?kind=&id=` (drafts for editors
+  only; bell schedule and pick-lists from the version's snapshot) and
+  `GET /terms/:termId/timetable/scopes`. Shared `gridColumns()` / `dayCells()` / `viewChoices()` / `viewBell()`.
+- Checked in the browser: desktop (dark), 400px (light), all four view kinds, generate → draft.
 
 ## Next
 
-- 2T-c: views by section, sub-group, faculty and room; week grid with breaks and lab blocks;
-  phone day view; the Generate screen with its progress bar (polls the job).
+- 2T-d: drag and drop with valid cells highlighted and plain-language refusals (one shared
+  checker in `packages/shared/src/timetable`), lock/unlock, "re-solve the rest", undo/redo,
+  and the "Not placed" panel with links to the screens that fix each reason.
 
 ## Blocked by
 
-- Nothing for 2T-c. CI runs the timetable API e2e tests only after INT's migration (they skip
+- Nothing for 2T-d. CI runs the timetable API e2e tests only after INT's migration (they skip
   themselves until the tables exist).
 
 ## New dependencies
@@ -55,6 +66,8 @@ None. Open requests:
 - `requests/2026-10-23-p2t-deterministic-sample-ids.md` — fixtures' ids don't exist in a
   seeded database (P1, INT).
 - `requests/2026-10-23-p2t-env-variables.md` — P2T settings in `.env.example` (INT).
+- `requests/2026-10-23-p2t-ui-timetable-grid.md` — `TimetableGrid`, `SlotCard`, segmented
+  control, progress bar, skeleton for the kit (UI); a launch.json entry for stream ports (INT).
 
 ## Notes for other streams
 
@@ -63,6 +76,8 @@ None. Open requests:
 - The demo term's published timetable uses the fixture's section/faculty/room ids until the
   deterministic-ids request lands.
 - Using `QueueService`? `apps/api` needs `ioredis` (added on this branch).
+- `/terms/:termId/timetable/scopes` reads P1's timetable_scopes table (read-only) until P1 has
+  a list route; P2T will switch to it.
 
 ## Last pushed
 

@@ -6,7 +6,7 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import type { Prisma, TxClient } from '@slotwise/db';
-import { can } from '@slotwise/shared';
+import { can, canSomewhere } from '@slotwise/shared';
 import type {
   GenerateTimetableInput,
   SolveJobDto,
@@ -163,10 +163,15 @@ export class TimetableGenerateService {
     return jobs.map(jobDto);
   }
 
+  /** Newest first. Drafts only for people who may edit timetables somewhere here. */
   async versions(tenant: Tenant, termId: string): Promise<VersionSummaryDto[]> {
+    const editor = canSomewhere(tenant.authUser, 'timetable.edit', {
+      id: tenant.institute.id,
+      parentUniversityId: tenant.institute.parentUniversityId,
+    });
     const rows = await this.prisma.tenant(this.ctx(tenant), (tx) =>
       tx.timetableVersion.findMany({
-        where: { termId },
+        where: editor ? { termId } : { termId, status: { not: 'draft' } },
         orderBy: { createdAt: 'desc' },
         include: { _count: { select: { slots: true } } },
       }),

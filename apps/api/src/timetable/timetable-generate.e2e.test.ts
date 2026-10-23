@@ -6,7 +6,7 @@
  * Needs the timetable tables and Redis; skipped until INT's migration is in (as the read test).
  */
 import type { INestApplication } from '@nestjs/common';
-import type { SolveJobDto, VersionSummaryDto } from '@slotwise/shared/timetable';
+import type { SolveJobDto, TimetableViewDto, VersionSummaryDto } from '@slotwise/shared/timetable';
 import { demoTermSnapshot } from '@slotwise/shared/fixtures';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -33,6 +33,7 @@ let a: Awaited<ReturnType<Fixtures['institute']>>;
 const tokens = new Map<string, string>();
 const u = {} as Record<'coord' | 'deptCoord' | 'student', { id: string }>;
 let termId = '';
+let draftId = '';
 
 function as(userId: string) {
   const http = request(app.getHttpServer());
@@ -151,6 +152,31 @@ describe('generate a timetable (mock solver, fixture snapshot)', () => {
     const recent = (await as(u.coord.id).get(`/terms/${termId}/timetable/jobs`))
       .body as SolveJobDto[];
     expect(recent[0]!.id).toBe(job.id);
+    draftId = job.versionId!;
+  });
+
+  live('shows the draft week to editors only', async () => {
+    const view = await as(u.coord.id).get(`/timetable/versions/${draftId}/view`);
+    expect(view.status).toBe(200);
+    const body = view.body as TimetableViewDto;
+    expect(body.version).toMatchObject({ id: draftId, status: 'draft', slotCount: 394 });
+    expect(body.who).toMatchObject({ kind: 'section', id: body.choices.section[0]!.id });
+    expect(body.slots.length).toBeGreaterThan(0);
+    expect(body.bell.periods.length).toBeGreaterThan(0);
+    expect(body.choices.faculty.length).toBe(snapshot.faculty.length);
+
+    const teacher = body.slots[0]!.faculty[0]!.id;
+    const byTeacher = (
+      await as(u.coord.id).get(`/timetable/versions/${draftId}/view?kind=faculty&id=${teacher}`)
+    ).body as TimetableViewDto;
+    expect(byTeacher.slots.every((s) => s.faculty.some((f) => f.id === teacher))).toBe(true);
+
+    const unknown = '00000000-0000-4000-8000-000000000002';
+    expect(
+      (await as(u.coord.id).get(`/timetable/versions/${draftId}/view?kind=room&id=${unknown}`))
+        .status,
+    ).toBe(404);
+    expect((await as(u.student.id).get(`/timetable/versions/${draftId}/view`)).status).toBe(403);
   });
 
   live('explains a failure in plain words', async () => {
@@ -176,7 +202,10 @@ describe('generate a timetable (mock solver, fixture snapshot)', () => {
     expect((await as(u.student.id).post(`/terms/${termId}/timetable/generate`)).status).toBe(403);
     // A department coordinator cannot generate the whole term.
     expect((await as(u.deptCoord.id).post(`/terms/${termId}/timetable/generate`)).status).toBe(403);
-    expect((await as(u.student.id).get(`/terms/${termId}/timetable/versions`)).status).toBe(403);
+    // Students see published versions only: here, none yet.
+    const asStudent = await as(u.student.id).get(`/terms/${termId}/timetable/versions`);
+    expect(asStudent.status).toBe(200);
+    expect(asStudent.body).toEqual([]);
   });
 
   live('checks the term, the timetable group and the input', async () => {

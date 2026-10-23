@@ -17,7 +17,7 @@ const id = new ZodPipe(idParam);
  * Generating timetables (a background job) and the versions editors see, drafts included.
  *   POST /terms/:termId/timetable/generate   → 202, the solve job to poll
  *   GET  /terms/:termId/timetable/jobs       recent solve jobs
- *   GET  /terms/:termId/timetable/versions   every version of the term
+ *   GET  /terms/:termId/timetable/versions   the term's versions (drafts for editors only)
  *   GET  /timetable/jobs/:jobId              one solve job (progress, outcome)
  */
 @Controller()
@@ -46,7 +46,7 @@ export class TimetableGenerateController {
   }
 
   @Get('terms/:termId/timetable/versions')
-  @RequirePermission('timetable.edit')
+  @RequirePermission('timetable.view')
   versions(
     @CurrentTenant() tenant: Tenant,
     @Param('termId', id) termId: string,

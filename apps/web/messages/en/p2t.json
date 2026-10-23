@@ -1,14 +1,122 @@
 {
   "p2t": {
+    "term": "Term",
     "nav": {
       "group": "Timetable",
-      "timetables": "Timetables"
+      "timetables": "Timetables",
+      "generate": "Generate"
     },
-    "placeholder": {
+    "page": {
       "title": "Timetables",
-      "description": "Generate, adjust and publish class timetables.",
-      "comingSoon": "Coming soon",
-      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+      "description": "The week for any section, lab group, teacher or room.",
+      "generate": "Generate timetable"
+    },
+    "empty": {
+      "noTermTitle": "No term yet",
+      "noTermBody": "Add the term’s dates first, then come back to make its timetable.",
+      "noTermAction": "Open terms",
+      "noTimetableTitle": "No timetable for {term} yet",
+      "noTimetableEditor": "Generate one from the term’s setup. It takes about a minute, and nobody else sees it until you publish it.",
+      "noTimetableViewer": "Your timetable coordinator has not published one yet. Please check again later.",
+      "nothingTitle": "Nothing to show",
+      "nothingBody": "This timetable has no sections, teachers or rooms in it."
+    },
+    "error": {
+      "title": "We couldn’t show this timetable",
+      "body": "Something went wrong while loading it. Please try again.",
+      "retry": "Try again"
+    },
+    "version": {
+      "label": "Version",
+      "draft": "Draft from {date}",
+      "published": "Published version {number}",
+      "archived": "Older version {number}",
+      "statusDraft": "Draft",
+      "statusPublished": "Published",
+      "statusArchived": "Older version",
+      "draftNote": "This is a draft. Only timetable coordinators can see it until it is published.",
+      "archivedNote": "This is an older version. The published one is in the Version list.",
+      "unplaced": "{count, plural, one {# class} other {# classes}} could not be placed."
+    },
+    "view": {
+      "show": "Show",
+      "kind": {
+        "section": "Section",
+        "subgroup": "Lab group",
+        "faculty": "Teacher",
+        "room": "Room"
+      }
+    },
+    "grid": {
+      "caption": "Week timetable for {name}",
+      "day": "Day",
+      "free": "Free period",
+      "break": "{label}, {minutes} minutes",
+      "tag": {
+        "lecture": "",
+        "tutorial": "Tut",
+        "practical": "Lab"
+      },
+      "component": {
+        "lecture": "lecture",
+        "tutorial": "tutorial",
+        "practical": "lab"
+      },
+      "periods": "{first}–{last}",
+      "noRoom": "no room yet",
+      "slot": "{code} {title}, {component}. {details}. {day} {periods}, {start} to {end}.",
+      "phoneHint": "On a phone, the timetable is shown one day at a time."
+    },
+    "days": {
+      "short": {
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat",
+        "7": "Sun"
+      },
+      "long": {
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday",
+        "7": "Sunday"
+      }
+    },
+    "day": {
+      "label": "Day",
+      "today": "{day} (today)",
+      "none": "No classes on {day}."
+    },
+    "generate": {
+      "title": "Generate a timetable",
+      "description": "Slotwise places every class of the term so that no section, teacher or room is double-booked.",
+      "classes": "Classes",
+      "wholeTerm": "Every running class of the term",
+      "scopeOption": "{name} ({count, plural, one {# batch} other {# batches}})",
+      "time": "How long to search",
+      "time30": "Quick (30 seconds)",
+      "time60": "Normal (1 minute)",
+      "time180": "Thorough (3 minutes)",
+      "timeHint": "Searching longer can find a timetable with fewer gaps and late periods.",
+      "start": "Generate",
+      "queued": "Waiting to start…",
+      "running": "Generating… {progress}%",
+      "progress": "Generating the timetable",
+      "doneTitle": "Draft ready",
+      "doneBody": "{placed, plural, one {# class} other {# classes}} placed. {unplaced, plural, =0 {Every class has a place.} one {# class could not be placed.} other {# classes could not be placed.}}",
+      "open": "Open the draft",
+      "failedTitle": "The timetable was not generated",
+      "tryAgain": "Try again",
+      "back": "Back to timetables",
+      "draftNote": "The result is a draft. Nobody else sees it until you publish it.",
+      "lostTrack": "We lost track of this run. Open Timetables to see if the draft is there.",
+      "notAllowedTitle": "Only timetable coordinators can generate timetables",
+      "notAllowedBody": "Ask your institute admin if you need to."
     }
   }
 }

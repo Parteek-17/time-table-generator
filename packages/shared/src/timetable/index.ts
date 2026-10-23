@@ -5,3 +5,5 @@
 export * from './slots';
 export * from './read';
 export * from './generate';
+export * from './grid';
+export * from './view';
