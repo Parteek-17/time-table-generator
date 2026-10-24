@@ -20,6 +20,7 @@ import type {
   ProgrammeInput,
   RoomInput,
   SchemeVersionInput,
+  SetupStep,
   StudentInput,
   TermCohortWindowInput,
   TermInput,
@@ -181,4 +182,47 @@ export interface GenerateCohortsResultDto {
 export interface HolidayPasteResultDto {
   created: number;
   errors: { line: number; text: string; message: string }[];
+}
+
+export interface SetupStepDto {
+  id: SetupStep;
+  /** What the admin said: done, skipped for now, or not yet. */
+  status: 'done' | 'skipped' | 'todo';
+  /** Whether there is already data for this step (e.g. 5 departments). */
+  hasData: boolean;
+  /** How many rows the step has (departments, rooms …). */
+  count: number;
+  /** False for steps that arrive in a later milestone (teaching grid, readiness). */
+  available: boolean;
+}
+
+/** Something that needs the admin's attention, with the screen that fixes it. */
+export interface SetupAttentionDto {
+  code:
+    | 'no_departments'
+    | 'no_programmes'
+    | 'no_active_term'
+    | 'no_cohorts'
+    | 'cohorts_without_sections'
+    | 'no_faculty'
+    | 'no_rooms'
+    | 'no_bell_schedule';
+  count: number;
+  href: string;
+}
+
+export interface SetupStateDto {
+  steps: SetupStepDto[];
+  /** First step not done or skipped (null when everything is). */
+  nextStep: SetupStep | null;
+  /** Share of available steps done or skipped, 0..100. */
+  percent: number;
+  attention: SetupAttentionDto[];
+  activeTermId: string | null;
+}
+
+export interface SampleInstituteDto {
+  slug: string;
+  /** Where to open it; the sample data loads in the background (a few seconds). */
+  url: string;
 }
