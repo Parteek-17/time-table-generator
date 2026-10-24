@@ -4,11 +4,12 @@ import type { NavSource } from './types';
 /** Institute setup and people (master data). */
 const nav: NavSource = async (me) => {
   if (!me.may('masterdata.view')) return [];
-  const t = await getTranslations('nav');
+  const [t, tSetup] = await Promise.all([getTranslations('nav'), getTranslations('p1.setup')]);
   return [
     {
       label: t('setup'),
       items: [
+        { href: '/setup', label: tSetup('navLabel') },
         { href: '/settings/institute', label: t('institute') },
         { href: '/departments', label: t('departments') },
         { href: '/programmes', label: t('programmes') },

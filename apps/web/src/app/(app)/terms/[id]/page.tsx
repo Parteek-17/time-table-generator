@@ -1,12 +1,5 @@
-import {
-  nextTerm,
-  runningSemesters,
-  type CohortRow,
-  type ProgrammeRow,
-  type TermCohortWindowRow,
-  type TermRow,
-} from '@slotwise/shared';
-import { Badge, buttonVariants, Card, CardContent, CardHeader, CardTitle } from '@slotwise/ui';
+import { nextTerm, type CohortRow, type TermRow } from '@slotwise/shared';
+import { Badge, buttonVariants } from '@slotwise/ui';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
@@ -14,7 +7,8 @@ import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/app-shell';
 import { api } from '@/lib/api';
 import { getMe, list } from '@/lib/me';
-import { GenerateCohorts, PromotePanel, WindowsManager } from './term-detail';
+import { TermStartsSection } from './section';
+import { GenerateCohorts, PromotePanel } from './term-detail';
 
 export const metadata: Metadata = { title: 'Term' };
 
@@ -25,9 +19,7 @@ export default async function TermPage({ params }: { params: Promise<{ id: strin
   const termRes = await api<TermRow>(`/terms/${encodeURIComponent(id)}`);
   if (!termRes.ok) notFound();
   const term = termRes.data;
-  const [programmes, windows, cohorts, terms] = await Promise.all([
-    list<ProgrammeRow>('/programmes'),
-    list<TermCohortWindowRow>(`/term-cohort-windows?termId=${id}`),
+  const [cohorts, terms] = await Promise.all([
     list<CohortRow>(`/cohorts?termId=${id}`),
     list<TermRow>('/terms'),
   ]);
@@ -43,46 +35,7 @@ export default async function TermPage({ params }: { params: Promise<{ id: strin
         <Badge>{tEnum(`termStatus.${term.status}`)}</Badge>
       </PageHeader>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('runningTitle')}</CardTitle>
-          <p className="text-sm text-muted-foreground">{t('runningHint')}</p>
-        </CardHeader>
-        <CardContent>
-          {programmes.length === 0 ? (
-            <p className="text-muted-foreground">{t('noProgrammes')}</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {programmes.map((p) => (
-                <li key={p.id} className="flex flex-wrap items-center gap-2">
-                  <span className="min-w-24 font-medium">{p.name}</span>
-                  {runningSemesters(p, term.kind).map((s) => (
-                    <Badge key={s}>{t('semesterShort', { semester: s })}</Badge>
-                  ))}
-                  {p.lateralEntrySemester ? (
-                    <span className="text-sm text-muted-foreground">
-                      {t('leetJoins', { semester: p.lateralEntrySemester })}
-                    </span>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-
-      <section className="flex flex-col gap-3" aria-labelledby="windows-heading">
-        <h2 id="windows-heading" className="text-lg font-semibold">
-          {t('windowsTitle')}
-        </h2>
-        <p className="text-sm text-muted-foreground">{t('windowsHint')}</p>
-        <WindowsManager
-          termId={id}
-          rows={windows}
-          programmes={programmes.map((p) => ({ value: p.id, label: p.name }))}
-          canManage={canManage}
-        />
-      </section>
+      <TermStartsSection term={term} />
 
       <section className="flex flex-col gap-3" aria-labelledby="cohorts-heading">
         <h2 id="cohorts-heading" className="text-lg font-semibold">
