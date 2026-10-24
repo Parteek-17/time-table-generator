@@ -16,6 +16,8 @@ def test_demo_fixture_solves() -> None:
     assert Counter(reasons(r))["no_suitable_room"] == 16
     assert len(r["placed"]) >= 394
     assert r["solveSeconds"] <= 12
+    # The greedy starting timetable scores 202; the improvement loop must beat it.
+    assert r["score"]["total"] < 202
     assert [b["constraint"] for b in r["score"]["breakdown"]] == [
         "theory_spread",
         "faculty_consecutive",

@@ -38,16 +38,21 @@ def theory_per_day_cap(total: int, days: int) -> int:
     return 1 if total <= days else ceil(total / days)
 
 
-def count_theory_spread(placed: list[Placed]) -> int:
+def count_theory_spread(placed: list[Placed], problem: Problem) -> int:
+    # The cap uses the course's whole L + T for the audience, placed or not.
+    total: dict[tuple[str, str], int] = defaultdict(int)
+    for s in problem.sessions:
+        if s.component in ("lecture", "tutorial"):
+            total[(s.course_id, s.target_id)] += 1
     groups: dict[tuple[str, str], list[Placed]] = defaultdict(list)
     for p in placed:
         if p.session.component in ("lecture", "tutorial"):
             groups[(p.session.course_id, p.session.target_id)].append(p)
     count = 0
-    for items in groups.values():
+    for key, items in groups.items():
         bell = items[0].session.bell
         days = len(bell.working_days) if bell else 5
-        cap = theory_per_day_cap(len(items), days)
+        cap = theory_per_day_cap(total[key], days)
         per_day: dict[int, int] = defaultdict(int)
         for p in items:
             per_day[p.option.weekday] += 1
@@ -129,7 +134,7 @@ def count_preferred_room(placed: list[Placed], problem: Problem) -> int:
 
 def score(placed: list[Placed], problem: Problem, weights: dict[str, float]) -> Json:
     counts = {
-        "theory_spread": count_theory_spread(placed),
+        "theory_spread": count_theory_spread(placed, problem),
         "faculty_consecutive": count_faculty_consecutive(placed),
         "late_slots": count_late_slots(placed),
         "section_idle_gaps": count_section_idle_gaps(placed),

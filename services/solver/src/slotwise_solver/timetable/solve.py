@@ -20,7 +20,7 @@ def solve(request: Json) -> Json:
     weights = {**DEFAULT_WEIGHTS, **(options.get("weights") or {})}
 
     problem = build_problem(request)
-    result = solve_model(problem, time_limit, seed)
+    result = solve_model(problem, time_limit, seed, weights)
 
     placed = [
         Placed(s, *result.placements[s.id]) for s in problem.sessions if s.id in result.placements
@@ -31,7 +31,7 @@ def solve(request: Json) -> Json:
     for s in problem.sessions:
         if s.id in result.placements:
             continue
-        reason, extra = _reason(problem, s, result.proven, load)
+        reason, extra = _reason(problem, s, result.placement_proven, load)
         unplaced.append(
             {
                 "sessionId": s.id,
@@ -42,12 +42,11 @@ def solve(request: Json) -> Json:
             }
         )
 
-    if result.status == "UNKNOWN":
-        status = "TIMEOUT"
-    elif not unplaced:
+    # OPTIMAL needs every penalty proven too; INFEASIBLE only needs the placement count proven.
+    if not unplaced:
         status = "OPTIMAL" if result.proven else "FEASIBLE"
     else:
-        status = "INFEASIBLE" if result.proven else "TIMEOUT"
+        status = "INFEASIBLE" if result.placement_proven else "TIMEOUT"
 
     return {
         "version": VERSION,

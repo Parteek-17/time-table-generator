@@ -2,8 +2,9 @@
 
 ## Current milestone
 
-1 — Model + hard constraints: done on `p2e/engine` (branched from `c0/contracts` because C0
-was not on `main` yet; rebase onto `origin/main` once C0 merges).
+2 — Soft constraints + score breakdown: done on `p2e/engine` (branched from `c0/contracts`
+because C0 was not on `main` yet; rebase onto `origin/main` once C0 merges). Milestone 1
+(hard constraints) is done too.
 
 ## Done
 
@@ -12,16 +13,21 @@ was not on `main` yet; rebase onto `origin/main` once C0 merges).
 - Engine (`services/solver/src/slotwise_solver/timetable/`):
   - `problem.py` sessions, time options and candidate rooms from the snapshot;
   - `greedy.py` fast valid placement, used as the CP-SAT hint and fallback;
-  - `model.py` CP-SAT in two stages: times (audience, faculty, load limits, counted rooms),
-    then rooms per day; anything left is re-offered to the greedy placer;
-  - `score.py` soft-constraint counts for the breakdown (not optimised yet: milestone 2);
+  - `model.py` CP-SAT in two stages. Times: pass A places as many periods as possible
+    (audience, faculty, load limits, counted rooms); pass B keeps that many and lowers the
+    time penalties (theory spread, >3 periods in a row, last period, idle gaps) with a
+    deterministic large-neighbourhood search (free a few sections' or teachers' classes,
+    re-solve, repeat). Rooms: one model for the week, placement first, then home room,
+    same lab per lab group, preferred room. Anything left goes to the greedy placer;
+  - `score.py` soft-constraint counts for the breakdown (the model's penalties mirror it);
   - `explain.py` plain-language messages for unplaced sessions;
   - `checker.py` independent hard-constraint checker (shares no code with the model).
-- Tests: every hard constraint on a tiny fixture, checker catches each kind of break, demo
-  fixture, determinism (same input + seed → same output), router.
-- Demo fixture (this 2-core laptop, 10 s limit): 396 of 414 placed; 16 unplaced for lack of a
-  drawing hall (planned gaps), 1 over a teacher's weekly limit (15 periods needed, max 14),
-  1 lab reported `time_limit` (not proven impossible yet; milestone 3's relaxation explains it).
+- Tests: every hard constraint and every soft constraint on a tiny fixture, request weights,
+  checker catches each kind of break, demo fixture, determinism, router (46 tests, ~18 s).
+- Demo fixture (this 2-core laptop): 397 of 414 placed; 16 unplaced for lack of a drawing hall
+  (planned gaps), 1 over a teacher's weekly limit (15 periods needed, max 14). Penalty with
+  default weights: greedy start 202 → 80 with a 10 s limit, → 29 with 30 s. Two 10 s runs give
+  identical output.
 
 Decisions (behaviour other streams may notice):
 
@@ -35,13 +41,18 @@ Decisions (behaviour other streams may notice):
   the stream brief.
 - Status: OPTIMAL/INFEASIBLE only when CP-SAT proves the placement count; otherwise
   FEASIBLE (all placed) or TIMEOUT (some unplaced).
-- Determinism: interleaved CP-SAT workers + a deterministic time budget. A wall-clock cap of
-  `timeLimitSeconds` also applies; on a much slower machine it can stop the search first.
+- Determinism: the improvement loop runs single-threaded on a deterministic-time budget of
+  0.15 × seconds (this laptop does ~0.2 per second), and pass A uses interleaved workers. A
+  wall-clock cap of `timeLimitSeconds` also applies; only a machine slower than this laptop
+  would stop on it first and lose reproducibility.
+- Time split: 15 % of the limit is kept for rooms; pass A gets a quarter of the rest. Status
+  OPTIMAL needs every penalty proven (only realistic for small problems); INFEASIBLE needs
+  only the placement count proven.
+- Same-lab and home-room penalties share the `home_room` count (the contract has no separate
+  same-lab key).
 
 ## Next
 
-- Milestone 2: soft constraints in the model + score breakdown (two-phase: keep the placement
-  count, then minimise penalties).
 - Milestone 3: relaxation pass for reason codes, tiny fixture per code.
 
 ## Blocked by
