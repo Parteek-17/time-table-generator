@@ -79,6 +79,14 @@ export class TimetableGenerateService {
     const job = await this.prisma.tenant(this.ctx(tenant), async (tx) => {
       const term = await tx.term.findFirst({ where: { id: termId, deletedAt: null } });
       if (!term) throw new NotFoundException('We could not find this term.');
+      // Re-solving a version keeps its term and timetable group.
+      if (input.baseVersionId) {
+        const base = await tx.timetableVersion.findFirst({
+          where: { id: input.baseVersionId, termId },
+        });
+        if (!base) throw new NotFoundException('We could not find the timetable to start from.');
+        input = { ...input, scopeId: base.scopeId };
+      }
       if (input.scopeId) {
         const scope = await tx.timetableScope.findFirst({
           where: { id: input.scopeId, termId, deletedAt: null },
@@ -107,6 +115,7 @@ export class TimetableGenerateService {
           instituteId: tenant.institute.id,
           termId,
           scopeId: input.scopeId,
+          baseVersionId: input.baseVersionId,
           cohortIds: [],
           options: { timeLimitSeconds: input.timeLimitSeconds, seed: input.seed },
           createdById: tenant.user.id,

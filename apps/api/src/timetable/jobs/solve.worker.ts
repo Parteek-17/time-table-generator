@@ -1,9 +1,12 @@
 import { createHash } from 'node:crypto';
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import type { Prisma } from '@slotwise/db';
-import type { SetupSnapshotV1, SolverTimetableRequestV1 } from '@slotwise/shared/contracts';
+import type {
+  PlacementV1,
+  SetupSnapshotV1,
+  SolverTimetableRequestV1,
+} from '@slotwise/shared/contracts';
 import {
-  busySlotsFrom,
   GenerateTimetableInput,
   SnapshotMismatchError,
   slotsFromPlacements,
@@ -13,6 +16,7 @@ import type { Queue } from 'bullmq';
 import { ENV, type Env } from '../../config/env';
 import { PrismaService } from '../../db/prisma.service';
 import { QueueService } from '../../queue/queue.service';
+import { publishedBusySlots } from '../busy';
 import { TIMETABLE_CONFIG, type TimetableConfig } from '../timetable.config';
 import { SnapshotClient, SolveProblem, SolverClient } from './clients';
 
@@ -137,8 +141,17 @@ export class SolveWorker implements OnModuleInit {
         options: {
           timeLimitSeconds: input.timeLimitSeconds,
           seed: input.seed,
-          lockedSessions: [],
-          busySlots: await this.busySlots(tenant, job.termId, job.scopeId, snapshot),
+          lockedSessions: job.baseVersionId
+            ? await this.lockedSessions(tenant, job.baseVersionId)
+            : [],
+          busySlots: await this.prisma.tenant(tenant, (tx) =>
+            publishedBusySlots(
+              tx,
+              job.termId,
+              job.scopeId,
+              new Set(snapshot.sections.map((x) => x.id)),
+            ),
+          ),
           weights: {},
         },
       };
@@ -176,6 +189,7 @@ export class SolveWorker implements OnModuleInit {
             instituteId,
             termId: job.termId,
             scopeId: job.scopeId,
+            parentId: job.baseVersionId,
             cohortIds,
             snapshotId: stored.id,
             solveJobId,
@@ -219,45 +233,21 @@ export class SolveWorker implements OnModuleInit {
     }
   }
 
-  /**
-   * Cells other published timetables of the term use (other timetable scopes), so the new
-   * timetable does not double-book their teachers, rooms or sections.
-   */
-  private async busySlots(
+  /** Locked classes of the version being re-solved, as placements the solver must keep. */
+  private async lockedSessions(
     tenant: { instituteId: string; userId: string },
-    termId: string,
-    scopeId: string | null,
-    snapshot: SetupSnapshotV1,
-  ) {
-    const others = await this.prisma.tenant(tenant, (tx) =>
-      tx.timetableVersion.findMany({
-        // Every other published version of the term; `NOT: { scopeId }` would drop null scopes.
-        where: {
-          termId,
-          status: 'published',
-          ...(scopeId
-            ? { OR: [{ scopeId: null }, { scopeId: { not: scopeId } }] }
-            : { scopeId: { not: null } }),
-        },
-        include: {
-          scope: { select: { name: true } },
-          slots: {
-            select: {
-              sectionIds: true,
-              facultyIds: true,
-              roomId: true,
-              weekday: true,
-              startPeriod: true,
-              length: true,
-            },
-          },
-        },
-      }),
+    versionId: string,
+  ): Promise<PlacementV1[]> {
+    const locked = await this.prisma.tenant(tenant, (tx) =>
+      tx.timetableSlot.findMany({ where: { versionId, locked: true, roomId: { not: null } } }),
     );
-    const own = new Set(snapshot.sections.map((s) => s.id));
-    return others.flatMap((v) =>
-      busySlotsFrom(v.slots, own, `${v.scope?.name ?? 'Whole-term'} timetable (published)`),
-    );
+    return locked.map((s) => ({
+      sessionId: s.sessionId,
+      weekday: s.weekday,
+      startPeriodIndex: s.startPeriod,
+      length: s.length,
+      roomId: s.roomId!,
+    }));
   }
 
   /** Moves the job's progress from 30 towards 90 while the solver works. */

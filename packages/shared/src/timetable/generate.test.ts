@@ -40,6 +40,7 @@ describe('GenerateTimetableInput', () => {
       scopeId: null,
       timeLimitSeconds: 60,
       seed: 0,
+      baseVersionId: null,
     });
   });
 

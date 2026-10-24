@@ -14,6 +14,11 @@ export const GenerateTimetableInput = z.object({
   timeLimitSeconds: z.int().min(5).max(600).default(60),
   /** Same input + seed → same timetable. */
   seed: z.int().min(0).default(0),
+  /**
+   * Re-solve the rest: start from this version, keep its locked classes where they are and
+   * place everything else again. The new draft's parent is this version; its scope wins.
+   */
+  baseVersionId: z.uuid().nullable().default(null),
 });
 export type GenerateTimetableInput = z.infer<typeof GenerateTimetableInput>;
 

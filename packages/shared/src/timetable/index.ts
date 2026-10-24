@@ -7,3 +7,5 @@ export * from './read';
 export * from './generate';
 export * from './grid';
 export * from './view';
+export * from './check';
+export * from './edit';

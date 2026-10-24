@@ -7,7 +7,8 @@ import { demoTermSolution } from '@slotwise/shared/fixtures';
 
 /**
  * Stand-in for P2E's solver until it is on `main` (SOLVER_SOURCE=mock): waits `delayMs`, then
- * answers with the demo term's solution, whatever was asked. Only matches the fixture snapshot.
+ * answers with the demo term's solution, whatever was asked, except that locked sessions stay
+ * exactly where the request says (as the real solver does). Only matches the fixture snapshot.
  * Remove when INT says the solver has landed.
  */
 export async function mockSolve(
@@ -15,5 +16,14 @@ export async function mockSolve(
   delayMs: number,
 ): Promise<SolverTimetableResponseV1> {
   await sleep(delayMs);
-  return { ...demoTermSolution(), requestId: request.requestId };
+  const solution = demoTermSolution();
+  const locked = new Map(request.options.lockedSessions.map((p) => [p.sessionId, p]));
+  return {
+    ...solution,
+    requestId: request.requestId,
+    placed: solution.placed.map((p) => {
+      const keep = locked.get(p.sessionId);
+      return keep ? { ...p, ...keep, locked: true } : p;
+    }),
+  };
 }
