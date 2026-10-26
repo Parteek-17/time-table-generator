@@ -15,6 +15,9 @@ def test_demo_fixture_solves() -> None:
     # the greedy fixture placed 394 of 414.
     assert Counter(reasons(r))["no_suitable_room"] == 16
     assert len(r["placed"]) >= 394
+    # Milestone 3: every other unplaced session has a specific reason, not "other".
+    assert "other" not in reasons(r)
+    assert all(u["message"] and u["involved"]["courseIds"] for u in r["unplaced"])
     assert r["solveSeconds"] <= 12
     # The greedy starting timetable scores 202; the improvement loop must beat it.
     assert r["score"]["total"] < 202

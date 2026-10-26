@@ -161,6 +161,8 @@ class Block:
     start: int
     end: int
     why: str  # fixed_slot | unavailable | busy
+    # Faculty, section, sub-group or elective id the block belongs to.
+    owner: str = ""
 
     def overlaps(self, o: Option) -> bool:
         return self.weekday == o.weekday and self.start < o.end and o.start < self.end
@@ -186,6 +188,10 @@ class Session:
     room_need: Json | None
     rooms: list[str] = field(default_factory=list)
     options: list[Option] = field(default_factory=list)
+    # Every place the bell schedule allows, and the fixed/unavailable/busy blocks in the way;
+    # relax.py uses them to explain why a session got no place.
+    all_options: list[Option] = field(default_factory=list)
+    blocks: list[Block] = field(default_factory=list)
     # Set when the session cannot be placed before solving (with the reason code).
     reason: str | None = None
     detail: str | None = None
@@ -266,13 +272,15 @@ def build_problem(request: Json) -> Problem:
         for sid, s in sections.items()
     }
 
-    def bell_span(bell: Bell | None, weekday: int, start: int, end: int, why: str) -> Block | None:
+    def bell_span(
+        bell: Bell | None, weekday: int, start: int, end: int, why: str, owner: str
+    ) -> Block | None:
         if bell is None:
             return None
         first, last = bell.period(start), bell.period(end)
         if first is None or last is None:
             return None
-        return Block(weekday, first.start, last.end, why)
+        return Block(weekday, first.start, last.end, why, owner)
 
     # Busy periods per resource, in minutes.
     section_blocks: dict[str, list[Block]] = {}
@@ -292,7 +300,12 @@ def build_problem(request: Json) -> Problem:
                 faculty_blocks,
                 f["id"],
                 bell_span(
-                    default_bell, c["weekday"], c["periodIndex"], c["periodIndex"], "unavailable"
+                    default_bell,
+                    c["weekday"],
+                    c["periodIndex"],
+                    c["periodIndex"],
+                    "unavailable",
+                    f["id"],
                 ),
             )
 
@@ -309,6 +322,7 @@ def build_problem(request: Json) -> Problem:
                         fs["startPeriodIndex"],
                         fs["endPeriodIndex"],
                         "fixed_slot",
+                        sid,
                     ),
                 )
         for fid in fs["facultyIds"]:
@@ -321,33 +335,34 @@ def build_problem(request: Json) -> Problem:
                     fs["startPeriodIndex"],
                     fs["endPeriodIndex"],
                     "fixed_slot",
+                    fid,
                 ),
             )
 
     for b in options.get("busySlots") or []:
         kind, rid, day, p = b["resource"], b["id"], b["weekday"], b["periodIndex"]
         if kind == "faculty":
-            add(faculty_blocks, rid, bell_span(default_bell, day, p, p, "busy"))
+            add(faculty_blocks, rid, bell_span(default_bell, day, p, p, "busy", rid))
             faculty_busy_cells.setdefault(rid, set()).add((day, p))
         elif kind == "room":
-            add(room_blocks, rid, bell_span(default_bell, day, p, p, "busy"))
+            add(room_blocks, rid, bell_span(default_bell, day, p, p, "busy", rid))
         elif kind == "section":
             add(
                 section_blocks,
                 rid,
-                bell_span(section_bell.get(rid, default_bell), day, p, p, "busy"),
+                bell_span(section_bell.get(rid, default_bell), day, p, p, "busy", rid),
             )
         elif kind == "subgroup":
             sec = subgroups[rid]["sectionId"] if rid in subgroups else None
             add(
                 subgroup_blocks,
                 rid,
-                bell_span(section_bell.get(sec, default_bell), day, p, p, "busy"),
+                bell_span(section_bell.get(sec, default_bell), day, p, p, "busy", rid),
             )
         else:
             src = electives[rid]["sourceSectionIds"] if rid in electives else []
             bell = section_bell.get(src[0], default_bell) if src else default_bell
-            add(elective_blocks, rid, bell_span(bell, day, p, p, "busy"))
+            add(elective_blocks, rid, bell_span(bell, day, p, p, "busy", rid))
 
     faculty_busy_load: dict[str, dict[int, int]] = {}
     for fid, cells in faculty_busy_cells.items():
@@ -452,17 +467,12 @@ def build_problem(request: Json) -> Problem:
                 s.reason = "locked_conflict"
                 continue
 
-            unavailable = [b for b in fac_blocks if b.why == "unavailable"]
-            fixed = [b for b in aud_blocks + fac_blocks if b.why == "fixed_slot"]
-            blocks = aud_blocks + fac_blocks
-            s.options = [o for o in all_opts if not any(b.overlaps(o) for b in blocks)]
+            s.all_options = all_opts
+            s.blocks = aud_blocks + fac_blocks
+            s.options = [o for o in all_opts if not any(b.overlaps(o) for b in s.blocks)]
             if not s.options:
-                if all(any(b.overlaps(o) for b in unavailable) for o in all_opts):
-                    s.reason = "faculty_unavailable"
-                elif all(any(b.overlaps(o) for b in fixed) for o in all_opts):
-                    s.reason = "blocked_by_fixed_slot"
-                else:
-                    s.reason = "no_free_slot"
+                # relax.diagnose() finds the real reason (unavailable, fixed slot …).
+                s.reason, s.detail = "no_free_slot", "blocked"
 
     boundaries: dict[int, list[int]] = {}
     for day in range(1, 8):

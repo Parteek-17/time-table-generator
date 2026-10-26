@@ -2,8 +2,8 @@
 
 ## Current milestone
 
-2 — Soft constraints + score breakdown: done on `p2e/engine` (rebased onto `origin/main` with
-C0 on 2026-10-26; 46 tests pass). Milestone 1 (hard constraints) is done too.
+3 — Reason codes for unplaced sessions (relaxation pass): done on `p2e/engine` (59 tests).
+Milestones 1 (hard constraints) and 2 (soft constraints + score breakdown) are done too.
 
 ## Done
 
@@ -19,12 +19,27 @@ C0 on 2026-10-26; 46 tests pass). Milestone 1 (hard constraints) is done too.
     re-solve, repeat). Rooms: one model for the week, placement first, then home room,
     same lab per lab group, preferred room. Anything left goes to the greedy placer;
   - `score.py` soft-constraint counts for the breakdown (the model's penalties mirror it);
-  - `explain.py` plain-language messages for unplaced sessions;
+  - `relax.py` relaxation pass: for each unplaced session, every place the bell schedule
+    allows is checked around the final timetable, collecting what is in the way (teacher
+    unavailable, fixed period, busy slot, daily limit, a locked class, another class, every
+    fitting room taken). If relaxing one kind alone frees a place, that kind names the reason
+    (`faculty_unavailable`, `blocked_by_fixed_slot`, `faculty_over_max`, `locked_conflict`);
+    a weekly limit always wins; nothing in the way means `time_limit`; otherwise
+    `no_free_slot` (or `time_limit` while other classes could still move). Pre-solve reasons
+    (`no_suitable_room`, `room_too_small`, `lab_block_does_not_fit`, invalid lock, `other`)
+    are kept;
+  - `explain.py` plain-language messages for unplaced sessions, naming the periods and who is
+    in the way ("Mon P1: Dr. Kaur teaches CS301 for CS B"); `involved` also lists the
+    blocking teachers, sections and rooms so the UI can offer fixes;
   - `checker.py` independent hard-constraint checker (shares no code with the model).
 - Tests: every hard constraint and every soft constraint on a tiny fixture, request weights,
-  checker catches each kind of break, demo fixture, determinism, router (46 tests, ~18 s).
-- Demo fixture (this 2-core laptop): 397 of 414 placed; 16 unplaced for lack of a drawing hall
-  (planned gaps), 1 over a teacher's weekly limit (15 periods needed, max 14). Penalty with
+  checker catches each kind of break, demo fixture, determinism, router, and one fixture per
+  unplaced reason code in `tests/timetable/test_reasons.py` (a test fails if the contract
+  gains a code without a fixture) — 59 tests.
+- Demo fixture (this 2-core laptop): 396–397 of 414 placed; 16 unplaced for lack of a drawing
+  hall (planned gaps), 1 over a teacher's weekly limit (15 periods needed, max 14), and when
+  the machine is busy sometimes 1 lab whose only workable period is a fixed period. None is
+  `other`; the relaxation pass takes ~0.03 s. Penalty with
   default weights: greedy start 202 → 80 with a 10 s limit, → 29 with 30 s. Two 10 s runs give
   identical output.
 
@@ -37,7 +52,8 @@ Decisions (behaviour other streams may notice):
   read in the default bell schedule's periods; section busy slots in the section's schedule.
 - Faculty busy slots count towards their per-day and per-week limits.
 - Reason codes are the contract's (`no_free_slot`, `faculty_over_max`, …), not the names in
-  the stream brief.
+  the stream brief. `locked_conflict` covers both an invalid lock and a session whose every
+  workable place is held by a locked class.
 - Status: OPTIMAL/INFEASIBLE only when CP-SAT proves the placement count; otherwise
   FEASIBLE (all placed) or TIMEOUT (some unplaced).
 - Determinism: the improvement loop runs single-threaded on a deterministic-time budget of
@@ -52,7 +68,13 @@ Decisions (behaviour other streams may notice):
 
 ## Next
 
-- Milestone 3: relaxation pass for reason codes, tiny fixture per code.
+- The next milestone in the P2E stream brief.
+- Load flakes (seen at 100 % CPU with parallel sessions, on 9b5abcc too, so not M3):
+  `test_demo_fixture_solves` asserts `solveSeconds <= 12` for a 10 s limit and took
+  12.7–16.8 s; `test_same_input_and_seed_give_the_same_timetable` once got INFEASIBLE vs
+  TIMEOUT (identical placements) because pass A hit the wall-clock cap before proving the
+  placement count. Both pass on a quieter machine. Consider making the proof deterministic
+  (deterministic-time limit for pass A) or loosening the timing bound.
 
 ## Blocked by
 
@@ -75,4 +97,4 @@ Decisions (behaviour other streams may notice):
 
 ## Last pushed
 
-Not pushed yet.
+origin/p2e/engine @ 9b5abcc
