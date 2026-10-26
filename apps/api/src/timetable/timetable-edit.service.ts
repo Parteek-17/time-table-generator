@@ -21,6 +21,7 @@ import {
 import type { Tenant } from '../common/request-context';
 import { PrismaService } from '../db/prisma.service';
 import { publishedBusySlots } from './busy';
+import { tenantLong } from './tenant-tx';
 import { storedSlot } from './timetable-read.service';
 
 const NOT_ALLOWED = 'You don’t have permission to change these classes. Ask your institute admin.';
@@ -205,7 +206,7 @@ export class TimetableEditService {
    * never change). Same slots, locks and solver notes; its parent is the original.
    */
   async copy(tenant: Tenant, versionId: string): Promise<{ versionId: string }> {
-    return this.prisma.tenant(this.ctx(tenant), async (tx) => {
+    return tenantLong(this.prisma, this.ctx(tenant), async (tx) => {
       const version = await this.load(tx, versionId);
       if (!versionDepartments(version).every((d) => this.mayEdit(tenant, d))) {
         throw new ForbiddenException(NOT_ALLOWED);

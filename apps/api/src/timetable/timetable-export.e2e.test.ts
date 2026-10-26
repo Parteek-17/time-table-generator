@@ -139,7 +139,8 @@ describe('timetable downloads', () => {
     expect(res.headers['content-type']).toContain('spreadsheetml');
     expect(res.headers['content-disposition']).toMatch(/filename="timetable-.+-v1\.xlsx"/);
     const book = new ExcelJS.Workbook();
-    await book.xlsx.load(res.body as Buffer);
+    // exceljs types its Buffer before Node 22's generic Buffer.
+    await book.xlsx.load(res.body as unknown as ExcelJS.Buffer);
     expect(book.worksheets).toHaveLength(1);
     const sheet = book.worksheets[0]!;
     expect(sheet.getCell('A1').value).toBe(section.name);
@@ -156,7 +157,8 @@ describe('timetable downloads', () => {
     expect(res.status).toBe(200);
     expect(res.headers['content-disposition']).toContain('timetable-rooms-v1.xlsx');
     const book = new ExcelJS.Workbook();
-    await book.xlsx.load(res.body as Buffer);
+    // exceljs types its Buffer before Node 22's generic Buffer.
+    await book.xlsx.load(res.body as unknown as ExcelJS.Buffer);
     expect(book.worksheets.map((s) => s.name)).toEqual(choices.room.map((r) => r.name));
   });
 

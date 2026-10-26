@@ -24,6 +24,7 @@ import {
 import { randomUUID } from 'node:crypto';
 import type { Tenant } from '../common/request-context';
 import { PrismaService } from '../db/prisma.service';
+import { tenantLong } from './tenant-tx';
 import { copyVersionTx, versionDepartments, type Version } from './timetable-edit.service';
 
 const NOT_ALLOWED =
@@ -51,7 +52,7 @@ export class TimetablePublishService {
   ) {}
 
   async publish(tenant: Tenant, versionId: string): Promise<PublishResult> {
-    const { result, events } = await this.prisma.tenant(this.ctx(tenant), async (tx) => {
+    const { result, events } = await tenantLong(this.prisma, this.ctx(tenant), async (tx) => {
       const version = await this.lockAndLoad(tx, versionId);
       this.assertMayPublish(tenant, version);
       if (version.status === 'published') {
@@ -106,7 +107,7 @@ export class TimetablePublishService {
   }
 
   async undoPublish(tenant: Tenant, versionId: string): Promise<UndoPublishResult> {
-    const { result, events } = await this.prisma.tenant(this.ctx(tenant), async (tx) => {
+    const { result, events } = await tenantLong(this.prisma, this.ctx(tenant), async (tx) => {
       const version = await this.lockAndLoad(tx, versionId);
       this.assertMayPublish(tenant, version);
       if (version.status !== 'published') throw new ConflictException(NOT_CURRENT);

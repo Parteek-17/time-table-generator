@@ -1,4 +1,4 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import type { Prisma } from '@slotwise/db';
 import type {
@@ -183,9 +183,16 @@ export class SolveWorker implements OnModuleInit {
       };
       const cohortIds =
         snapshot.scope?.cohortIds ?? snapshot.cohorts.filter((c) => c.isRunning).map((c) => c.id);
-      await this.prisma.tenant(tenant, async (tx) => {
-        const version = await tx.timetableVersion.create({
+      // One batch transaction, not an interactive one: a few hundred rows can take longer than
+      // Prisma's 5-second interactive limit on a slow machine. RLS settings go first, as in
+      // withTenant() (requests/2026-10-27-p2t-tenant-transaction-timeout.md).
+      const versionId = randomUUID();
+      await this.prisma.$transaction([
+        this.prisma.$executeRaw`SELECT set_config('app.institute_id', ${instituteId}, true),
+                                       set_config('app.user_id', ${tenant.userId}, true)`,
+        this.prisma.timetableVersion.create({
           data: {
+            id: versionId,
             instituteId,
             termId: job.termId,
             scopeId: job.scopeId,
@@ -197,16 +204,16 @@ export class SolveWorker implements OnModuleInit {
             score: json(response.score),
             createdById: job.createdById,
           },
-        });
-        await tx.timetableSlot.createMany({
+        }),
+        this.prisma.timetableSlot.createMany({
           data: slots.map((slot) => ({
             ...slot,
             faculty: json(slot.faculty),
             instituteId,
-            versionId: version.id,
+            versionId,
           })),
-        });
-        await tx.solveJob.update({
+        }),
+        this.prisma.solveJob.update({
           where: { id: solveJobId },
           data: {
             status: 'succeeded',
@@ -214,8 +221,8 @@ export class SolveWorker implements OnModuleInit {
             resultSummary: json(summary),
             finishedAt: new Date(),
           },
-        });
-      });
+        }),
+      ]);
     } catch (error) {
       const message = error instanceof SolveProblem ? error.message : GENERIC_FAILURE;
       if (!(error instanceof SolveProblem)) {
