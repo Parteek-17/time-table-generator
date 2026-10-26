@@ -3,6 +3,7 @@
  * readiness issues it leaves on purpose (PLANNED_GAPS), and build under row-level security
  * as the restricted app role, the way the API will run it.
  */
+import '../src/load-env';
 import { randomUUID } from 'node:crypto';
 import { readiness, type ReadinessResult } from '@slotwise/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -14,14 +15,6 @@ import {
   withTenant,
   type SampleSummary,
 } from '../src/index';
-
-for (const file of ['.env.local', '.env']) {
-  try {
-    process.loadEnvFile(file);
-  } catch {
-    // CI passes the URLs as environment variables.
-  }
-}
 
 const owner = new PrismaClient({ datasources: { db: { url: process.env.OWNER_DATABASE_URL } } });
 const app = new PrismaClient({ datasources: { db: { url: process.env.APP_DATABASE_URL } } });

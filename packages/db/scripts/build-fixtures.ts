@@ -8,6 +8,7 @@
  * database gives the same files. Owner connection: no row-level security, so every query is
  * filtered by the demo institute explicitly.
  */
+import '../src/load-env';
 import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -35,15 +36,6 @@ import {
   type UnplacedSessionV1,
 } from '@slotwise/shared/contracts';
 import { PrismaClient } from '../src/index';
-
-// .env.local (stream worktree overrides, scripts/stream-env.mjs) wins over .env.
-for (const file of ['.env.local', '.env']) {
-  try {
-    process.loadEnvFile(file);
-  } catch {
-    // No .env file: rely on the environment.
-  }
-}
 
 const OUT = join(__dirname, '..', '..', 'shared', 'fixtures');
 const prisma = new PrismaClient();

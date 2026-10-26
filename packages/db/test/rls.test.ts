@@ -4,6 +4,7 @@
  *   OWNER_DATABASE_URL  owner role (creates fixtures)
  *   APP_DATABASE_URL    restricted slotwise_app role (what the API uses)
  */
+import '../src/load-env';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -13,14 +14,6 @@ import {
   TENANT_TABLES_DELETE_ORDER,
   withTenant,
 } from '../src/index';
-
-for (const file of ['.env.local', '.env']) {
-  try {
-    process.loadEnvFile(file);
-  } catch {
-    // CI passes the URLs as environment variables.
-  }
-}
 
 const ownerUrl = process.env.OWNER_DATABASE_URL;
 const appUrl = process.env.APP_DATABASE_URL;

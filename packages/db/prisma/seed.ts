@@ -4,6 +4,7 @@
  * `default async function (prisma: PrismaClient): Promise<void>`, must be safe to re-run and
  * may assume P1's demo institute exists. Fictional data only (CLAUDE.md "Things to avoid").
  */
+import '../src/load-env';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { PrismaClient } from '../src/index';
@@ -13,15 +14,6 @@ type StreamSeed = (prisma: PrismaClient) => Promise<void>;
 
 /** Merge order (docs/coordination/MERGE-ORDER.md), after P1. */
 const STREAM_SEEDS = ['p2t', 'p4', 'p6', 'p5', 'p7'] as const;
-
-// .env.local (stream worktree overrides, scripts/stream-env.mjs) wins over .env.
-for (const file of ['.env.local', '.env']) {
-  try {
-    process.loadEnvFile(file);
-  } catch {
-    // No .env file: rely on the environment (CI, hosted DBs).
-  }
-}
 
 const prisma = new PrismaClient();
 
