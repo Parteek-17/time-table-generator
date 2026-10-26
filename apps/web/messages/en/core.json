@@ -29,12 +29,7 @@
     "timetableSoon": "Your timetable will appear here once it’s published.",
     "setupTitle": "Set up your institute",
     "setupHint": "Enter what a timetable needs: programmes, the current term, sections, faculty, rooms and the bell schedule.",
-    "setupProgrammes": "Programmes",
-    "setupTerms": "Terms",
-    "setupCohorts": "Sections",
-    "setupFaculty": "Faculty",
-    "setupRooms": "Rooms",
-    "setupBell": "Bell schedule"
+    "setupOpen": "Open setup"
   },
   "members": {
     "title": "Members",

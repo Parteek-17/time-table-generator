@@ -86,22 +86,9 @@ export default async function HomePage({
           <CardHeader>
             <CardTitle>{t('setupTitle')}</CardTitle>
             <CardDescription>{t('setupHint')}</CardDescription>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {(
-                [
-                  ['/programmes', 'setupProgrammes'],
-                  ['/terms', 'setupTerms'],
-                  ['/cohorts', 'setupCohorts'],
-                  ['/faculty', 'setupFaculty'],
-                  ['/rooms', 'setupRooms'],
-                  ['/bell-schedules', 'setupBell'],
-                ] as const
-              ).map(([href, key]) => (
-                <Button key={href} asChild variant="outline" size="sm">
-                  <Link href={href}>{t(key)}</Link>
-                </Button>
-              ))}
-            </div>
+            <Button asChild className="mt-2 self-start">
+              <Link href="/setup">{t('setupOpen')}</Link>
+            </Button>
           </CardHeader>
         </Card>
       ) : null}
