@@ -2,8 +2,14 @@
 
 ## Current milestone
 
-2T-d — editing, locks, re-solve, undo/redo, Not placed: done (branch `p2t/schema`, based on `c0/contracts`
-until C0 is on `main`; rebase then).
+2T-d — editing, locks, re-solve, undo/redo, Not placed: done (branch `p2t/schema`, rebased
+onto `main` with C0, P1 1b+/1c and INT's 2026-10-26 fixes). Lint, typecheck, ownership pass;
+shared 198 and API 77 tests pass against `slotwise_p2t`.
+
+Known local failure until INT merges P2T: `packages/db` `rls.test.ts` "every table with
+institute_id…" expects P2T's four tables in `TENANT_TABLES_DELETE_ORDER` (INT's `purge.ts`,
+part of the migration request). RLS itself is on for them. CI is not affected (its database has
+no P2T tables yet).
 
 ## Done
 
@@ -75,7 +81,8 @@ None. Open requests:
 
 - `requests/2026-10-23-p2t-timetable-migration.md` — migration + RLS SQL, purge order (INT).
 - `requests/2026-10-23-p2t-seed-uses-stream-database.md` — `pnpm db:seed` in a worktree writes
-  to the main database (INT).
+  to the main database (INT). Fixed on `main` by `packages/db/src/load-env.ts` (P1's request);
+  INT can move this one to `done/` on merge.
 - `requests/2026-10-23-p2t-deterministic-sample-ids.md` — fixtures' ids don't exist in a
   seeded database (P1, INT).
 - `requests/2026-10-23-p2t-env-variables.md` — P2T settings in `.env.example` (INT).
@@ -88,7 +95,7 @@ None. Open requests:
   should read through `timetable-read.v1`, never the tables.
 - The demo term's published timetable uses the fixture's section/faculty/room ids until the
   deterministic-ids request lands.
-- Using `QueueService`? `apps/api` needs `ioredis` (added on this branch).
+- `ioredis` 5.11.1 is on `main` now too (P1 added the same version).
 - `/terms/:termId/timetable/scopes` reads P1's timetable_scopes table (read-only) until P1 has
   a list route; P2T will switch to it.
 
