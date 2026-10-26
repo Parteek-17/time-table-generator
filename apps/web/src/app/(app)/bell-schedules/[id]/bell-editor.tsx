@@ -26,11 +26,14 @@ export function BellEditor({
   initial,
   programmes,
   canManage,
+  stayOnSave = false,
 }: {
   id: string | null;
   initial: BellScheduleInput;
   programmes: Option[];
   canManage: boolean;
+  /** Refresh in place after creating instead of opening the new schedule's page (wizard). */
+  stayOnSave?: boolean;
 }) {
   const t = useTranslations('bell');
   const tEntity = useTranslations('entity');
@@ -80,7 +83,10 @@ export function BellEditor({
       );
       if (res.ok) {
         setResult({ ok: true });
-        if (!id && res.data) router.replace(`/bell-schedules/${res.data.id}`);
+        if (!id && res.data) {
+          if (stayOnSave) router.refresh();
+          else router.replace(`/bell-schedules/${res.data.id}`);
+        }
       } else {
         const details = Object.values(res.fieldErrors ?? {}).flat();
         setResult({ ok: false, message: [res.message, ...details].filter(Boolean).join(' ') });

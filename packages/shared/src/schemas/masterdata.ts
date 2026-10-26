@@ -595,3 +595,32 @@ export const listQuerySchema = z.object({
   semester: z.coerce.number().int().min(1).max(12).optional(),
 });
 export type ListQuery = z.infer<typeof listQuerySchema>;
+
+// ---- Setup wizard --------------------------------------------------------------------------
+
+/**
+ * Setup wizard steps, in order (docs/phase1/plan.md §5; schemes come before the term and
+ * batches because a batch needs the scheme it follows).
+ */
+export const SETUP_STEPS = [
+  'profile',
+  'departments',
+  'programmes',
+  'schemes',
+  'term',
+  'cohorts',
+  'faculty',
+  'rooms',
+  'bell',
+  'calendar',
+  'teaching',
+  'ready',
+] as const;
+export type SetupStep = (typeof SETUP_STEPS)[number];
+export const setupStepSchema = z.enum(SETUP_STEPS, { error: 'Unknown setup step.' });
+
+/** Mark a step done, skipped for now, or back to to-do. */
+export const setupStepUpdateSchema = z.object({
+  status: z.enum(['done', 'skipped', 'todo'], { error: 'Choose done, skipped or to-do.' }),
+});
+export type SetupStepUpdateInput = z.infer<typeof setupStepUpdateSchema>;

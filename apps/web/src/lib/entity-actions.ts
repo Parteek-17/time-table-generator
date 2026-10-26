@@ -28,6 +28,8 @@ async function call<T>(
   const res = await api<T>(path, { method, body });
   if (!res.ok) return { ok: false, message: res.message, fieldErrors: res.fieldErrors };
   revalidatePath(revalidate, 'layout');
+  // The setup wizard shows the same data under /setup.
+  revalidatePath('/setup', 'layout');
   return { ok: true, data: res.data };
 }
 

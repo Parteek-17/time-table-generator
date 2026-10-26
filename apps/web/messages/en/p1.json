@@ -573,5 +573,132 @@
     "students": "Students",
     "faculty": "Faculty",
     "rooms": "Rooms"
+  },
+  "p1": {
+    "setup": {
+      "navLabel": "Setup progress",
+      "title": "Set up your institute",
+      "subtitle": "Twelve short steps, in the order a timetable needs them. Save and stop any time; everything stays editable later.",
+      "start": "Start setup",
+      "resume": "Continue where you left off",
+      "percentDone": "Setup {percent}% done",
+      "allDone": "Every step is done or skipped. You can still change anything from the menu.",
+      "attentionTitle": "Needs attention",
+      "attentionHint": "Fix these before making a timetable.",
+      "attentionNone": "Nothing needs your attention right now.",
+      "attention": {
+        "no_departments": "No departments yet.",
+        "no_programmes": "No programmes yet (B.Tech, MBA …).",
+        "no_active_term": "No current term. Add the term you are planning and mark it current.",
+        "no_cohorts": "{count, plural, one {# batch has} other {# batches have}} no cohort in the current term yet.",
+        "cohorts_without_sections": "{count, plural, one {# cohort has} other {# cohorts have}} no sections yet.",
+        "no_faculty": "No faculty yet.",
+        "no_rooms": "No rooms yet.",
+        "no_bell_schedule": "No bell schedule yet."
+      },
+      "fix": "Fix",
+      "stepsTitle": "Steps",
+      "status": {
+        "done": "Done",
+        "skipped": "Skipped for now",
+        "todo": "To do",
+        "later": "Coming soon"
+      },
+      "later": "Arrives with the teaching grid and readiness check.",
+      "open": "Open",
+      "review": "Review",
+      "openStep": "Open step: {step}",
+      "stepOf": "Step {n} of {total}",
+      "editLater": "You can change this later in",
+      "back": "Back",
+      "overview": "All steps",
+      "skip": "Skip for now",
+      "continue": "Save and continue",
+      "finish": "Finish",
+      "next": "Next step",
+      "saving": "Saving…",
+      "saveFailed": "We couldn’t save your progress. Please try again.",
+      "needTermTitle": "Add the current term first",
+      "needTermBody": "This step belongs to a term. Add the term you are planning in the term step, then come back.",
+      "goToTermStep": "Go to the term step",
+      "laterTitle": "Coming next",
+      "schemesCourses": "Open a scheme to add its courses per semester. You can add courses later too.",
+      "batchesHeading": "Batches",
+      "batchesHint": "One batch per branch and admission year (and lateral entry). Each follows a scheme.",
+      "cohortsHeading": "Sections in {term}",
+      "cohortsHint": "Create the term's cohorts from the batches, then add sections to each.",
+      "fixedSlotsLater": "Fixed slots (mentoring, library, sports) come with the teaching grid.",
+      "sampleTitle": "Try with sample data",
+      "sampleHint": "Explore a complete, fictional college before entering your own: departments, schemes, sections, 44 teachers, rooms and a calendar. It is a separate institute; your data is not touched.",
+      "sampleButton": "Create a sample institute",
+      "sampleCreating": "Creating…",
+      "sampleReady": "Your sample institute is ready. Its data loads in a few seconds.",
+      "sampleSignIn": "It has its own address, so sign in there with the same email.",
+      "sampleFailed": "We couldn’t create the sample institute. Please try again.",
+      "step": {
+        "profile": {
+          "title": "Institute profile",
+          "hint": "Your institute's name, type and time zone.",
+          "summary": "Name, type and time zone"
+        },
+        "departments": {
+          "title": "Departments",
+          "hint": "Teaching departments and service departments (like Applied Sciences).",
+          "summary": "{count, plural, =0 {None yet} one {# department} other {# departments}}"
+        },
+        "programmes": {
+          "title": "Programmes and branches",
+          "hint": "Start from B.Tech, M.Tech, MBA … and add branches.",
+          "summary": "{count, plural, =0 {None yet} one {# programme} other {# programmes}}"
+        },
+        "schemes": {
+          "title": "Schemes and courses",
+          "hint": "The study scheme each batch follows, with courses and L-T-P per semester.",
+          "summary": "{count, plural, =0 {None yet} one {# scheme} other {# schemes}}"
+        },
+        "term": {
+          "title": "Session and term",
+          "hint": "The term you are planning, and when each group starts. The app shows which semesters run.",
+          "summary": "{count, plural, =0 {None yet} one {# term} other {# terms}}"
+        },
+        "cohorts": {
+          "title": "Batches and sections",
+          "hint": "Batches, then sections and sub-groups for every running semester.",
+          "summary": "{count, plural, =0 {None yet} one {# batch} other {# batches}}"
+        },
+        "faculty": {
+          "title": "Faculty",
+          "hint": "Teachers, their departments, load limits and availability.",
+          "summary": "{count, plural, =0 {None yet} one {# teacher} other {# teachers}}"
+        },
+        "rooms": {
+          "title": "Buildings and rooms",
+          "hint": "Lecture rooms, labs and halls with their seats.",
+          "summary": "{count, plural, =0 {None yet} one {# room} other {# rooms}}"
+        },
+        "bell": {
+          "title": "Bell schedule",
+          "hint": "Periods and breaks of the day. Pre-filled with the usual day; change only what differs.",
+          "summary": "{count, plural, =0 {Not set yet} other {Set}}"
+        },
+        "calendar": {
+          "title": "Calendar",
+          "hint": "Holidays, exam weeks and working Saturdays for the current term.",
+          "summary": "{count, plural, =0 {No holidays yet} one {# holiday} other {# holidays}}"
+        },
+        "teaching": {
+          "title": "Who teaches what",
+          "hint": "Pick a teacher for each course and section.",
+          "summary": "Coming soon",
+          "laterBody": "The teaching grid (who teaches each course to each section and sub-group) is being built. Skip this step for now; it will appear here."
+        },
+        "ready": {
+          "title": "Ready to generate?",
+          "hint": "Check everything a timetable needs and choose which cohorts to include.",
+          "summary": "Coming soon",
+          "laterBody": "The readiness check is being built. When it is ready, this step will list anything missing and link to the screen that fixes it."
+        }
+      }
+    }
   }
 }
