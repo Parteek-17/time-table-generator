@@ -109,24 +109,7 @@ export class MasterDataService {
   }
 
   create<I, R extends BaseRow, D>(def: EntityDef<I, R, D>, tenant: Tenant, input: I): Promise<D> {
-    return this.run(
-      tenant,
-      async (ctx) => {
-        const dept = await def.departmentOf(ctx, input);
-        this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, dept));
-        const data = await def.toData(ctx, input);
-        const created: R = await def
-          .model(ctx.tx)
-          .create({ data: { ...data, instituteId: tenant.institute.id } });
-        await def.afterWrite?.(ctx, created, input, true);
-        const row = await this.find(def, ctx.tx, created.id, false);
-        await this.audit(ctx, `${def.name}.created`, def.name, row.id, {
-          after: json(def.toInput(row)),
-        });
-        return toDto(def, row);
-      },
-      def.duplicate,
-    );
+    return this.run(tenant, (ctx) => this.createIn(ctx, def, input), def.duplicate);
   }
 
   update<I, R extends BaseRow, D>(
@@ -135,28 +118,54 @@ export class MasterDataService {
     id: string,
     input: I,
   ): Promise<D> {
-    return this.run(
-      tenant,
-      async (ctx) => {
-        const existing = await this.find(def, ctx.tx, id, false);
-        const before = def.toInput(existing);
-        // Moving something between departments needs rights on both.
-        const [oldDept, newDept] = await Promise.all([
-          def.departmentOf(ctx, before, existing),
-          def.departmentOf(ctx, input, existing),
-        ]);
-        this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, oldDept));
-        this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, newDept));
-        const data = await def.toData(ctx, input, existing);
-        const updated: R = await def.model(ctx.tx).update({ where: { id }, data });
-        await def.afterWrite?.(ctx, updated, input, false);
-        const row = await this.find(def, ctx.tx, id, false);
-        const diff = changes(json(before), json(def.toInput(row)));
-        await this.audit(ctx, `${def.name}.updated`, def.name, id, { changes: json(diff) });
-        return toDto(def, row);
-      },
-      def.duplicate,
-    );
+    return this.run(tenant, (ctx) => this.updateIn(ctx, def, id, input), def.duplicate);
+  }
+
+  /** create() inside a transaction the caller already holds (imports commit many rows). */
+  async createIn<I, R extends BaseRow, D>(
+    ctx: EntityContext,
+    def: EntityDef<I, R, D>,
+    input: I,
+  ): Promise<D> {
+    const { tenant } = ctx;
+    const dept = await def.departmentOf(ctx, input);
+    this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, dept));
+    const data = await def.toData(ctx, input);
+    const created: R = await def
+      .model(ctx.tx)
+      .create({ data: { ...data, instituteId: tenant.institute.id } });
+    await def.afterWrite?.(ctx, created, input, true);
+    const row = await this.find(def, ctx.tx, created.id, false);
+    await this.audit(ctx, `${def.name}.created`, def.name, row.id, {
+      after: json(def.toInput(row)),
+    });
+    return toDto(def, row);
+  }
+
+  /** update() inside a transaction the caller already holds. */
+  async updateIn<I, R extends BaseRow, D>(
+    ctx: EntityContext,
+    def: EntityDef<I, R, D>,
+    id: string,
+    input: I,
+  ): Promise<D> {
+    const { tenant } = ctx;
+    const existing = await this.find(def, ctx.tx, id, false);
+    const before = def.toInput(existing);
+    // Moving something between departments needs rights on both.
+    const [oldDept, newDept] = await Promise.all([
+      def.departmentOf(ctx, before, existing),
+      def.departmentOf(ctx, input, existing),
+    ]);
+    this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, oldDept));
+    this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, newDept));
+    const data = await def.toData(ctx, input, existing);
+    const updated: R = await def.model(ctx.tx).update({ where: { id }, data });
+    await def.afterWrite?.(ctx, updated, input, false);
+    const row = await this.find(def, ctx.tx, id, false);
+    const diff = changes(json(before), json(def.toInput(row)));
+    await this.audit(ctx, `${def.name}.updated`, def.name, id, { changes: json(diff) });
+    return toDto(def, row);
   }
 
   /** Soft delete. Undo with restore (CLAUDE.md "Undo instead of confirm"). */
@@ -210,7 +219,8 @@ export class MasterDataService {
     return row;
   }
 
-  private friendly(error: unknown, duplicate: (target: string) => string): unknown {
+  /** Database constraint errors as plain messages (also used by imports). */
+  friendly(error: unknown, duplicate: (target: string) => string): unknown {
     if (!(error instanceof Prisma.PrismaClientKnownRequestError)) return error;
     if (error.code === 'P2002') {
       const target = error.meta?.target;

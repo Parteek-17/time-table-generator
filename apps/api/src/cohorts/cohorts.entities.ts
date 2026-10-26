@@ -36,7 +36,7 @@ export async function cohortDepartment(tx: TxClient, cohortId: string): Promise<
 
 // ---- Batches -------------------------------------------------------------------------------
 
-const batchInclude = {
+export const batchInclude = {
   programme: { select: { code: true } },
   branch: { select: { code: true } },
   schemeVersion: { select: { name: true } },
@@ -100,7 +100,7 @@ export const batches: EntityDef<BatchInput, BatchDb, BatchRow> = {
 
 // ---- Sections ------------------------------------------------------------------------------
 
-const sectionInclude = {
+export const sectionInclude = {
   subGroups: { where: live, orderBy: { name: 'asc' } },
 } satisfies Prisma.SectionInclude;
 type SectionDb = Prisma.SectionGetPayload<{ include: typeof sectionInclude }>;

@@ -54,7 +54,7 @@ export const departments: EntityDef<DepartmentInput, DepartmentDb, DepartmentRow
 
 // ---- Programmes --------------------------------------------------------------------------
 
-const programmeInclude = {
+export const programmeInclude = {
   department: { select: { code: true } },
   branches: {
     where: live,
@@ -231,7 +231,7 @@ export const schemeVersions: EntityDef<SchemeVersionInput, SchemeDb, SchemeVersi
 
 // ---- Courses -----------------------------------------------------------------------------
 
-const courseInclude = {
+export const courseInclude = {
   branches: true,
   offeringDepartment: { select: { code: true } },
 } satisfies Prisma.CourseInclude;
