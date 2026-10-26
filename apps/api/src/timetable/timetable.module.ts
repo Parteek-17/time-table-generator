@@ -7,6 +7,8 @@ import { TimetableEditService } from './timetable-edit.service';
 import { TimetableGenerateController } from './timetable-generate.controller';
 import { TimetableGenerateService } from './timetable-generate.service';
 import { TimetableHealthController } from './timetable-health.controller';
+import { TimetablePublishController } from './timetable-publish.controller';
+import { TimetablePublishService } from './timetable-publish.service';
 import { TimetableReadController } from './timetable-read.controller';
 import { TimetableReadService } from './timetable-read.service';
 import { TimetableViewController } from './timetable-view.controller';
@@ -20,6 +22,7 @@ import { TimetableViewService } from './timetable-view.service';
     TimetableGenerateController,
     TimetableViewController,
     TimetableEditController,
+    TimetablePublishController,
   ],
   providers: [
     { provide: TIMETABLE_CONFIG, useFactory: () => loadTimetableConfig() },
@@ -30,6 +33,7 @@ import { TimetableViewService } from './timetable-view.service';
     TimetableGenerateService,
     TimetableViewService,
     TimetableEditService,
+    TimetablePublishService,
   ],
 })
 export class TimetableModule {}

@@ -27,7 +27,51 @@ const NOT_ALLOWED = 'You don’t have permission to change these classes. Ask yo
 const NOT_A_DRAFT =
   'Published timetables can’t be changed. Make an editable copy first, then publish it.';
 
-type Version = Prisma.TimetableVersionGetPayload<{ include: { snapshot: true; slots: true } }>;
+export type Version = Prisma.TimetableVersionGetPayload<{
+  include: { snapshot: true; slots: true };
+}>;
+
+/** Departments of the cohorts a version covers ([null] when it names none). */
+export function versionDepartments(version: Version): (string | null)[] {
+  // Written only from a validated SetupSnapshotV1.
+  const snapshot = version.snapshot.data as unknown as SetupSnapshotV1;
+  const departments = [
+    ...new Set(
+      snapshot.cohorts.filter((c) => version.cohortIds.includes(c.id)).map((c) => c.departmentId),
+    ),
+  ];
+  return departments.length ? departments : [null];
+}
+
+/**
+ * A new draft with the same slots, locks and solver notes as `version`; its parent is the
+ * original (CLAUDE.md: edits create a new draft; published versions never change).
+ */
+export async function copyVersionTx(tx: TxClient, version: Version, userId: string) {
+  const draft = await tx.timetableVersion.create({
+    data: {
+      instituteId: version.instituteId,
+      termId: version.termId,
+      scopeId: version.scopeId,
+      cohortIds: version.cohortIds,
+      parentId: version.id,
+      snapshotId: version.snapshotId,
+      unplaced: version.unplaced ?? [],
+      score: version.score ?? undefined,
+      createdById: userId,
+    },
+  });
+  await tx.timetableSlot.createMany({
+    data: version.slots.map(
+      ({ id: _id, versionId: _v, createdAt: _c, updatedAt: _u, faculty, ...rest }) => ({
+        ...rest,
+        faculty: faculty ?? [],
+        versionId: draft.id,
+      }),
+    ),
+  });
+  return draft;
+}
 
 const editorSlot = (s: StoredSlot): EditorSlot => ({
   ...toSlotV1(s),
@@ -163,41 +207,10 @@ export class TimetableEditService {
   async copy(tenant: Tenant, versionId: string): Promise<{ versionId: string }> {
     return this.prisma.tenant(this.ctx(tenant), async (tx) => {
       const version = await this.load(tx, versionId);
-      const snapshot = version.snapshot.data as unknown as SetupSnapshotV1;
-      const departments = [
-        ...new Set(
-          snapshot.cohorts
-            .filter((c) => version.cohortIds.includes(c.id))
-            .map((c) => c.departmentId),
-        ),
-      ];
-      const allowed = (departments.length ? departments : [null]).every((d) =>
-        this.mayEdit(tenant, d),
-      );
-      if (!allowed) throw new ForbiddenException(NOT_ALLOWED);
-
-      const draft = await tx.timetableVersion.create({
-        data: {
-          instituteId: version.instituteId,
-          termId: version.termId,
-          scopeId: version.scopeId,
-          cohortIds: version.cohortIds,
-          parentId: version.id,
-          snapshotId: version.snapshotId,
-          unplaced: version.unplaced ?? [],
-          score: version.score ?? undefined,
-          createdById: tenant.user.id,
-        },
-      });
-      await tx.timetableSlot.createMany({
-        data: version.slots.map(
-          ({ id: _id, versionId: _v, createdAt: _c, updatedAt: _u, faculty, ...rest }) => ({
-            ...rest,
-            faculty: faculty ?? [],
-            versionId: draft.id,
-          }),
-        ),
-      });
+      if (!versionDepartments(version).every((d) => this.mayEdit(tenant, d))) {
+        throw new ForbiddenException(NOT_ALLOWED);
+      }
+      const draft = await copyVersionTx(tx, version, tenant.user.id);
       return { versionId: draft.id };
     });
   }
