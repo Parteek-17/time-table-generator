@@ -215,10 +215,11 @@
       "csv": "Copy as CSV",
       "csvLabel": "Copy {name} as CSV, to paste into a spreadsheet",
       "copied": "Copied. Paste it into Excel or Google Sheets.",
-      "copyFailed": "Couldn’t copy. Use Download Excel instead.",
+      "copyFailed": "This browser didn’t allow copying. Select the text below and copy it, or download Excel.",
       "all": "Every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}}",
       "allLabel": "Download every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}} as Excel, one sheet each",
-      "failed": "The download didn’t work: {message}"
+      "failed": "The download didn’t work: {message}",
+      "csvBox": "{name} as CSV"
     }
   }
 }

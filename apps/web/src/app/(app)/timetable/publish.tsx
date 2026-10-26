@@ -88,7 +88,7 @@ export function PublishNotice({
   if (notice === 'undone') {
     return (
       <Alert variant="success" role="status" className="flex flex-wrap items-center gap-3">
-        <span className="flex-1">
+        <span className="min-w-0 basis-full sm:basis-0 sm:flex-1">
           {restoredNumber !== null ? t('undoneBack', { number: restoredNumber }) : t('undoneNone')}
         </span>
         {close}
@@ -98,7 +98,9 @@ export function PublishNotice({
   return (
     <Alert variant="success" role="status" className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="flex-1">{t('published', { number: number ?? 0 })}</span>
+        <span className="min-w-0 basis-full sm:basis-0 sm:flex-1">
+          {t('published', { number: number ?? 0 })}
+        </span>
         <Button
           type="button"
           variant="outline"

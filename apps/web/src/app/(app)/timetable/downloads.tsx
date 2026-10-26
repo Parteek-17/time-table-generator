@@ -37,6 +37,7 @@ export function Downloads({
   const t = useTranslations('p2t');
   const [status, setStatus] = useState<Status>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [fallback, setFallback] = useState<string | null>(null);
 
   async function download(format: ExportFormat, id: string | null) {
     const key = `${format}:${id ?? 'all'}`;
@@ -79,16 +80,28 @@ export function Downloads({
       },
       noRoom: t('grid.noRoom'),
     };
+    setFallback(null);
+    const csv: Promise<string> = draft
+      ? freshWeek(versionId, who.kind, who.id).then((fresh) =>
+          tableToCsv(exportTable(fresh.ok ? fresh : { bell, slots }, who, labels)),
+        )
+      : Promise.resolve(tableToCsv(exportTable({ bell, slots }, who, labels)));
     try {
-      let week = { bell, slots };
-      if (draft) {
-        const fresh = await freshWeek(versionId, who.kind, who.id);
-        if (!fresh.ok) throw new Error(fresh.message);
-        week = fresh;
+      // Hand the clipboard a promise inside the click, so Safari still allows it after the
+      // draft's week has been read again.
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/plain': csv.then((text) => new Blob([text], { type: 'text/plain' })),
+          }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(await csv);
       }
-      await navigator.clipboard.writeText(tableToCsv(exportTable(week, who, labels)));
       setStatus({ kind: 'ok', text: t('export.copied') });
     } catch {
+      // Clipboard blocked: show the text to copy by hand.
+      setFallback(await csv);
       setStatus({ kind: 'error', text: t('export.copyFailed') });
     }
   }
@@ -139,6 +152,16 @@ export function Downloads({
         <Alert variant={status.kind === 'error' ? 'destructive' : 'success'} role="status">
           {status.text}
         </Alert>
+      ) : null}
+      {fallback !== null ? (
+        <textarea
+          readOnly
+          aria-label={t('export.csvBox', { name: who.name })}
+          className="h-40 w-full rounded-md border border-input bg-background p-2 font-mono text-xs"
+          value={fallback}
+          onFocus={(e) => e.currentTarget.select()}
+          ref={(el) => el?.select()}
+        />
       ) : null}
     </section>
   );
