@@ -24,6 +24,13 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U slotwise -d slotwise"
           --health-interval 5s --health-timeout 3s --health-retries 20
+      # BullMQ queues (QueueService); the API's default REDIS_URL points here.
+      redis:
+        image: redis:7.4.11-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 3s --health-retries 20
     env:
       # Owner role: migrations, seed and test fixtures.
       OWNER_DATABASE_URL: postgresql://slotwise:slotwise@localhost:5432/slotwise
