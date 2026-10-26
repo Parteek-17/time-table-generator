@@ -3,6 +3,7 @@
  * permissions, and "Try with sample data" (provisioning mock → institute.created → P1's
  * sample-data queue → the sample institute's master data).
  */
+import { connect } from 'node:net';
 import type { INestApplication } from '@nestjs/common';
 import { purgeInstitute } from '@slotwise/db';
 import type { SampleInstituteDto, SetupStateDto } from '@slotwise/shared';
@@ -10,6 +11,25 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { SampleDataListener } from '../src/setup/sample-data.listener';
 import { createTestApp, Fixtures, signToken } from './helpers';
+
+/** True when Redis answers within a second (CI has no Redis yet). */
+function redisReachable(url: string): Promise<boolean> {
+  const u = new URL(url);
+  return new Promise((resolve) => {
+    const socket = connect({ host: u.hostname, port: Number(u.port || 6379) });
+    const done = (ok: boolean) => {
+      socket.destroy();
+      resolve(ok);
+    };
+    socket.setTimeout(1000, () => done(false));
+    socket.once('connect', () => done(true));
+    socket.once('error', () => done(false));
+  });
+}
+
+// Needs Redis for the sample-data queue (requests/2026-10-26-p1-redis-in-ci.md).
+const NO_REDIS = 'needs Redis for the sample-data queue';
+let hasRedis = false;
 
 let app: INestApplication;
 const fx = new Fixtures();
@@ -36,6 +56,7 @@ const auditCount = () => fx.owner.auditLog.count({ where: { instituteId: a.insti
 beforeAll(async () => {
   let env;
   ({ app, env } = await createTestApp());
+  hasRedis = await redisReachable(env.REDIS_URL);
   a = await fx.institute('setup');
   for (const key of ['admin', 'hod'] as const) {
     u[key] = await fx.user(`setup-${key}`);
@@ -123,7 +144,10 @@ describe('setup progress', () => {
 });
 
 describe('try with sample data', () => {
-  it('creates a separate institute with the caller as admin and loads the sample in the background', async () => {
+  it('creates a separate institute with the caller as admin and loads the sample in the background', async ({
+    skip,
+  }) => {
+    skip(!hasRedis, NO_REDIS);
     expect((await as(u.hod.id).post('/setup/sample-institute')).status).toBe(403);
 
     const res = await as(u.admin.id).post('/setup/sample-institute');
@@ -155,7 +179,8 @@ describe('try with sample data', () => {
     expect(await fx.owner.course.count({ where: { instituteId: a.institute.id } })).toBe(0);
   }, 60_000);
 
-  it('loading the same institute twice does nothing the second time', async () => {
+  it('loading the same institute twice does nothing the second time', async ({ skip }) => {
+    skip(!hasRedis, NO_REDIS);
     const listener = app.get(SampleDataListener);
     const sample = await fx.owner.institute.findUniqueOrThrow({ where: { id: sampleIds[0]! } });
     const again = await listener.load({

@@ -1,9 +1,10 @@
-import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { buildSampleInstitute } from '@slotwise/db';
 import type { EventPayloadV1 } from '@slotwise/shared/contracts';
 import type { Queue } from 'bullmq';
 import { AuditService } from '../audit/audit.service';
+import { ENV, type Env } from '../config/env';
 import { PrismaService } from '../db/prisma.service';
 import { QueueService } from '../queue/queue.service';
 
@@ -20,23 +21,35 @@ export const SAMPLE_DATA_QUEUE = 'p1.sample-data';
 @Injectable()
 export class SampleDataListener implements OnModuleInit {
   private readonly logger = new Logger(SampleDataListener.name);
-  private queue!: Queue<InstituteCreated>;
+  private queue: Queue<InstituteCreated> | null = null;
 
   constructor(
+    @Inject(ENV) private readonly env: Env,
     private readonly queues: QueueService,
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
   ) {}
 
   onModuleInit(): void {
+    // Tests (and CI, which has no Redis) start the worker only when something is enqueued.
+    if (this.env.NODE_ENV !== 'test') this.start();
+  }
+
+  private start(): Queue<InstituteCreated> {
+    if (this.queue) return this.queue;
     this.queue = this.queues.queue<InstituteCreated>(SAMPLE_DATA_QUEUE);
-    this.queues.worker<InstituteCreated>(SAMPLE_DATA_QUEUE, (job) => this.load(job.data));
+    this.queue.on('error', (e) => this.logger.error(`queue: ${e.message}`));
+    const worker = this.queues.worker<InstituteCreated>(SAMPLE_DATA_QUEUE, (job) =>
+      this.load(job.data),
+    );
+    worker.on('error', (e) => this.logger.error(`worker: ${e.message}`));
+    return this.queue;
   }
 
   @OnEvent('institute.created')
   async onInstituteCreated(event: InstituteCreated): Promise<void> {
     if (!event.withSampleData) return;
-    await this.queue.add('load', event, {
+    await this.start().add('load', event, {
       jobId: event.eventId,
       attempts: 3,
       backoff: { type: 'exponential', delay: 2_000 },
