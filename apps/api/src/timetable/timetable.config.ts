@@ -11,6 +11,8 @@ const schema = z.object({
   SOLVER_SOURCE: z.enum(['mock', 'http']).default('mock'),
   /** How long the mock solver pretends to work, in milliseconds. */
   SOLVER_MOCK_DELAY_MS: z.coerce.number().int().min(0).default(3000),
+  /** Chrome or Edge for PDF exports; empty = look in the usual install places. */
+  PDF_BROWSER_PATH: z.string().optional(),
 });
 
 export type TimetableConfig = z.infer<typeof schema>;

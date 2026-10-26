@@ -2,12 +2,8 @@ import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/commo
 import { canSomewhere } from '@slotwise/shared';
 import type { SetupSnapshotV1 } from '@slotwise/shared/contracts';
 import {
-  compareSlots,
-  slotIsFor,
-  subGroupSections,
-  toSlotV1,
-  viewBell,
   viewChoices,
+  weekOf,
   type TimetableViewDto,
   type TimetableViewQuery,
 } from '@slotwise/shared/timetable';
@@ -60,15 +56,7 @@ export class TimetableViewService {
           );
         }
         const who = chosen ? { kind, id: chosen.id, name: chosen.name } : null;
-        const subGroupSection =
-          who?.kind === 'subgroup' ? (subGroupSections(snapshot).get(who.id) ?? null) : null;
-        const slots = who
-          ? version.slots
-              .map(storedSlot)
-              .filter((s) => slotIsFor(s, who, subGroupSection))
-              .sort(compareSlots)
-              .map((s) => ({ ...toSlotV1(s), locked: s.locked }))
-          : [];
+        const week = who ? weekOf(snapshot, version.slots.map(storedSlot), who) : null;
         return {
           version: {
             id: version.id,
@@ -85,8 +73,8 @@ export class TimetableViewService {
             validFrom: version.validFrom?.toISOString().slice(0, 10) ?? null,
           },
           who,
-          bell: viewBell(snapshot, who) ?? { workingDays: [], periods: [], breaks: [] },
-          slots,
+          bell: week?.bell ?? { workingDays: [], periods: [], breaks: [] },
+          slots: week?.slots ?? [],
           choices,
         };
       },

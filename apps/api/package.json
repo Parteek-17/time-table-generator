@@ -18,9 +18,11 @@
     "@slotwise/db": "workspace:*",
     "@slotwise/shared": "workspace:*",
     "bullmq": "6.3.11",
+    "exceljs": "4.4.0",
     "ioredis": "5.11.1",
     "jose": "6.2.13",
     "nodemailer": "8.0.11",
+    "puppeteer-core": "25.12.0",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2",
     "zod": "4.6.7"

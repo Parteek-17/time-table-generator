@@ -9,8 +9,8 @@ import type { TimetableSlotV1 } from '../contracts/timetable-read.v1';
 import { bellScheduleFor } from '../domain/readiness';
 import type { VersionSummaryDto } from './generate';
 import type { GridBell } from './grid';
-import type { TimetableFor } from './read';
-import { targetNames } from './slots';
+import { compareSlots, slotIsFor, toSlotV1, type StoredSlot, type TimetableFor } from './read';
+import { subGroupSections, targetNames } from './slots';
 
 export const VIEW_KINDS = ['section', 'subgroup', 'faculty', 'room'] as const;
 export type ViewKind = (typeof VIEW_KINDS)[number];
@@ -75,5 +75,22 @@ export function viewBell(snapshot: SetupSnapshotV1, who: TimetableFor | null): G
     workingDays: [...bell.workingDays],
     periods: bell.periods.map((p) => ({ ...p })),
     breaks: bell.breaks.map((b) => ({ ...b })),
+  };
+}
+
+/** One week: `who`'s classes of a version, in order, with the bell schedule to draw them. */
+export function weekOf(
+  snapshot: SetupSnapshotV1,
+  slots: readonly StoredSlot[],
+  who: TimetableFor,
+): { bell: GridBell; slots: ViewSlot[] } {
+  const subGroupSection =
+    who.kind === 'subgroup' ? (subGroupSections(snapshot).get(who.id) ?? null) : null;
+  return {
+    bell: viewBell(snapshot, who) ?? { workingDays: [], periods: [], breaks: [] },
+    slots: slots
+      .filter((s) => slotIsFor(s, who, subGroupSection))
+      .sort(compareSlots)
+      .map((s) => ({ ...toSlotV1(s), locked: s.locked })),
   };
 }
