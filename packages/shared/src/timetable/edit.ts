@@ -12,6 +12,8 @@ export const EditInput = z.discriminatedUnion('type', [
     slotId: z.uuid(),
     weekday: z.int().min(1).max(7),
     startPeriodIndex: z.int().min(1),
+    /** Room to use if it is free and suits (undo sends the old room); else the checker picks. */
+    roomId: z.uuid().optional(),
   }),
   z.object({
     type: z.literal('lock'),

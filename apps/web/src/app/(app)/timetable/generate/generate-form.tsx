@@ -14,11 +14,14 @@ export function GenerateForm({
   termId,
   scopes,
   running,
+  baseVersionId = null,
 }: {
   termId: string;
   scopes: { id: string; name: string; cohortCount: number }[];
   /** A run of this term already in progress (after a reload). */
   running: SolveJobDto | null;
+  /** Re-solve the rest of this version (keeps its locked classes). */
+  baseVersionId?: string | null;
 }) {
   const t = useTranslations('p2t.generate');
   const ids = { scope: useId(), time: useId(), hint: useId() };
@@ -45,6 +48,7 @@ export function GenerateForm({
       const res = await startGenerate(termId, {
         scopeId: scopeId || null,
         timeLimitSeconds: Number(time),
+        baseVersionId,
       });
       if (res.ok) setJob(res.job);
       else setError(res.message);

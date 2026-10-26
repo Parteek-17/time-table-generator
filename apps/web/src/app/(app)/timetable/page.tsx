@@ -1,4 +1,5 @@
 import { isFlagOn } from '@slotwise/shared';
+import type { EditorDataDto } from '@slotwise/shared/timetable';
 import { Alert, Badge, buttonVariants } from '@slotwise/ui';
 import type { Metadata } from 'next';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -6,10 +7,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/app-shell';
 import { Problem } from '@/components/problem';
+import { api } from '@/lib/api';
 import { getMe } from '@/lib/me';
+import { CopyButton } from './copy-button';
 import { pickVersion, termsAndCurrent, versionsOf, viewOf } from './data';
 import { DayView } from './day-view';
+import { TimetableEditor } from './timetable-editor';
 import { TimetableGrid } from './timetable-grid.local';
+import { UnplacedPanel } from './unplaced-panel';
 import { UrlSelect } from './url-select';
 import { ViewPicker } from './view-picker';
 
@@ -94,7 +99,10 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
     );
   }
 
-  const view = await viewOf(version.id, params.kind, params.id);
+  const [view, editor] = await Promise.all([
+    viewOf(version.id, params.kind, params.id),
+    canGenerate ? api<EditorDataDto>(`/timetable/versions/${version.id}/editor`) : null,
+  ]);
   const versionLabel = (v: (typeof versions.data)[number]) =>
     v.status === 'draft'
       ? t('version.draft', {
@@ -123,9 +131,12 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
       {version.status === 'archived' ? <Alert>{t('version.archivedNote')}</Alert> : null}
       {canGenerate && version.unplacedCount > 0 ? (
         <Alert variant="destructive">
-          {t('version.unplaced', { count: version.unplacedCount })}
+          <a href="#not-placed" className="underline underline-offset-4">
+            {t('version.unplaced', { count: version.unplacedCount })}
+          </a>
         </Alert>
       ) : null}
+      {editor?.ok && version.status !== 'draft' ? <CopyButton versionId={version.id} /> : null}
 
       {!view.ok ? (
         <Problem title={t('error.title')} body={view.message} />
@@ -134,22 +145,44 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
       ) : (
         <>
           <ViewPicker kind={view.data.who.kind} id={view.data.who.id} choices={view.data.choices} />
-          <div className="hidden min-w-0 md:block">
-            <TimetableGrid
+          {editor?.ok && version.status === 'draft' ? (
+            <TimetableEditor
+              key={version.id}
+              versionId={version.id}
+              termId={term.id}
+              data={editor.data}
+              who={view.data.who}
               bell={view.data.bell}
-              slots={view.data.slots}
-              kind={view.data.who.kind}
-              whoName={view.data.who.name}
             />
-          </div>
-          <div className="min-w-0 md:hidden">
-            <DayView
-              bell={view.data.bell}
-              slots={view.data.slots}
-              kind={view.data.who.kind}
-              whoName={view.data.who.name}
-            />
-          </div>
+          ) : (
+            <>
+              <div className="hidden min-w-0 md:block">
+                <TimetableGrid
+                  bell={view.data.bell}
+                  slots={view.data.slots}
+                  kind={view.data.who.kind}
+                  whoName={view.data.who.name}
+                />
+              </div>
+              <div className="min-w-0 md:hidden">
+                <DayView
+                  bell={view.data.bell}
+                  slots={view.data.slots}
+                  kind={view.data.who.kind}
+                  whoName={view.data.who.name}
+                />
+              </div>
+            </>
+          )}
+          {editor?.ok ? (
+            <section id="not-placed" className="scroll-mt-4">
+              <UnplacedPanel
+                unplaced={editor.data.unplaced}
+                snapshot={editor.data.snapshot}
+                termId={term.id}
+              />
+            </section>
+          ) : null}
         </>
       )}
     </>

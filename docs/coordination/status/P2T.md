@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-2T-c — views and the Generate screen: done (branch `p2t/schema`, based on `c0/contracts`
+2T-d — editing, locks, re-solve, undo/redo, Not placed: done (branch `p2t/schema`, based on `c0/contracts`
 until C0 is on `main`; rebase then).
 
 ## Done
@@ -35,20 +35,33 @@ until C0 is on `main`; rebase then).
   `GET /terms/:termId/timetable/scopes`. Shared `gridColumns()` / `dayCells()` / `viewChoices()` / `viewBell()`.
 - Checked in the browser: desktop (dark), 400px (light), all four view kinds, generate → draft.
 
+- 2T-d: one clash checker for API and web (`TimetableChecker` in `@slotwise/shared/timetable`:
+  bell schedule, long breaks, fixed slots, section / lab group / elective clashes, teacher
+  clashes, unavailability, day limits, other published timetables; picks a free suitable room).
+  `POST /timetable/versions/:id/edits` (move with optional preferred room, lock; drafts only;
+  409 + reasons), `GET .../editor`, `POST .../copy`. Re-solve the rest = generate with
+  `baseVersionId` (locked classes go in as `lockedSessions`; new draft's parent is the base).
+  Web: drag and drop (dnd-kit) with valid periods highlighted and the reason shown in words, a
+  Move menu for keyboard and touch, Lock/Unlock, Undo/Redo (buttons, Ctrl+Z / Ctrl+Y), "Make an
+  editable copy" on published versions, "Not placed" panel with plain reasons and links to the
+  setup screens (by URL). Checked in the browser: refused drop, Move, room change, undo back to
+  the old room, redo, lock, reload keeps both.
+
 ## Next
 
-- 2T-d: drag and drop with valid cells highlighted and plain-language refusals (one shared
-  checker in `packages/shared/src/timetable`), lock/unlock, "re-solve the rest", undo/redo,
-  and the "Not placed" panel with links to the screens that fix each reason.
+- 2T-e: publish (DRAFT → PUBLISHED, old one ARCHIVED, exactly one `timetable.published`),
+  `timetable.version.archived`, PDF / Excel exports per section, teacher and room, copy as CSV,
+  Playwright flow in `apps/web/e2e/p2t` (generate → edit → publish).
 
 ## Blocked by
 
-- Nothing for 2T-d. CI runs the timetable API e2e tests only after INT's migration (they skip
+- Nothing for 2T-e. CI runs the timetable API e2e tests only after INT's migration (they skip
   themselves until the tables exist).
 
 ## New dependencies
 
 - `apps/api`: `ioredis` 5.11.1 (BullMQ 6's optional peer; without it `QueueService` hangs).
+- `apps/web`: `@dnd-kit/core` 6.3.1 (timetable drag and drop).
 
 ## Env variables added
 

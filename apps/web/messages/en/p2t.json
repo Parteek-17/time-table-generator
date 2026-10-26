@@ -116,7 +116,81 @@
       "draftNote": "The result is a draft. Nobody else sees it until you publish it.",
       "lostTrack": "We lost track of this run. Open Timetables to see if the draft is there.",
       "notAllowedTitle": "Only timetable coordinators can generate timetables",
-      "notAllowedBody": "Ask your institute admin if you need to."
+      "notAllowedBody": "Ask your institute admin if you need to.",
+      "resolveTitle": "Re-solve the rest",
+      "resolveDescription": "Locked classes stay where they are; Slotwise places everything else again. The result is a new draft."
+    },
+    "edit": {
+      "undo": "Undo",
+      "redo": "Redo",
+      "resolve": "Re-solve the rest",
+      "resolveHint": "Keeps locked classes where they are and places everything else again.",
+      "copy": "Make an editable copy",
+      "copyHint": "Published timetables don’t change. Edit a copy, then publish it.",
+      "copying": "Making a copy…",
+      "dragHint": "Drag a class to a highlighted period, or use Move. Changes save straight away; Undo takes them back.",
+      "phoneNote": "To change the timetable, use a tablet or computer.",
+      "move": "Move",
+      "moveLabel": "Move {code} for {who}",
+      "moveTitle": "Move {code} ({who}) to…",
+      "moveNone": "There is no free time for this class this week.",
+      "moveTo": "{day} {periods}",
+      "cancel": "Cancel",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockLabel": "Lock {code} for {who}",
+      "unlockLabel": "Unlock {code} for {who}",
+      "locked": "Locked",
+      "moved": "Moved {code} to {day} {periods}.",
+      "movedRoom": "Moved {code} to {day} {periods}, in room {room} because its room was taken.",
+      "lockedDone": "{code} locked. Re-solving keeps it here.",
+      "unlockedDone": "{code} unlocked.",
+      "undone": "Undone.",
+      "redone": "Redone.",
+      "nothingToUndo": "Nothing to undo.",
+      "nothingToRedo": "Nothing to redo.",
+      "refused": "{code} can’t go there:",
+      "validHere": "Can go here",
+      "invalidHere": "Can’t go here",
+      "failed": "That change wasn’t saved: {message}"
+    },
+    "problems": {
+      "locked": "{code} is locked. Unlock it to move it.",
+      "not_working_day": "{day} is not a teaching day.",
+      "outside_day": "It doesn’t fit before the end of {day}.",
+      "crosses_break": "A lab can’t run across {breakName}.",
+      "fixed_slot": "This time is kept free for {label}.",
+      "section_busy": "{who} already has {code} in {periods}.",
+      "faculty_busy": "{name} teaches {who} ({code}) in {periods}.",
+      "faculty_unavailable": "{name} is not available on {day} {periods}.",
+      "faculty_day_limit": "{name} would teach more than {max} periods on {day}.",
+      "busy_elsewhere": "Already booked in another timetable: {reason}.",
+      "no_free_room": "No suitable room is free on {day} {periods}."
+    },
+    "unplaced": {
+      "title": "Not placed ({count})",
+      "intro": "These classes have no period yet. Fix the cause, then re-solve or generate again.",
+      "reason": {
+        "no_free_slot": "No period where the section, the teacher and a room are all free.",
+        "faculty_unavailable": "The teacher is unavailable whenever it could go.",
+        "faculty_over_max": "It would go over the teacher’s daily or weekly limit.",
+        "no_suitable_room": "There is no room of the right type.",
+        "room_too_small": "The rooms of the right type are too small for this class.",
+        "lab_block_does_not_fit": "The lab block doesn’t fit between breaks on any day.",
+        "blocked_by_fixed_slot": "Fixed periods (mentoring, library…) block every option.",
+        "locked_conflict": "A locked class is in the way.",
+        "time_limit": "The search ran out of time before placing it.",
+        "other": "Something else blocks it."
+      },
+      "fix": {
+        "faculty": "Check teachers",
+        "rooms": "Check rooms",
+        "bell": "Check bell schedules",
+        "calendar": "Check fixed periods",
+        "generate": "Generate again with more time",
+        "unlock": "Unlock classes in this timetable, then re-solve."
+      },
+      "solverSays": "Details: {message}"
     }
   }
 }

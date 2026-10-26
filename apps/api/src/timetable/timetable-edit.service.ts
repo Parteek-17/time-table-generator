@@ -132,7 +132,7 @@ export class TimetableEditService {
       }
 
       const to = { weekday: input.weekday, startPeriodIndex: input.startPeriodIndex };
-      const plan = checker.plan(slot.id, to);
+      const plan = checker.plan(slot.id, to, input.roomId);
       if (!plan.ok) {
         const refusal: EditRefusal = {
           statusCode: 409,

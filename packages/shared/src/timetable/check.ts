@@ -204,18 +204,18 @@ export class TimetableChecker {
     return dedupe(problems);
   }
 
-  /** Rooms that suit the class (type, lab category, size), its own first, then the smallest. */
-  private suitableRooms(slot: EditorSlot) {
+  /**
+   * Rooms that suit the class (type, lab category, size): the preferred room first (undo puts a
+   * class back in its old room), then its own, then the smallest.
+   */
+  private suitableRooms(slot: EditorSlot, preferRoomId?: string | null) {
     const course = this.snapshot.courses.find((c) => c.id === slot.course.id);
     const need = course?.roomNeeds[slot.component];
     const size = this.strength.get(slot.target.id) ?? 0;
+    const rank = (id: string) => (id === preferRoomId ? 2 : id === slot.room?.id ? 1 : 0);
     return this.snapshot.rooms
       .filter((r) => (need ? roomFits(r, need) : true) && r.capacity >= size)
-      .sort(
-        (a, b) =>
-          Number(b.id === slot.room?.id) - Number(a.id === slot.room?.id) ||
-          a.capacity - b.capacity,
-      );
+      .sort((a, b) => rank(b.id) - rank(a.id) || a.capacity - b.capacity);
   }
 
   private roomFree(roomId: string, slot: EditorSlot, to: MoveTarget): boolean {
@@ -239,16 +239,17 @@ export class TimetableChecker {
 
   /**
    * Whether the class can move there, and in which room: its own room if free, else the
-   * smallest suitable free room. Locked classes never move.
+   * smallest suitable free room (or `preferRoomId` when it is free and suits). Locked classes
+   * never move.
    */
-  plan(slotId: string, to: MoveTarget): MovePlan {
+  plan(slotId: string, to: MoveTarget, preferRoomId?: string | null): MovePlan {
     const slot = this.bySlot.get(slotId);
     if (!slot) return { ok: false, problems: [{ code: 'outside_day', params: {} }] };
     if (slot.locked)
       return { ok: false, problems: [{ code: 'locked', params: { code: slot.course.code } }] };
     const problems = this.timeProblems(slot, to);
     if (problems.length) return { ok: false, problems };
-    const room = this.suitableRooms(slot).find((r) => this.roomFree(r.id, slot, to));
+    const room = this.suitableRooms(slot, preferRoomId).find((r) => this.roomFree(r.id, slot, to));
     if (!room) {
       return {
         ok: false,

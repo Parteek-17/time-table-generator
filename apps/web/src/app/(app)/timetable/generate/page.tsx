@@ -19,18 +19,25 @@ export const metadata: Metadata = { title: 'Generate a timetable' };
 export default async function GeneratePage({
   searchParams,
 }: {
-  searchParams: Promise<{ term?: string }>;
+  searchParams: Promise<{ term?: string; base?: string }>;
 }) {
   if (!isFlagOn('P2T')) notFound();
   const me = await getMe('/timetable/generate');
-  const [t, { term: termParam }] = await Promise.all([getTranslations('p2t'), searchParams]);
+  const [t, { term: termParam, base: baseParam }] = await Promise.all([
+    getTranslations('p2t'),
+    searchParams,
+  ]);
+  const base = baseParam && /^[0-9a-f-]{36}$/.test(baseParam) ? baseParam : null;
   const back = (
     <Link href="/timetable" className={buttonVariants({ variant: 'outline' })}>
       {t('generate.back')}
     </Link>
   );
   const header = (
-    <PageHeader title={t('generate.title')} description={t('generate.description')}>
+    <PageHeader
+      title={base ? t('generate.resolveTitle') : t('generate.title')}
+      description={base ? t('generate.resolveDescription') : t('generate.description')}
+    >
       {back}
     </PageHeader>
   );
@@ -74,7 +81,13 @@ export default async function GeneratePage({
         options={terms.map((x) => ({ value: x.id, label: x.label }))}
       />
       {/* key: a new term starts a fresh form. */}
-      <GenerateForm key={term.id} termId={term.id} scopes={scopes} running={running} />
+      <GenerateForm
+        key={term.id}
+        termId={term.id}
+        scopes={base ? [] : scopes}
+        running={running}
+        baseVersionId={base}
+      />
     </>
   );
 }

@@ -2,6 +2,7 @@ import { formatTime } from '@slotwise/shared';
 import type { ViewKind, ViewSlot } from '@slotwise/shared/timetable';
 import { cn } from '@slotwise/ui';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 /**
  * One class in a timetable cell. Local until the UI kit ships `SlotCard` (requests/
@@ -13,12 +14,15 @@ export function SlotCard({
   kind,
   whoName,
   className,
+  actions,
 }: {
   slot: ViewSlot;
   /** Whose week this is: decides what the second line shows. */
   kind: ViewKind;
   whoName: string;
   className?: string;
+  /** Buttons under the card (Move, Lock) while editing. */
+  actions?: ReactNode;
 }) {
   const t = useTranslations('p2t');
   const teachers = slot.faculty.map((f) => f.shortCode).join(', ');
@@ -68,11 +72,18 @@ export function SlotCard({
     >
       <div className="flex items-center justify-between gap-1">
         <span className="truncate font-mono text-sm font-medium">{slot.course.code}</span>
-        {tag ? (
-          <span className="shrink-0 rounded border border-current px-1 text-xs font-semibold uppercase tracking-wide opacity-80">
-            {tag}
-          </span>
-        ) : null}
+        <span className="flex shrink-0 gap-1">
+          {slot.locked ? (
+            <span className="rounded bg-foreground px-1 text-xs font-semibold text-background">
+              {t('edit.locked')}
+            </span>
+          ) : null}
+          {tag ? (
+            <span className="rounded border border-current px-1 text-xs font-semibold uppercase tracking-wide opacity-80">
+              {tag}
+            </span>
+          ) : null}
+        </span>
       </div>
       <span className="truncate text-sm" title={slot.course.title}>
         {slot.course.shortName || slot.course.title}
@@ -80,6 +91,7 @@ export function SlotCard({
       <span className="mt-auto truncate text-xs text-muted-foreground" title={detailText}>
         {detailText}
       </span>
+      {actions ? <div className="mt-1 flex flex-wrap gap-1">{actions}</div> : null}
     </div>
   );
 }
