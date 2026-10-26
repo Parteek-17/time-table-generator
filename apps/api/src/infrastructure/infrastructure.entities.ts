@@ -34,7 +34,7 @@ export const buildings: EntityDef<BuildingInput, BuildingDb, BuildingRow> = {
   duplicate: () => 'A building with this name already exists.',
 };
 
-const roomInclude = { building: { select: { name: true } } } satisfies Prisma.RoomInclude;
+export const roomInclude = { building: { select: { name: true } } } satisfies Prisma.RoomInclude;
 type RoomDb = Prisma.RoomGetPayload<{ include: typeof roomInclude }>;
 
 export const rooms: EntityDef<RoomInput, RoomDb, RoomRow> = {

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { validateBellSchedule } from '../domain/bell';
 import { isIsoDate, toDayNumber } from '../domain/calendar';
 import { COURSE_TYPES, ROOM_TYPES } from '../domain/constants';
+import { IMPORT_KINDS } from '../domain/imports';
 
 // ---- Building blocks ----------------------------------------------------------------
 
@@ -624,3 +625,32 @@ export const setupStepUpdateSchema = z.object({
   status: z.enum(['done', 'skipped', 'todo'], { error: 'Choose done, skipped or to-do.' }),
 });
 export type SetupStepUpdateInput = z.infer<typeof setupStepUpdateSchema>;
+
+// ---- Excel/CSV import (milestone 1d, ADR 0011) ---------------------------------------------
+
+/** Upload (query string; the request body is the file itself, at most IMPORT_MAX_BYTES). */
+export const importCreateSchema = z.object({
+  kind: z.enum(IMPORT_KINDS, { error: 'Choose what you are importing.' }),
+  termId: optionalId,
+  fileName: text(200, 'Choose a file.'),
+});
+export type ImportCreateInput = z.infer<typeof importCreateSchema>;
+
+/** Template column → index of the file's header (null = not in the file). */
+export const importMappingSchema = z.object({
+  mapping: z.record(z.string().max(40), z.number().int().min(0).max(500).nullable()),
+});
+export type ImportMappingInput = z.infer<typeof importMappingSchema>;
+
+/** Inline fix of one row: new cell values (template column → text) and/or skip. */
+export const importRowEditSchema = z.object({
+  data: z.record(z.string().max(40), z.string().max(500)).optional(),
+  skip: z.boolean().optional(),
+});
+export type ImportRowEditInput = z.infer<typeof importRowEditSchema>;
+
+export const importRowsQuerySchema = z.object({
+  show: z.enum(['all', 'problems', 'create', 'update', 'unchanged', 'skip']).default('all'),
+  page: z.coerce.number().int().min(1).max(10_000).default(1),
+});
+export type ImportRowsQuery = z.infer<typeof importRowsQuerySchema>;

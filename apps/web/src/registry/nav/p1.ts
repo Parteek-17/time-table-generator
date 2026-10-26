@@ -17,6 +17,7 @@ const nav: NavSource = async (me) => {
         { href: '/terms', label: t('terms') },
         { href: '/calendar', label: t('calendar') },
         { href: '/bell-schedules', label: t('bellSchedules') },
+        ...(me.may('import.run') ? [{ href: '/imports', label: t('imports') }] : []),
       ],
     },
     {

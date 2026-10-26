@@ -21,7 +21,7 @@ import { api } from '@/lib/api';
 import { getMe } from '@/lib/me';
 import { pickTerm } from '@/lib/terms';
 import { ProgressBar } from '../progress.local';
-import { isStep, neighbours, STEP_HOME } from '../steps';
+import { isStep, neighbours, STEP_HOME, STEP_IMPORTS } from '../steps';
 import { WizardNav } from '../wizard-nav';
 
 export const metadata: Metadata = { title: 'Set up your institute' };
@@ -38,6 +38,8 @@ export default async function SetupStepPage({ params }: { params: Promise<{ step
   const { prev, next } = neighbours(step);
   const home = STEP_HOME[step];
   const title = t(`step.${step}.title`);
+  const tImports = await getTranslations('p1.imports');
+  const imports = me.may('import.run') ? (STEP_IMPORTS[step] ?? []) : [];
 
   return (
     <>
@@ -56,6 +58,19 @@ export default async function SetupStepPage({ params }: { params: Promise<{ step
             <Link className="text-primary underline" href={home}>
               {t(`step.${step}.title`)}
             </Link>
+          </p>
+        ) : null}
+        {imports.length > 0 ? (
+          <p className="text-sm text-muted-foreground">
+            {tImports('setupImport')}{' '}
+            {imports.map((kind, i) => (
+              <span key={kind}>
+                {i > 0 ? ' · ' : null}
+                <Link className="text-primary underline" href={`/imports/new?kind=${kind}`}>
+                  {tImports('setupImportLink', { kind: tImports(`kind.${kind}.title`) })}
+                </Link>
+              </span>
+            ))}
           </p>
         ) : null}
       </div>

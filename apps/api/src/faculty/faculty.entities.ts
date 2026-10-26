@@ -2,7 +2,7 @@ import type { Prisma } from '@slotwise/db';
 import { facultySchema, type FacultyInput, type FacultyRow } from '@slotwise/shared';
 import { requireRefs, type EntityDef } from '../masterdata/entity';
 
-const facultyInclude = {
+export const facultyInclude = {
   departments: true,
   homeDepartment: { select: { code: true } },
   _count: { select: { unavailability: true } },
