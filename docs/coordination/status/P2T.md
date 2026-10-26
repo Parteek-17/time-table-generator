@@ -53,11 +53,36 @@ no P2T tables yet).
   setup screens (by URL). Checked in the browser: refused drop, Move, room change, undo back to
   the old room, redo, lock, reload keeps both.
 
+- 2T-e: `POST /timetable/versions/:id/publish` (permission `timetable.publish` for every
+  department in it): the current version is archived (validTo = day before), the draft gets the
+  next number and validFrom = today in the institute's timezone (kept inside the term);
+  `timetable.version.archived` and exactly one `timetable.published` go out after commit
+  (advisory lock per term and group, so a double click or two coordinators give one event;
+  `sectionIds` = sections whose week changed, all of them on a first publish).
+  `POST .../undo-publish`: the undone version is archived, the one it replaced is published
+  again (same events), and its classes come back as a new draft — published versions never
+  change. Shared `changedSections()`, `publishValidFrom()`.
+  `GET .../export?format=pdf|xlsx&kind=&id=`: one week, or every section / lab group / teacher /
+  room (a sheet or page each). One table model (`exportTable()`, `tableToCsv()`,
+  `slotDetails()` in shared) behind PDF (puppeteer-core + Chrome/Edge), Excel (ExcelJS, lab
+  blocks merged, A4 landscape) and Copy as CSV (built in the browser with the translated
+  labels; shows the text to copy by hand when the clipboard is blocked).
+  Web: Publish button on drafts (no confirm), "Published as version N" notice with Undo,
+  downloads panel; web route `/timetable/export` passes files through.
+  Fix: the solve worker lost drafts to Prisma's 5 s interactive-transaction limit on this
+  laptop; it now saves in one batch transaction, and copy / publish / undo use a 30 s tenant
+  transaction (`tenant-tx.ts`) until INT adds a timeout option.
+  Tests: API e2e `timetable-publish` (6) and `timetable-export` (5), shared `publish` /
+  `export` unit tests, Playwright `e2e/p2t/publish.spec.ts` (generate → move → publish → undo →
+  publish → Excel, PDF, CSV). Checked in the browser at 400px: Publish, the notice, Undo, Copy
+  as CSV fallback, all three downloads through the web route. The PDF layout itself was not
+  looked at by eye (the preview pane doesn't render PDFs).
+
 ## Next
 
-- 2T-e: publish (DRAFT → PUBLISHED, old one ARCHIVED, exactly one `timetable.published`),
-  `timetable.version.archived`, PDF / Excel exports per section, teacher and room, copy as CSV,
-  Playwright flow in `apps/web/e2e/p2t` (generate → edit → publish).
+- 2T-f (proposed): section names repeat in pick-lists and export sheet names ("BCA A" ×3 —
+  same display name in different semesters); show programme/semester with the name.
+- PDF exports are English-only (`EXPORT_LABELS_EN`); pass the web's labels when Hindi lands.
 
 ## Blocked by
 
@@ -68,12 +93,14 @@ no P2T tables yet).
 
 - `apps/api`: `ioredis` 5.11.1 (BullMQ 6's optional peer; without it `QueueService` hangs).
 - `apps/web`: `@dnd-kit/core` 6.3.1 (timetable drag and drop).
+- `apps/api`: `exceljs` 4.4.0, `puppeteer-core` 25.12.0 (no bundled browser; uses Chrome/Edge).
 
 ## Env variables added
 
 - API, read in `timetable/timetable.config.ts` (all optional): `SNAPSHOT_SOURCE` (`fixture` |
   `api`, default `fixture`), `SOLVER_SOURCE` (`mock` | `http`, default `mock`),
-  `SOLVER_MOCK_DELAY_MS` (default 3000). `SOLVER_URL` already existed.
+  `SOLVER_MOCK_DELAY_MS` (default 3000), `PDF_BROWSER_PATH` (Chrome/Edge for PDFs; empty = the
+  usual install places; the API host needs Chromium). `SOLVER_URL` already existed.
 
 ## Contract change requests
 
@@ -86,11 +113,18 @@ None. Open requests:
 - `requests/2026-10-23-p2t-deterministic-sample-ids.md` — fixtures' ids don't exist in a
   seeded database (P1, INT).
 - `requests/2026-10-23-p2t-env-variables.md` — P2T settings in `.env.example` (INT).
+- `requests/2026-10-27-p2t-api-file-helper.md` — `apiFile()` in the web's `lib/api.ts`;
+  `PDF_BROWSER_PATH` in `.env.example`, Chromium on the API host (INT).
+- `requests/2026-10-27-p2t-tenant-transaction-timeout.md` — timeout option for `withTenant()`
+  (INT).
 - `requests/2026-10-23-p2t-ui-timetable-grid.md` — `TimetableGrid`, `SlotCard`, segmented
   control, progress bar, skeleton for the kit (UI); a launch.json entry for stream ports (INT).
 
 ## Notes for other streams
 
+- P4/P5: `timetable.published` is sent after commit, once per publish and once when Undo
+  re-publishes the previous version (with `previousVersionId` = the undone one). Key on
+  `eventId`; `validFrom` is the first date to use the new version.
 - Published slots carry copies of course/audience/faculty/room names (ADR 0050); P4/P5/P6
   should read through `timetable-read.v1`, never the tables.
 - The demo term's published timetable uses the fixture's section/faculty/room ids until the
