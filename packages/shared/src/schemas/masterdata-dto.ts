@@ -2,6 +2,7 @@
  * Response shapes of the Phase 1 master-data API (API → web). Dates are "YYYY-MM-DD",
  * timestamps ISO strings. `archivedAt` is the row's deleted_at (the UI says "Archived").
  */
+import type { CellProblem, ImportKindName } from '../domain/imports';
 import type { PromoteRow } from '../domain/promote';
 import type {
   AcademicSessionInput,
@@ -225,4 +226,70 @@ export interface SampleInstituteDto {
   slug: string;
   /** Where to open it; the sample data loads in the background (a few seconds). */
   url: string;
+}
+
+// ---- Excel/CSV import (ADR 0011) -----------------------------------------------------------
+
+export type ImportStatusName =
+  | 'uploaded'
+  | 'parsing'
+  | 'mapping'
+  | 'preview'
+  | 'committing'
+  | 'committed'
+  | 'failed'
+  | 'cancelled';
+
+/** What committing a row will do, decided by its natural key (or the admin's skip). */
+export type ImportRowAction = 'create' | 'update' | 'unchanged' | 'skip';
+
+export interface ImportSummaryDto {
+  created: number;
+  updated: number;
+  unchanged: number;
+  skipped: number;
+  /** Plain-language reason when reading or committing failed. */
+  error?: string;
+}
+
+export interface ImportJobDto {
+  id: string;
+  kind: ImportKindName;
+  status: ImportStatusName;
+  fileName: string;
+  termId: string | null;
+  rowCount: number;
+  /** 0..100 while reading or committing in the background. */
+  progress: number;
+  /** Header row of the file, for matching columns by hand. */
+  headers: string[];
+  /** Template column → header index; missing = not in the file. */
+  mapping: Record<string, number>;
+  /** Required template columns without a header. */
+  missingRequired: string[];
+  /** Row counts for the preview (before commit) or the result (after). */
+  counts: { problems: number } & Record<ImportRowAction, number>;
+  summary: ImportSummaryDto;
+  createdAt: string;
+  createdByName: string | null;
+}
+
+export interface ImportRowDto {
+  rowNumber: number;
+  data: Record<string, string>;
+  errors: CellProblem[];
+  action: ImportRowAction;
+}
+
+export interface ImportRowsPageDto {
+  rows: ImportRowDto[];
+  page: number;
+  pageCount: number;
+  total: number;
+}
+
+/** A template file, base64-encoded so it travels in JSON. */
+export interface ImportTemplateFileDto {
+  fileName: string;
+  contentBase64: string;
 }
