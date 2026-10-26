@@ -3,6 +3,7 @@ import { AcademicsModule } from '../../academics/academics.module';
 import { CalendarModule } from '../../calendar/calendar.module';
 import { CohortsModule } from '../../cohorts/cohorts.module';
 import { FacultyModule } from '../../faculty/faculty.module';
+import { ImportsModule } from '../../imports/imports.module';
 import { InfrastructureModule } from '../../infrastructure/infrastructure.module';
 import { InstituteModule } from '../../institute/institute.module';
 import { SetupModule } from '../../setup/setup.module';
@@ -18,4 +19,5 @@ export const P1_MODULES: Type[] = [
   CalendarModule,
   SnapshotModule,
   SetupModule,
+  ImportsModule,
 ];
