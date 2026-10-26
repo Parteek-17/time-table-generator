@@ -572,7 +572,8 @@
     "cohorts": "Cohorts and sections",
     "students": "Students",
     "faculty": "Faculty",
-    "rooms": "Rooms"
+    "rooms": "Rooms",
+    "imports": "Import from Excel"
   },
   "p1": {
     "setup": {
@@ -699,6 +700,151 @@
           "laterBody": "The readiness check is being built. When it is ready, this step will list anything missing and link to the screen that fixes it."
         }
       }
+    },
+    "imports": {
+      "title": "Import from Excel",
+      "subtitle": "Bring in the sheets you already have. Download a template or upload your own file: we match the columns, show any problems in plain words, and import only when everything looks right.",
+      "kindsHeading": "What do you want to import?",
+      "orderHint": "Import in this order, so each sheet can refer to the ones before it.",
+      "kind": {
+        "departments": {
+          "title": "Departments",
+          "hint": "Codes, names, teaching or service."
+        },
+        "programmes": {
+          "title": "Programmes and branches",
+          "hint": "B.Tech with its branches, MBA, BCA …"
+        },
+        "courses": {
+          "title": "Courses (scheme)",
+          "hint": "Each semester’s courses with L-T-P and credits."
+        },
+        "batches_sections": {
+          "title": "Batches and sections",
+          "hint": "Sections of each batch this term, with strength."
+        },
+        "students": {
+          "title": "Students",
+          "hint": "The roll list, placed in sections and lab groups."
+        },
+        "faculty": {
+          "title": "Faculty",
+          "hint": "Teachers with designation, department and load."
+        },
+        "rooms": {
+          "title": "Rooms",
+          "hint": "Classrooms and labs with seats."
+        },
+        "holidays": {
+          "title": "Holidays",
+          "hint": "The holiday list, for the whole institute or one department."
+        },
+        "teaching_assignments": {
+          "title": "Teaching assignments",
+          "hint": "Who teaches which course to which section (subject distribution)."
+        }
+      },
+      "downloadTemplate": "Template",
+      "downloadTemplateFor": "Download the {kind} template",
+      "upload": "Upload",
+      "uploadFor": "Upload {kind}",
+      "recentHeading": "Recent imports",
+      "recentNone": "Nothing imported yet.",
+      "by": "{name}, {date}",
+      "rows": "{count, plural, one {# row} other {# rows}}",
+      "open": "Open",
+      "openLabel": "Open the import of {file}",
+      "status": {
+        "uploaded": "Uploaded",
+        "parsing": "Reading the file",
+        "mapping": "Columns to match",
+        "preview": "Ready to check",
+        "committing": "Importing",
+        "committed": "Imported",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      },
+      "newTitle": "Upload {kind}",
+      "newTitleAny": "Upload a file",
+      "chooseKind": "What are you importing?",
+      "term": "Term",
+      "termRequired": "Sections and teaching assignments are for one term.",
+      "termOptional": "Only needed to put students in sections.",
+      "noTerm": "None",
+      "needTerm": "Add a term on the Sessions and terms page first.",
+      "file": "Excel or CSV file",
+      "fileHint": ".xlsx or .csv, up to 5 MB. Your own column names are fine; we match them.",
+      "uploadButton": "Upload and check",
+      "uploading": "Uploading and checking…",
+      "noSheet": "No sheet yet?",
+      "templateLink": "Download the {kind} template",
+      "reading": "Reading {count, plural, one {# row} other {# rows}}. This page updates by itself.",
+      "committingBody": "Importing. This page updates by itself.",
+      "progress": "{percent}% done",
+      "mappingTitle": "Match the columns",
+      "mappingHint": "We could not find every column we need. For each one, pick the column of your file that holds it.",
+      "notInFile": "Not in my file",
+      "requiredMark": "required",
+      "saveMapping": "Use these columns",
+      "saving": "Checking…",
+      "columnsLink": "Change which columns are used",
+      "counts": {
+        "problems": "{count, plural, one {# problem} other {# problems}}",
+        "create": "{count} new",
+        "update": "{count} changed",
+        "unchanged": "{count} no change",
+        "skip": "{count} skipped"
+      },
+      "show": {
+        "all": "All",
+        "problems": "Problems",
+        "create": "New",
+        "update": "Changed",
+        "unchanged": "No change",
+        "skip": "Skipped"
+      },
+      "filterLabel": "Show rows",
+      "rowLabel": "Row {n}",
+      "action": {
+        "create": "New",
+        "update": "Changes",
+        "unchanged": "No change",
+        "skip": "Skipped"
+      },
+      "problem": "Problem",
+      "rowProblem": "{column}: {message}",
+      "fix": "Fix",
+      "fixLabel": "Fix row {n}",
+      "editLabel": "Edit row {n}",
+      "saveRow": "Check again",
+      "cancelEdit": "Cancel",
+      "skipRow": "Skip",
+      "skipLabel": "Skip row {n}",
+      "includeRow": "Include",
+      "includeLabel": "Include row {n} again",
+      "noRows": "No rows here.",
+      "pageOf": "Page {page} of {pages}",
+      "prev": "Previous",
+      "next": "Next",
+      "commit": "{count, plural, =0 {Nothing to import} one {Import # row} other {Import # rows}}",
+      "commitBlocked": "{count, plural, one {Fix or skip the row with a problem first.} other {Fix or skip the # rows with problems first.}}",
+      "commitHint": "Everything is imported together: if one row cannot be saved, nothing changes.",
+      "importing": "Importing…",
+      "cancel": "Cancel this import",
+      "doneTitle": "Imported",
+      "doneBody": "{created} new, {updated} changed, {unchanged} with no change, {skipped} skipped.",
+      "openPage": "Open {page}",
+      "importAnother": "Import another file",
+      "backToSetup": "Back to setup",
+      "failedTitle": "This file could not be imported",
+      "cancelledBody": "This import was cancelled. Nothing was changed.",
+      "uploadAgain": "Upload a file",
+      "commitFailed": "Nothing was imported",
+      "setupImport": "Have this in Excel already?",
+      "setupImportLink": "Import {kind}",
+      "notAllowed": "Only institute admins, heads of department and timetable coordinators can import.",
+      "uploadFailed": "The file could not be uploaded. Check your connection and try again.",
+      "edit": "Edit"
     }
   }
 }
