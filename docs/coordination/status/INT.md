@@ -9,8 +9,9 @@ stay off.
 **Rebase now: P1, UI, P2E, P2T, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once
 `main` is pushed). Contracts, schema files, registries and shared configs are new on `main`.
 
-Known red test on `main`, not from C0: the P1 faculty list sort test
-(`requests/2026-10-23-int-p1-faculty-sort-test.md`).
+`pnpm test` is green on `main` (2026-10-26): P1's collation-independent faculty sort test
+(`b0b51bc` on `p1/setup-snapshot`) was cherry-picked; P1's rebase drops its copy.
+`requests/done/2026-10-23-int-p1-faculty-sort-test.md`.
 
 ## Done
 
@@ -31,7 +32,7 @@ Known red test on `main`, not from C0: the P1 faculty list sort test
 
 ## Blocked by
 
-- P1: `pnpm test` red on `main` until `requests/2026-10-23-int-p1-faculty-sort-test.md` is fixed.
+Nothing.
 
 ## New dependencies
 
