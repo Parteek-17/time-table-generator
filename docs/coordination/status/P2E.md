@@ -2,9 +2,8 @@
 
 ## Current milestone
 
-2 — Soft constraints + score breakdown: done on `p2e/engine` (branched from `c0/contracts`
-because C0 was not on `main` yet; rebase onto `origin/main` once C0 merges). Milestone 1
-(hard constraints) is done too.
+2 — Soft constraints + score breakdown: done on `p2e/engine` (rebased onto `origin/main` with
+C0 on 2026-10-26; 46 tests pass). Milestone 1 (hard constraints) is done too.
 
 ## Done
 
@@ -57,7 +56,6 @@ Decisions (behaviour other streams may notice):
 
 ## Blocked by
 
-- C0 (`c0/contracts`) merging to `main`.
 - `2026-10-23-p2e-solver-image-contracts.md`: the solver image needs `contracts/` for request
   validation.
 
