@@ -2,16 +2,15 @@
 
 ## Current milestone
 
-C0 — contracts and scaffolding, merged into `main` on 2026-10-23 (`merge(c0): …`). No
-migration: `prisma migrate diff` from the migrations to the split schema is empty. All flags
-stay off.
+P1 merged into `main` on 2026-10-26 (`merge(p1): …`, 1b+ setup snapshot and 1c setup
+wizard). No migration: P1 changed no schema file. All checks, the full suite (API 58, sample-data
+tests now run with Redis) and the build pass.
 
-**Rebase now: P1, UI, P2E, P2T, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once
-`main` is pushed). Contracts, schema files, registries and shared configs are new on `main`.
+**Rebase now: UI, P2E, P2T, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once `main`
+is pushed). New on `main`: P1's snapshot route, `ioredis` and `@playwright/test`, and the env
+loader in `packages/db`, so `pnpm db:seed` and the db tests now use a worktree's `.env.local`.
 
-`pnpm test` is green on `main` (2026-10-26): P1's collation-independent faculty sort test
-(`b0b51bc` on `p1/setup-snapshot`) was cherry-picked; P1's rebase drops its copy.
-`requests/done/2026-10-23-int-p1-faculty-sort-test.md`.
+C0 merged on 2026-10-23.
 
 ## Done
 
@@ -23,6 +22,8 @@ stay off.
 - Web nav registry, per-stream message files, "Coming soon" pages.
 - v1 contracts, fixtures, solver JSON Schemas, solver routers per stream.
 - `stream-env`, `new-worktree`, stream databases, S3 storage service in compose.
+- 2026-10-26, P1's requests: Redis service in CI, home page card opens `/setup`,
+  `packages/db/src/load-env.ts` loaded first by the seed, fixtures and db tests.
 
 ## Next
 
