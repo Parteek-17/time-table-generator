@@ -87,7 +87,8 @@ async function StepContent({ step }: { step: SetupStep }): Promise<ReactNode> {
       />
     );
 
-  const later = <Notice title={t('laterTitle')} body={t(`step.${step}.laterBody`)} />;
+  // Only "teaching" and "ready" have a laterBody, so build it when one of them is shown.
+  const later = () => <Notice title={t('laterTitle')} body={t(`step.${step}.laterBody`)} />;
   // A map rather than a switch: one step is called "faculty", which the lint rule against
   // inline role checks would (wrongly) flag.
   const content: Record<SetupStep, () => ReactNode> = {
@@ -133,8 +134,8 @@ async function StepContent({ step }: { step: SetupStep }): Promise<ReactNode> {
       </>
     ),
     calendar: () => <CalendarSection term={term!} />,
-    teaching: () => later,
-    ready: () => later,
+    teaching: later,
+    ready: later,
   };
   return content[step]();
 }
