@@ -3,10 +3,8 @@
  * steps at phone width, adds a department on the way (and archives it again with Undo
  * available), and the overview shows every step done.
  */
-import { expect, test, type Page } from '@playwright/test';
-
-const MAILPIT = process.env.MAILPIT_URL ?? 'http://localhost:8025';
-const ADMIN = 'admin@demo.slotwise.test';
+import { expect, test } from '@playwright/test';
+import { ADMIN, signIn } from './sign-in';
 
 /** Steps the admin completes in the wizard, in order (steps 11 and 12 come with 1e). */
 const STEPS = [
@@ -21,36 +19,6 @@ const STEPS = [
   ['bell', 'Bell schedule'],
   ['calendar', 'Calendar'],
 ] as const;
-
-type MailpitList = { messages: { ID: string; Created: string }[] };
-
-/** Signs in with the email link, read from Mailpit's API. */
-async function signIn(page: Page, email: string): Promise<void> {
-  const since = Date.now();
-  await page.goto('/sign-in');
-  await page.getByLabel('Email').fill(email);
-  await page.getByRole('button', { name: 'Email me a sign-in link' }).click();
-
-  let link: string | undefined;
-  await expect
-    .poll(
-      async () => {
-        const res = await fetch(
-          `${MAILPIT}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`,
-        );
-        const latest = ((await res.json()) as MailpitList).messages[0];
-        if (!latest || Date.parse(latest.Created) < since - 1000) return false;
-        const message = (await (await fetch(`${MAILPIT}/api/v1/message/${latest.ID}`)).json()) as {
-          Text: string;
-        };
-        link = /https?:\/\/\S+\/api\/auth\/callback\/\S+/.exec(message.Text)?.[0];
-        return Boolean(link);
-      },
-      { message: 'sign-in email in Mailpit', timeout: 30_000 },
-    )
-    .toBe(true);
-  await page.goto(link!);
-}
 
 test('an admin walks the setup wizard and the overview shows every step done', async ({ page }) => {
   await signIn(page, ADMIN);
