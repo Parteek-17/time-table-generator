@@ -12,6 +12,8 @@ import { getMe } from '@/lib/me';
 import { CopyButton } from './copy-button';
 import { pickVersion, termsAndCurrent, versionsOf, viewOf } from './data';
 import { DayView } from './day-view';
+import { Downloads } from './downloads';
+import { PublishButton, PublishNotice } from './publish';
 import { TimetableEditor } from './timetable-editor';
 import { TimetableGrid } from './timetable-grid.local';
 import { UnplacedPanel } from './unplaced-panel';
@@ -20,7 +22,15 @@ import { ViewPicker } from './view-picker';
 
 export const metadata: Metadata = { title: 'Timetables' };
 
-type Params = { term?: string; version?: string; kind?: string; id?: string };
+type Params = {
+  term?: string;
+  version?: string;
+  kind?: string;
+  id?: string;
+  /** Set after publishing or undoing it, for the notice. */
+  notice?: string;
+  restored?: string;
+};
 
 /** A term's timetable: pick a version and a section, lab group, teacher or room; see the week. */
 export default async function TimetablePage({ searchParams }: { searchParams: Promise<Params> }) {
@@ -32,6 +42,7 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
     searchParams,
   ]);
   const canGenerate = me.may('timetable.edit');
+  const canPublish = me.may('timetable.publish');
   const { terms, term } = await termsAndCurrent(params.term);
 
   const generate = canGenerate ? (
@@ -127,7 +138,26 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
         </Badge>
       </div>
 
+      {params.notice === 'published' && version.status === 'published' && canPublish ? (
+        <PublishNotice
+          notice="published"
+          versionId={version.id}
+          number={version.number}
+          restoredNumber={null}
+        />
+      ) : null}
+      {params.notice === 'undone' && version.status === 'draft' ? (
+        <PublishNotice
+          notice="undone"
+          versionId={version.id}
+          number={null}
+          restoredNumber={versions.data.find((v) => v.id === params.restored)?.number ?? null}
+        />
+      ) : null}
       {version.status === 'draft' ? <Alert>{t('version.draftNote')}</Alert> : null}
+      {version.status === 'draft' && canPublish && editor?.ok ? (
+        <PublishButton versionId={version.id} unplacedCount={version.unplacedCount} />
+      ) : null}
       {version.status === 'archived' ? <Alert>{t('version.archivedNote')}</Alert> : null}
       {canGenerate && version.unplacedCount > 0 ? (
         <Alert variant="destructive">
@@ -174,6 +204,13 @@ export default async function TimetablePage({ searchParams }: { searchParams: Pr
               </div>
             </>
           )}
+          <Downloads
+            versionId={version.id}
+            draft={version.status === 'draft'}
+            who={view.data.who}
+            bell={view.data.bell}
+            slots={view.data.slots}
+          />
           {editor?.ok ? (
             <section id="not-placed" className="scroll-mt-4">
               <UnplacedPanel

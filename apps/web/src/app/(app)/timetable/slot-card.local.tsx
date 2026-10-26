@@ -1,5 +1,5 @@
 import { formatTime } from '@slotwise/shared';
-import type { ViewKind, ViewSlot } from '@slotwise/shared/timetable';
+import { slotDetails, type ViewKind, type ViewSlot } from '@slotwise/shared/timetable';
 import { cn } from '@slotwise/ui';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -25,19 +25,7 @@ export function SlotCard({
   actions?: ReactNode;
 }) {
   const t = useTranslations('p2t');
-  const teachers = slot.faculty.map((f) => f.shortCode).join(', ');
-  const room = slot.room?.code ?? t('grid.noRoom');
-  // Show what the viewer doesn't already know: a section sees teacher and room, a teacher
-  // sees the class and room, a room sees the class and teacher.
-  const audience = slot.target.name !== whoName ? slot.target.name : null;
-  // A lookup, not `kind === 'faculty'`: the lint rule against inline role checks flags it.
-  const details: Record<ViewKind, (string | null)[]> = {
-    section: [audience, teachers, room],
-    subgroup: [audience, teachers, room],
-    faculty: [slot.target.name, room],
-    room: [slot.target.name, teachers],
-  };
-  const detailText = details[kind].filter(Boolean).join(' · ');
+  const detailText = slotDetails(slot, kind, whoName, t('grid.noRoom'));
   const tag = slot.component === 'lecture' ? null : t(`grid.tag.${slot.component}`);
   const periods =
     slot.length > 1

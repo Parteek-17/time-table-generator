@@ -191,6 +191,34 @@
         "unlock": "Unlock classes in this timetable, then re-solve."
       },
       "solverSays": "Details: {message}"
+    },
+    "publish": {
+      "publish": "Publish",
+      "publishing": "Publishing…",
+      "hint": "Everyone in these sections sees it straight away. You can undo.",
+      "hasUnplaced": "{count, plural, one {# class is} other {# classes are}} not placed yet. You can still publish.",
+      "published": "Published as version {number}. Students and teachers see it now.",
+      "undo": "Undo publishing",
+      "undoing": "Undoing…",
+      "undoneBack": "Publishing undone. Version {number} is published again. Your changes are in this draft.",
+      "undoneNone": "Publishing undone. Nothing is published now. Your changes are in this draft.",
+      "failed": "Not published: {message}",
+      "undoFailed": "Couldn’t undo: {message}",
+      "dismiss": "Close"
+    },
+    "export": {
+      "title": "Download or copy",
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "pdfLabel": "Download {name} as PDF",
+      "xlsxLabel": "Download {name} as Excel",
+      "csv": "Copy as CSV",
+      "csvLabel": "Copy {name} as CSV, to paste into a spreadsheet",
+      "copied": "Copied. Paste it into Excel or Google Sheets.",
+      "copyFailed": "Couldn’t copy. Use Download Excel instead.",
+      "all": "Every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}}",
+      "allLabel": "Download every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}} as Excel, one sheet each",
+      "failed": "The download didn’t work: {message}"
     }
   }
 }
