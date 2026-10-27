@@ -1,10 +1,9 @@
-import type { Action } from '@slotwise/shared';
+import { EXAM_MANAGE as MANAGE, EXAM_VIEW as VIEW } from '@slotwise/shared/exams';
 
-/**
- * Actions P6 checks with can(). Until INT adds `exam.view` / `exam.manage` to
- * packages/shared/src/auth/permissions.ts (requests/2026-10-27-p6-exam-permissions.md), they
- * map onto existing actions: staff who read master data read date sheets, and only institute
- * admins change them. Swap these two lines when the request is merged.
- */
-export const EXAM_VIEW: Action = 'masterdata.view';
-export const EXAM_MANAGE: Action = 'institute.manage';
+// P6's permission mapping lives in @slotwise/shared/exams (permissions.ts) so the web uses it
+// too. Fail at start-up rather than run routes with an undefined permission (the guard would
+// then let anyone through), e.g. when packages/shared was not rebuilt.
+if (!MANAGE || !VIEW) throw new Error('Exam permissions missing: rebuild packages/shared.');
+
+export const EXAM_MANAGE = MANAGE;
+export const EXAM_VIEW = VIEW;

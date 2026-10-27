@@ -9,7 +9,11 @@ import {
   dateSheetProblems,
   shortDate,
   type CreateExamInput,
+  hallCapacity,
+  hallFromRoom,
+  type DateSheetChoicesDto,
   type DateSheetDto,
+  type ExamTermDto,
   type DateSheetSessionDto,
   type ExamPaperInput,
   type ExamSessionInput,
@@ -236,6 +240,79 @@ export class DateSheetService {
       const paper = await this.paper(tx, paperId);
       await this.refuseIfPublished(tx, paper.sessionId);
       await tx.examPaper.delete({ where: { id: paperId } });
+    });
+  }
+
+  terms(tenant: Tenant): Promise<ExamTermDto[]> {
+    return this.tx(tenant, async (tx) => {
+      const terms = await tx.term.findMany({
+        where: { deletedAt: null },
+        orderBy: { startDate: 'desc' },
+      });
+      return terms.map((t) => ({
+        id: t.id,
+        label: t.label,
+        status: t.status,
+        startDate: iso(t.startDate),
+        endDate: iso(t.endDate),
+      }));
+    });
+  }
+
+  choices(tenant: Tenant, examId: string): Promise<DateSheetChoicesDto> {
+    return this.tx(tenant, async (tx) => {
+      const exam = await this.exam(tx, examId);
+      const [assignments, sections, rooms] = await Promise.all([
+        tx.teachingAssignment.findMany({
+          where: { termId: exam.termId, deletedAt: null, course: { deletedAt: null } },
+          select: { sectionId: true, course: true },
+        }),
+        tx.section.findMany({
+          where: { deletedAt: null, cohort: { termId: exam.termId, deletedAt: null } },
+          include: {
+            _count: { select: { students: { where: { status: 'active', deletedAt: null } } } },
+          },
+          orderBy: { displayName: 'asc' },
+        }),
+        tx.room.findMany({
+          where: { deletedAt: null },
+          orderBy: [{ floor: 'asc' }, { code: 'asc' }],
+        }),
+      ]);
+      const courses = new Map<string, DateSheetChoicesDto['courses'][number]>();
+      for (const a of assignments) {
+        const c = courses.get(a.course.id) ?? {
+          id: a.course.id,
+          code: a.course.code,
+          title: a.course.title,
+          semester: a.course.semester,
+          sectionIds: [],
+        };
+        if (a.sectionId && !c.sectionIds.includes(a.sectionId)) c.sectionIds.push(a.sectionId);
+        courses.set(c.id, c);
+      }
+      return {
+        courses: [...courses.values()].sort((x, y) => x.code.localeCompare(y.code)),
+        sections: sections.map((s) => ({
+          id: s.id,
+          name: s.displayName,
+          studentCount: s._count.students,
+        })),
+        rooms: rooms.flatMap((r) => {
+          const hall = hallFromRoom(r, 0);
+          return hall
+            ? [
+                {
+                  id: r.id,
+                  code: r.code,
+                  floor: r.floor,
+                  examSeats: hallCapacity(hall),
+                  isAccessible: r.isAccessible,
+                },
+              ]
+            : [];
+        }),
+      };
     });
   }
 

@@ -7,8 +7,10 @@ import {
   ExamSessionInput,
   UpdateExamInput,
   UpdateExamPaperInput,
+  type DateSheetChoicesDto,
   type DateSheetDto,
   type ExamSummaryDto,
+  type ExamTermDto,
 } from '@slotwise/shared/exams';
 import { CurrentTenant, RequirePermission } from '../common/decorators';
 import { FeatureFlag } from '../common/feature-flag';
@@ -22,6 +24,8 @@ const id = new ZodPipe(idParam);
 /**
  * Exams and date sheets.
  *   GET    /exams[?termId=]                 exams of the institute (or of one term)
+ *   GET    /exams/terms                     terms to hold an exam in
+ *   GET    /exams/:examId/choices           courses, sections and rooms to pick from
  *   POST   /exams                           new exam
  *   PATCH  /exams/:examId                   rename, seating settings
  *   DELETE /exams/:examId                   remove (soft)
@@ -45,6 +49,21 @@ export class DateSheetController {
     @Query(new ZodPipe(ExamListQuery)) query: ExamListQuery,
   ): Promise<ExamSummaryDto[]> {
     return this.service.list(tenant, query.termId);
+  }
+
+  @Get('terms')
+  @RequirePermission(EXAM_VIEW)
+  terms(@CurrentTenant() tenant: Tenant): Promise<ExamTermDto[]> {
+    return this.service.terms(tenant);
+  }
+
+  @Get(':examId/choices')
+  @RequirePermission(EXAM_VIEW)
+  choices(
+    @CurrentTenant() tenant: Tenant,
+    @Param('examId', id) examId: string,
+  ): Promise<DateSheetChoicesDto> {
+    return this.service.choices(tenant, examId);
   }
 
   @Post()

@@ -6,7 +6,12 @@
  * Needs the exam tables (prisma db push locally until INT's migration); skipped without them.
  */
 import type { INestApplication } from '@nestjs/common';
-import type { DateSheetDto, ExamSummaryDto } from '@slotwise/shared/exams';
+import type {
+  DateSheetChoicesDto,
+  DateSheetDto,
+  ExamSummaryDto,
+  ExamTermDto,
+} from '@slotwise/shared/exams';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createTestApp, Fixtures, signToken } from '../../test/helpers';
@@ -91,6 +96,25 @@ describe('date sheet', () => {
       firstDate: null,
     });
     ids.exam = exam.id;
+  });
+
+  live('the screens get terms, courses taught, sections and exam rooms to pick from', async () => {
+    const terms = (await as(u.admin.id).get('/exams/terms')).body as ExamTermDto[];
+    expect(terms.map((t) => t.label)).toEqual(['July–Dec 2026']);
+    const choices = (await as(u.admin.id).get(`/exams/${ids.exam}/choices`))
+      .body as DateSheetChoicesDto;
+    expect(choices.courses).toEqual([
+      expect.objectContaining({ code: 'CS301', sectionIds: [world.sections.a.id] }),
+    ]);
+    expect(choices.sections.map((s) => [s.name, s.studentCount])).toEqual([
+      ['CS A', 5],
+      ['CS B', 4],
+    ]);
+    // The lab has no exam seats; ground floor first.
+    expect(choices.rooms.map((r) => [r.code, r.examSeats, r.isAccessible])).toEqual([
+      ['G1', 6, true],
+      ['F1', 6, false],
+    ]);
   });
 
   live('sessions and papers build the date sheet with student counts', async () => {

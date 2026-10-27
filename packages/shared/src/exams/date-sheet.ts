@@ -153,3 +153,21 @@ export function dateSheetProblems(sessions: readonly DateSheetSessionDto[]): Dat
   }
   return problems;
 }
+
+export interface ExamTermDto {
+  id: string;
+  label: string;
+  status: 'planning' | 'active' | 'closed';
+  startDate: string;
+  endDate: string;
+}
+
+/** What the date-sheet screen offers to pick from, for the exam's term. */
+export interface DateSheetChoicesDto {
+  /** Courses taught in the term, with the sections they are taught to (pre-selected). */
+  courses: { id: string; code: string; title: string; semester: number; sectionIds: string[] }[];
+  /** Regular sections of the term's cohorts. */
+  sections: { id: string; name: string; studentCount: number }[];
+  /** Rooms with exam seats, ground floor first. */
+  rooms: { id: string; code: string; floor: number; examSeats: number; isAccessible: boolean }[];
+}
