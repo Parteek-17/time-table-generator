@@ -1,0 +1,735 @@
+diff --git a/apps/api/src/app.module.ts b/apps/api/src/app.module.ts
+index 50e6981..0bd8a7e 100644
+--- a/apps/api/src/app.module.ts
++++ b/apps/api/src/app.module.ts
+@@ -5,6 +5,7 @@ import { AuthGuard } from './auth/auth.guard';
+ import type { Env } from './config/env';
+ import { CoreModule } from './core/core.module';
+ import { HealthController } from './health/health.controller';
++import { InstituteProvisioningModule } from './institute-provisioning/institute-provisioning.module';
+ import { InvitesController } from './invites/invites.controller';
+ import { InvitesService } from './invites/invites.service';
+ import { InstituteController } from './me/institute.controller';
+@@ -25,6 +26,8 @@ export class AppModule {
+         // Domain events between streams (packages/shared/src/contracts/events.v1.ts).
+         EventEmitterModule.forRoot(),
+         QueueModule,
++        // institute-provisioning.v1 (POST /platform/institutes), used by P1 and P7.
++        InstituteProvisioningModule,
+         // Stream modules (apps/api/src/registry/modules/<stream>.ts).
+         ...REGISTRY_MODULES,
+       ],
+diff --git a/apps/api/src/institute-provisioning/institute-provisioning.controller.ts b/apps/api/src/institute-provisioning/institute-provisioning.controller.ts
+new file mode 100644
+index 0000000..dea761d
+--- /dev/null
++++ b/apps/api/src/institute-provisioning/institute-provisioning.controller.ts
+@@ -0,0 +1,31 @@
++import { Body, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
++import {
++  INSTITUTE_PROVISIONING_V1_ROUTE,
++  type ProvisionInstituteRequestV1Input,
++  type ProvisionInstituteResponseV1,
++} from '@slotwise/shared/contracts';
++import { CurrentUser, SkipTenant } from '../common/decorators';
++import type { SignedInUser } from '../common/request-context';
++import { InstituteProvisioningService } from './institute-provisioning.service';
++import { PlatformAdminGuard } from './platform-admin.guard';
++
++/** institute-provisioning.v1 for platform admins (P7's platform screens). */
++@Controller(INSTITUTE_PROVISIONING_V1_ROUTE.slice(1))
++@SkipTenant()
++@UseGuards(PlatformAdminGuard)
++export class InstituteProvisioningController {
++  constructor(private readonly provisioning: InstituteProvisioningService) {}
++
++  @Post()
++  @HttpCode(201)
++  create(
++    // Validated by the service so refusals carry the contract's error codes.
++    @Body() body: unknown,
++    @CurrentUser() user: SignedInUser,
++  ): Promise<ProvisionInstituteResponseV1> {
++    return this.provisioning.provision(body as ProvisionInstituteRequestV1Input, {
++      actorUserId: user.id,
++      via: 'platform',
++    });
++  }
++}
+diff --git a/apps/api/src/institute-provisioning/institute-provisioning.module.ts b/apps/api/src/institute-provisioning/institute-provisioning.module.ts
+new file mode 100644
+index 0000000..2f9a05e
+--- /dev/null
++++ b/apps/api/src/institute-provisioning/institute-provisioning.module.ts
+@@ -0,0 +1,15 @@
++import { Module } from '@nestjs/common';
++import { InstituteProvisioningController } from './institute-provisioning.controller';
++import { InstituteProvisioningService } from './institute-provisioning.service';
++import { PlatformAdminGuard } from './platform-admin.guard';
++
++/**
++ * institute-provisioning.v1: `POST /platform/institutes` and the service behind it, which P7's
++ * sign-up and P1's sample institute import. Owned by INT.
++ */
++@Module({
++  controllers: [InstituteProvisioningController],
++  providers: [InstituteProvisioningService, PlatformAdminGuard],
++  exports: [InstituteProvisioningService, PlatformAdminGuard],
++})
++export class InstituteProvisioningModule {}
+diff --git a/apps/api/src/institute-provisioning/institute-provisioning.service.ts b/apps/api/src/institute-provisioning/institute-provisioning.service.ts
+new file mode 100644
+index 0000000..05a00c8
+--- /dev/null
++++ b/apps/api/src/institute-provisioning/institute-provisioning.service.ts
+@@ -0,0 +1,197 @@
++import { createHash, randomBytes, randomUUID } from 'node:crypto';
++import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
++import { EventEmitter2 } from '@nestjs/event-emitter';
++import { Prisma } from '@slotwise/db';
++import { RESERVED_SUBDOMAINS } from '@slotwise/shared';
++import {
++  INSTITUTE_PROVISIONING_V1,
++  ProvisionInstituteRequestV1,
++  ProvisionInstituteResponseV1,
++  parseEvent,
++  type ProvisionInstituteRequestV1Input,
++} from '@slotwise/shared/contracts';
++import { AuditService } from '../audit/audit.service';
++import { ENV, type Env } from '../config/env';
++import { PrismaService } from '../db/prisma.service';
++import { MailService } from '../mail/mail.service';
++import { inviteEmail } from '../mail/templates';
++
++export interface ProvisionOptions {
++  /** Platform admin who asked; null for the public sign-up, which acts as the platform. */
++  actorUserId: string | null;
++  /** Where the request came from, for the audit log. */
++  via: 'platform' | 'signup' | 'sample';
++  /**
++   * The first admin is the signed-in caller ("Try with sample data"): give them the
++   * membership straight away instead of emailing an invite.
++   */
++  grantNow?: boolean;
++}
++
++/** Thrown as `{ code, message }` (institute-provisioning.v1 PROVISIONING_ERRORS_V1). */
++function refuse(status: 400 | 409, code: string, message: string, extra: object = {}): never {
++  const body = { statusCode: status, code, message, ...extra };
++  throw status === 409 ? new ConflictException(body) : new BadRequestException(body);
++}
++
++/**
++ * Creates an institute and its first institute admin (institute-provisioning.v1) and emits
++ * `institute.created`. Used by `POST /platform/institutes`, P7's sign-up and P1's sample
++ * institute.
++ */
++@Injectable()
++export class InstituteProvisioningService {
++  constructor(
++    private readonly prisma: PrismaService,
++    private readonly audit: AuditService,
++    private readonly mail: MailService,
++    private readonly events: EventEmitter2,
++    @Inject(ENV) private readonly env: Env,
++  ) {}
++
++  /** Validates the request; refusals use the contract's error codes. */
++  parse(input: unknown): ProvisionInstituteRequestV1 {
++    const result = ProvisionInstituteRequestV1.safeParse(input);
++    if (result.success) return result.data;
++    const slug = (input as { slug?: unknown } | null)?.slug;
++    if (typeof slug === 'string' && RESERVED_SUBDOMAINS.includes(slug.toLowerCase())) {
++      refuse(400, 'slug_reserved', `“${slug}” can’t be used as an address. Pick another one.`);
++    }
++    const fieldErrors: Record<string, string[]> = {};
++    for (const issue of result.error.issues) {
++      (fieldErrors[issue.path.join('.') || '_'] ??= []).push(issue.message);
++    }
++    refuse(400, 'invalid_input', 'Please check the highlighted fields.', { fieldErrors });
++  }
++
++  async provision(
++    input: ProvisionInstituteRequestV1Input,
++    opts: ProvisionOptions,
++  ): Promise<ProvisionInstituteResponseV1> {
++    const req = this.parse(input);
++    const slugTaken = () =>
++      refuse(409, 'slug_taken', `${req.slug} is already taken. Try another address.`);
++    if (
++      await this.prisma.institute.findUnique({ where: { slug: req.slug }, select: { id: true } })
++    ) {
++      slugTaken();
++    }
++
++    const instituteId = randomUUID();
++    const email = req.firstAdmin.email.toLowerCase();
++    const token = randomBytes(32).toString('base64url');
++    const now = new Date();
++    const expiresAt = new Date(now.getTime() + this.env.INVITE_TTL_DAYS * 86_400_000);
++
++    // One transaction: no institute without its first admin's invite. institutes and users
++    // are global tables; the invite, membership and audit rows need the new institute's id.
++    let result;
++    try {
++      result = await this.prisma.tenant({ instituteId, userId: opts.actorUserId }, async (tx) => {
++        const institute = await tx.institute.create({
++          data: {
++            id: instituteId,
++            name: req.name,
++            slug: req.slug,
++            type: req.type,
++            timezone: req.timezone,
++            affiliatingUniversityName: req.affiliatingUniversityName,
++            isSample: req.withSampleData,
++          },
++        });
++        const admin = await tx.user.upsert({
++          where: { email },
++          update: {},
++          create: { email, name: req.firstAdmin.name },
++        });
++        const invite = await tx.invite.create({
++          data: {
++            instituteId,
++            email,
++            role: 'institute_admin',
++            scopeType: 'institute',
++            scopeId: instituteId,
++            tokenHash: createHash('sha256').update(token).digest('hex'),
++            expiresAt,
++            // Self-serve sign-up: the person asked for it themselves.
++            invitedById: opts.actorUserId ?? admin.id,
++            ...(opts.grantNow ? { acceptedAt: now, acceptedById: admin.id } : {}),
++          },
++        });
++        if (opts.grantNow) {
++          await tx.membership.create({
++            data: {
++              userId: admin.id,
++              role: 'institute_admin',
++              scopeType: 'institute',
++              scopeId: instituteId,
++              instituteId,
++              createdById: opts.actorUserId,
++            },
++          });
++        }
++        await this.audit.record(tx, {
++          instituteId,
++          actorUserId: opts.actorUserId,
++          action: 'institute.created',
++          targetType: 'institute',
++          targetId: instituteId,
++          metadata: {
++            via: opts.via,
++            withSampleData: req.withSampleData,
++            planCode: req.planCode,
++            firstAdminEmail: email,
++          },
++        });
++        return { institute, admin, invite };
++      });
++    } catch (error) {
++      // Two requests for the same slug at once: the unique index decides.
++      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
++        slugTaken();
++      }
++      throw error;
++    }
++    const { institute, admin, invite } = result;
++    const url = this.env.WEB_URL_TEMPLATE.replace('{slug}', institute.slug);
++
++    // After commit: a slow mail server must not hold the transaction.
++    if (!opts.grantNow) {
++      await this.mail.send(
++        inviteEmail({
++          to: email,
++          inviterName: 'Slotwise',
++          instituteName: institute.name,
++          role: 'institute_admin',
++          scopeName: institute.name,
++          acceptUrl: `${url}/invite/${token}`,
++          expiresAt,
++        }),
++      );
++    }
++
++    this.events.emit(
++      'institute.created',
++      parseEvent('institute.created', {
++        eventId: randomUUID(),
++        occurredAt: now.toISOString(),
++        instituteId,
++        actorUserId: opts.actorUserId,
++        slug: institute.slug,
++        name: institute.name,
++        firstAdminUserId: admin.id,
++        withSampleData: req.withSampleData,
++      }),
++    );
++
++    return ProvisionInstituteResponseV1.parse({
++      version: INSTITUTE_PROVISIONING_V1,
++      instituteId,
++      slug: institute.slug,
++      url,
++      firstAdminUserId: admin.id,
++      inviteId: invite.id,
++      inviteExpiresAt: expiresAt.toISOString(),
++    });
++  }
++}
+diff --git a/apps/api/src/institute-provisioning/platform-admin.guard.ts b/apps/api/src/institute-provisioning/platform-admin.guard.ts
+new file mode 100644
+index 0000000..ced9f88
+--- /dev/null
++++ b/apps/api/src/institute-provisioning/platform-admin.guard.ts
+@@ -0,0 +1,38 @@
++import {
++  ForbiddenException,
++  Injectable,
++  InternalServerErrorException,
++  type CanActivate,
++  type ExecutionContext,
++} from '@nestjs/common';
++import { canManagePlatform, type AuthUser } from '@slotwise/shared';
++import type { AppRequest } from '../common/request-context';
++import { PrismaService } from '../db/prisma.service';
++import { toGrant } from '../tenancy/grants';
++
++/**
++ * For `/platform/*` routes (which also carry @SkipTenant()): loads the caller's platform
++ * memberships and lets them through only if can() says they manage the platform.
++ * Use with `@UseGuards(PlatformAdminGuard)`.
++ */
++@Injectable()
++export class PlatformAdminGuard implements CanActivate {
++  constructor(private readonly prisma: PrismaService) {}
++
++  async canActivate(context: ExecutionContext): Promise<boolean> {
++    const req = context.switchToHttp().getRequest<AppRequest>();
++    const user = req.user;
++    if (!user) throw new InternalServerErrorException('PlatformAdminGuard needs a signed-in route');
++    // No institute: RLS still shows the caller their own memberships.
++    const memberships = await this.prisma.tenant({ instituteId: null, userId: user.id }, (tx) =>
++      tx.membership.findMany({
++        where: { userId: user.id, scopeType: 'platform', revokedAt: null },
++      }),
++    );
++    const authUser: AuthUser = { id: user.id, memberships: memberships.map(toGrant) };
++    if (!canManagePlatform(authUser)) {
++      throw new ForbiddenException('Only Slotwise platform admins can do this.');
++    }
++    return true;
++  }
++}
+diff --git a/apps/api/src/setup/provisioning.mock.ts b/apps/api/src/setup/provisioning.mock.ts
+deleted file mode 100644
+index cbfa649..0000000
+--- a/apps/api/src/setup/provisioning.mock.ts
++++ /dev/null
+@@ -1,123 +0,0 @@
+-/**
+- * MOCK of INT's institute provisioning (institute-provisioning.v1, `POST /platform/institutes`,
+- * apps/api/src/institute-provisioning), used only by "Try with sample data" until INT's
+- * service is on `main`. Then replace this file with a call to INT's service and delete it.
+- *
+- * Follows the contract's request and response and emits the real `institute.created` event.
+- * Differences from the real thing: the first admin gets their membership straight away (the
+- * invite row is created already accepted) because they are the signed-in user asking for it,
+- * and it refuses to run in production.
+- */
+-import { createHash, randomBytes, randomUUID } from 'node:crypto';
+-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+-import { EventEmitter2 } from '@nestjs/event-emitter';
+-import {
+-  INSTITUTE_PROVISIONING_V1,
+-  ProvisionInstituteRequestV1,
+-  ProvisionInstituteResponseV1,
+-  parseEvent,
+-  type ProvisionInstituteRequestV1Input,
+-} from '@slotwise/shared/contracts';
+-import { AuditService } from '../audit/audit.service';
+-import { ENV, type Env } from '../config/env';
+-import { PrismaService } from '../db/prisma.service';
+-
+-@Injectable()
+-export class InstituteProvisionerMock {
+-  constructor(
+-    private readonly prisma: PrismaService,
+-    private readonly audit: AuditService,
+-    private readonly events: EventEmitter2,
+-    @Inject(ENV) private readonly env: Env,
+-  ) {}
+-
+-  async provision(
+-    input: ProvisionInstituteRequestV1Input,
+-    actorUserId: string,
+-  ): Promise<ProvisionInstituteResponseV1> {
+-    if (this.env.NODE_ENV === 'production') {
+-      throw new ForbiddenException('Sample institutes are not available here yet.');
+-    }
+-    const req = ProvisionInstituteRequestV1.parse(input);
+-    // institutes and users are global tables (no row-level security).
+-    const institute = await this.prisma.institute.create({
+-      data: {
+-        name: req.name,
+-        slug: req.slug,
+-        type: req.type,
+-        timezone: req.timezone,
+-        affiliatingUniversityName: req.affiliatingUniversityName,
+-        isSample: req.withSampleData,
+-      },
+-    });
+-    const email = req.firstAdmin.email.toLowerCase();
+-    const admin = await this.prisma.user.upsert({
+-      where: { email },
+-      update: {},
+-      create: { email, name: req.firstAdmin.name },
+-    });
+-    const expiresAt = new Date(Date.now() + 7 * 86_400_000);
+-    const invite = await this.prisma.tenant(
+-      { instituteId: institute.id, userId: actorUserId },
+-      async (tx) => {
+-        const row = await tx.invite.create({
+-          data: {
+-            instituteId: institute.id,
+-            email,
+-            role: 'institute_admin',
+-            scopeType: 'institute',
+-            scopeId: institute.id,
+-            tokenHash: createHash('sha256').update(randomBytes(32)).digest('hex'),
+-            expiresAt,
+-            acceptedAt: new Date(),
+-            acceptedById: admin.id,
+-            invitedById: actorUserId,
+-          },
+-        });
+-        await tx.membership.create({
+-          data: {
+-            userId: admin.id,
+-            role: 'institute_admin',
+-            scopeType: 'institute',
+-            scopeId: institute.id,
+-            instituteId: institute.id,
+-            createdById: actorUserId,
+-          },
+-        });
+-        await this.audit.record(tx, {
+-          instituteId: institute.id,
+-          actorUserId,
+-          action: 'institute.created',
+-          targetType: 'institute',
+-          targetId: institute.id,
+-          metadata: { withSampleData: req.withSampleData, via: 'provisioning.mock' },
+-        });
+-        return row;
+-      },
+-    );
+-
+-    this.events.emit(
+-      'institute.created',
+-      parseEvent('institute.created', {
+-        eventId: randomUUID(),
+-        occurredAt: new Date().toISOString(),
+-        instituteId: institute.id,
+-        actorUserId,
+-        slug: institute.slug,
+-        name: institute.name,
+-        firstAdminUserId: admin.id,
+-        withSampleData: req.withSampleData,
+-      }),
+-    );
+-
+-    return ProvisionInstituteResponseV1.parse({
+-      version: INSTITUTE_PROVISIONING_V1,
+-      instituteId: institute.id,
+-      slug: institute.slug,
+-      url: this.env.WEB_URL_TEMPLATE.replace('{slug}', institute.slug),
+-      firstAdminUserId: admin.id,
+-      inviteId: invite.id,
+-      inviteExpiresAt: expiresAt.toISOString(),
+-    });
+-  }
+-}
+diff --git a/apps/api/src/setup/setup.controller.ts b/apps/api/src/setup/setup.controller.ts
+index b355175..d2ee966 100644
+--- a/apps/api/src/setup/setup.controller.ts
++++ b/apps/api/src/setup/setup.controller.ts
+@@ -8,11 +8,11 @@ import {
+   type SetupStep,
+   type SetupStepUpdateInput,
+ } from '@slotwise/shared';
++import { InstituteProvisioningService } from '../institute-provisioning/institute-provisioning.service';
+ import { CurrentTenant, RequirePermission } from '../common/decorators';
+ import type { Tenant } from '../common/request-context';
+ import { ZodPipe } from '../common/zod.pipe';
+ import { MasterDataService } from '../masterdata/masterdata.service';
+-import { InstituteProvisionerMock } from './provisioning.mock';
+ import { SetupService } from './setup.service';
+ 
+ /** Setup wizard progress and "Try with sample data". */
+@@ -20,7 +20,7 @@ import { SetupService } from './setup.service';
+ export class SetupController {
+   constructor(
+     private readonly setup: SetupService,
+-    private readonly provisioner: InstituteProvisionerMock,
++    private readonly provisioning: InstituteProvisioningService,
+     private readonly md: MasterDataService,
+   ) {}
+ 
+@@ -49,7 +49,7 @@ export class SetupController {
+   async sample(@CurrentTenant() tenant: Tenant): Promise<SampleInstituteDto> {
+     this.md.assertCan(tenant, 'institute.manage', this.md.resource(tenant, 'institute', null));
+     const base = tenant.institute.slug.slice(0, 40);
+-    const res = await this.provisioner.provision(
++    const res = await this.provisioning.provision(
+       {
+         version: 'institute-provisioning.v1',
+         name: 'Demo Institute of Engineering (sample)',
+@@ -60,7 +60,7 @@ export class SetupController {
+         firstAdmin: { email: tenant.user.email, name: tenant.user.name ?? tenant.user.email },
+         withSampleData: true,
+       },
+-      tenant.user.id,
++      { actorUserId: tenant.user.id, via: 'sample', grantNow: true },
+     );
+     await this.md.run(tenant, (ctx) =>
+       this.md.audit(ctx, 'setup.sample_created', 'institute', res.instituteId, { slug: res.slug }),
+diff --git a/apps/api/src/setup/setup.module.ts b/apps/api/src/setup/setup.module.ts
+index 556f888..dc7c97a 100644
+--- a/apps/api/src/setup/setup.module.ts
++++ b/apps/api/src/setup/setup.module.ts
+@@ -1,12 +1,13 @@
+ import { Module } from '@nestjs/common';
+-import { InstituteProvisionerMock } from './provisioning.mock';
++import { InstituteProvisioningModule } from '../institute-provisioning/institute-provisioning.module';
+ import { SampleDataListener } from './sample-data.listener';
+ import { SetupController } from './setup.controller';
+ import { SetupService } from './setup.service';
+ 
+ /** Setup wizard progress, sample data (institute.created listener). */
+ @Module({
++  imports: [InstituteProvisioningModule],
+   controllers: [SetupController],
+-  providers: [SetupService, SampleDataListener, InstituteProvisionerMock],
++  providers: [SetupService, SampleDataListener],
+ })
+ export class SetupModule {}
+diff --git a/apps/api/test/institute-provisioning.e2e.test.ts b/apps/api/test/institute-provisioning.e2e.test.ts
+new file mode 100644
+index 0000000..11e93a4
+--- /dev/null
++++ b/apps/api/test/institute-provisioning.e2e.test.ts
+@@ -0,0 +1,112 @@
++/**
++ * institute-provisioning.v1 against a real, migrated Postgres: `POST /platform/institutes`
++ * creates an institute, invites its first admin and emits `institute.created`.
++ */
++import type { INestApplication } from '@nestjs/common';
++import { EventEmitter2 } from '@nestjs/event-emitter';
++import { purgeInstitute } from '@slotwise/db';
++import type { EventPayloadV1, ProvisionInstituteResponseV1 } from '@slotwise/shared/contracts';
++import request from 'supertest';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import type { Env } from '../src/config/env';
++import { createTestApp, Fixtures, signToken, type FakeMail } from './helpers';
++
++let app: INestApplication;
++let env: Env;
++let mail: FakeMail;
++const fx = new Fixtures();
++const run = Math.random().toString(36).slice(2, 8);
++const created: string[] = [];
++const events: EventPayloadV1<'institute.created'>[] = [];
++let platformToken: string;
++let adminToken: string;
++let adminInstituteSlug: string;
++
++const body = (slug: string, extra: object = {}) => ({
++  version: 'institute-provisioning.v1',
++  name: 'Demo Polytechnic College',
++  slug,
++  type: 'college',
++  firstAdmin: { email: `first-admin-${run}@slotwise.test`, name: 'First Admin' },
++  ...extra,
++});
++const post = (token: string | null, payload: object) => {
++  const req = request(app.getHttpServer()).post('/platform/institutes');
++  if (token) req.set('authorization', `Bearer ${token}`);
++  return req.send(payload);
++};
++
++beforeAll(async () => {
++  ({ app, env, mail } = await createTestApp());
++  app.get(EventEmitter2).on('institute.created', (e: EventPayloadV1<'institute.created'>) => {
++    events.push(e);
++  });
++  const platform = await fx.user('platform');
++  await fx.owner.membership.create({
++    data: { userId: platform.id, role: 'platform_admin', scopeType: 'platform' },
++  });
++  platformToken = await signToken(env, platform.id);
++  const { institute } = await fx.institute('prov');
++  adminInstituteSlug = institute.slug;
++  const admin = await fx.user('inst-admin');
++  await fx.grant(admin.id, 'institute_admin', institute.id, { type: 'institute' });
++  adminToken = await signToken(env, admin.id);
++});
++
++afterAll(async () => {
++  await app?.close();
++  for (const id of created) await purgeInstitute(fx.owner, id, { includeInstitute: true });
++  await fx.owner.user.deleteMany({ where: { email: `first-admin-${run}@slotwise.test` } });
++  await fx.cleanup();
++});
++
++describe('POST /platform/institutes', () => {
++  it('a platform admin creates an institute; its first admin gets an invite', async () => {
++    const res = await post(platformToken, body(`t-prov-${run}`));
++    expect(res.status).toBe(201);
++    const data = res.body as ProvisionInstituteResponseV1;
++    created.push(data.instituteId);
++    expect(data).toMatchObject({ version: 'institute-provisioning.v1', slug: `t-prov-${run}` });
++    expect(data.url).toBe(env.WEB_URL_TEMPLATE.replace('{slug}', `t-prov-${run}`));
++
++    const invite = await fx.owner.invite.findUniqueOrThrow({ where: { id: data.inviteId } });
++    expect(invite).toMatchObject({ role: 'institute_admin', acceptedAt: null });
++    const sent = mail.sent.find((m) => m.to === `first-admin-${run}@slotwise.test`);
++    expect(sent?.text).toContain(`${data.url}/invite/`);
++
++    expect(events.find((e) => e.instituteId === data.instituteId)).toMatchObject({
++      slug: `t-prov-${run}`,
++      firstAdminUserId: data.firstAdminUserId,
++      withSampleData: false,
++    });
++    const audit = await fx.owner.auditLog.findFirst({
++      where: { instituteId: data.instituteId, action: 'institute.created' },
++    });
++    expect(audit?.metadata).toMatchObject({ via: 'platform' });
++  });
++
++  it('refuses a taken, reserved or invalid address with the contract codes', async () => {
++    const taken = await post(platformToken, body(`t-prov-${run}`));
++    expect(taken.status).toBe(409);
++    expect(taken.body.code).toBe('slug_taken');
++
++    const reserved = await post(platformToken, body('admin'));
++    expect(reserved.status).toBe(400);
++    expect(reserved.body.code).toBe('slug_reserved');
++
++    const invalid = await post(platformToken, body(`t-prov2-${run}`, { name: 'x' }));
++    expect(invalid.status).toBe(400);
++    expect(invalid.body.code).toBe('invalid_input');
++    expect(invalid.body.fieldErrors.name).toBeDefined();
++  });
++
++  it('institute admins and signed-out callers cannot use it', async () => {
++    const asAdmin = await post(adminToken, body(`t-prov3-${run}`)).set(
++      'x-institute-slug',
++      adminInstituteSlug,
++    );
++    expect(asAdmin.status).toBe(403);
++    expect((await post(null, body(`t-prov3-${run}`))).status).toBe(401);
++    expect(await fx.owner.institute.findUnique({ where: { slug: `t-prov3-${run}` } })).toBeNull();
++  });
++});
+diff --git a/apps/api/test/masterdata-setup.e2e.test.ts b/apps/api/test/masterdata-setup.e2e.test.ts
+index b2cfe68..68ea76a 100644
+--- a/apps/api/test/masterdata-setup.e2e.test.ts
++++ b/apps/api/test/masterdata-setup.e2e.test.ts
+@@ -1,6 +1,6 @@
+ /**
+  * Setup wizard API (milestone 1c): progress that is saved and resumed, "needs attention",
+- * permissions, and "Try with sample data" (provisioning mock → institute.created → P1's
++ * permissions, and "Try with sample data" (institute provisioning → institute.created → P1's
+  * sample-data queue → the sample institute's master data).
+  */
+ import { connect } from 'node:net';
+diff --git a/packages/shared/src/auth/platform.test.ts b/packages/shared/src/auth/platform.test.ts
+new file mode 100644
+index 0000000..7eaa47a
+--- /dev/null
++++ b/packages/shared/src/auth/platform.test.ts
+@@ -0,0 +1,46 @@
++import { describe, expect, it } from 'vitest';
++import type { AuthUser } from './can';
++import { canManagePlatform } from './platform';
++
++const platformAdmin: AuthUser = {
++  id: 'p',
++  memberships: [
++    { role: 'platform_admin', scopeType: 'platform', scopeId: null, instituteId: null },
++  ],
++};
++const instituteAdmin: AuthUser = {
++  id: 'a',
++  memberships: [
++    { role: 'institute_admin', scopeType: 'institute', scopeId: 'inst-a', instituteId: 'inst-a' },
++  ],
++};
++const universityAdmin: AuthUser = {
++  id: 'u',
++  memberships: [
++    { role: 'university_admin', scopeType: 'university', scopeId: 'univ', instituteId: 'univ' },
++  ],
++};
++
++describe('canManagePlatform', () => {
++  it('only platform admins', () => {
++    expect(canManagePlatform(platformAdmin)).toBe(true);
++    expect(canManagePlatform(instituteAdmin)).toBe(false);
++    expect(canManagePlatform(universityAdmin)).toBe(false);
++    expect(canManagePlatform({ id: 'x', memberships: [] })).toBe(false);
++  });
++
++  it('a platform role held in an institute scope does not count', () => {
++    const odd: AuthUser = {
++      id: 'o',
++      memberships: [
++        {
++          role: 'platform_admin',
++          scopeType: 'institute',
++          scopeId: 'inst-a',
++          instituteId: 'inst-a',
++        },
++      ],
++    };
++    expect(canManagePlatform(odd)).toBe(false);
++  });
++});
+diff --git a/packages/shared/src/auth/platform.ts b/packages/shared/src/auth/platform.ts
+new file mode 100644
+index 0000000..b925d57
+--- /dev/null
++++ b/packages/shared/src/auth/platform.ts
+@@ -0,0 +1,16 @@
++import { can, type AuthUser, type Resource } from './can';
++
++/**
++ * An institute id no real institute has. Managing "an institute that is nobody's" is what
++ * only platform-scope memberships may do: every other scope is tied to a real institute,
++ * university or department id, so can() refuses them here.
++ */
++export const NO_INSTITUTE_ID = '00000000-0000-0000-0000-000000000000';
++
++/** The resource for platform screens (all institutes, plans, sign-ups). */
++export const PLATFORM_RESOURCE: Resource = { type: 'institute', instituteId: NO_INSTITUTE_ID };
++
++/** Platform admin check, through can() like every other permission check. */
++export function canManagePlatform(user: AuthUser): boolean {
++  return can(user, 'institute.manage', PLATFORM_RESOURCE);
++}
+diff --git a/packages/shared/src/index.ts b/packages/shared/src/index.ts
+index 0d996e6..f73b7ab 100644
+--- a/packages/shared/src/index.ts
++++ b/packages/shared/src/index.ts
+@@ -2,6 +2,7 @@ export * from './auth/roles';
+ export * from './auth/permissions';
+ export * from './auth/can';
+ export * from './auth/otp';
++export * from './auth/platform';
+ export * from './tenancy';
+ export * from './domain';
+ export * from './schemas/members';
