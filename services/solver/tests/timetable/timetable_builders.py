@@ -50,6 +50,7 @@ class Tiny:
         self.programme = uid("programme")
         self.scheme = uid("scheme")
         self.cohort = uid("cohort")
+        self.cohorts: list[Json] = [self._cohort_row("T CSE", 3)]
         ps, t = [], 540
         for i in range(1, periods + 1):
             ps.append({"index": i, "label": f"P{i}", "startMinute": t, "endMinute": t + 50})
@@ -78,6 +79,30 @@ class Tiny:
         self.rooms: list[Json] = []
         self.fixed: list[Json] = []
         self.options: Json = {"timeLimitSeconds": 10, "seed": 0}
+
+    def _cohort_row(self, code: str, semester: int) -> Json:
+        return {
+            "id": self.cohort,
+            "displayCode": code,
+            "semester": semester,
+            "isRunning": True,
+            "entryType": "regular",
+            "schemeVersionId": self.scheme,
+            "programmeId": self.programme,
+            "branchId": uid(f"branch:{self.dept}"),
+            "departmentId": self.dept,
+            "joinsCohortId": None,
+        }
+
+    def department(self, code: str) -> None:
+        """Later cohorts, courses and teachers belong to a new department and programme."""
+        self.dept = uid(f"dept:{code}")
+        self.programme = uid(f"programme:{code}")
+
+    def new_cohort(self, code: str, semester: int) -> None:
+        """Later sections belong to a new cohort (semester) of the current department."""
+        self.cohort = uid(f"cohort:{code}")
+        self.cohorts.append(self._cohort_row(code, semester))
 
     def section(
         self,
@@ -296,20 +321,7 @@ class Tiny:
             "calendarWindows": [],
             "extraWorkingDays": [],
             "cohortWindows": [],
-            "cohorts": [
-                {
-                    "id": self.cohort,
-                    "displayCode": "T CSE",
-                    "semester": 3,
-                    "isRunning": True,
-                    "entryType": "regular",
-                    "schemeVersionId": self.scheme,
-                    "programmeId": self.programme,
-                    "branchId": uid("branch"),
-                    "departmentId": self.dept,
-                    "joinsCohortId": None,
-                }
-            ],
+            "cohorts": self.cohorts,
             "sections": self.sections,
             "subGroups": self.subgroups,
             "electiveSections": self.electives,
@@ -350,3 +362,56 @@ def solve_ok(request: Json) -> Json:
 
 def reasons(response: Json) -> list[str]:
     return [u["reason"] for u in response["unplaced"]]
+
+
+def big_institute(
+    departments: tuple[str, ...] = ("CSE", "ECE", "ME", "CE"),
+    semesters: tuple[int, ...] = (1, 3, 5, 7),
+    sections_per_semester: int = 3,
+) -> Tiny:
+    """A fictional four-department college: 48 sections, 1,536 periods a week.
+
+    Mon–Fri, 8 periods with lunch after P4. Per section: six theory courses (L3 T1, one
+    teacher) and two labs (P2) for each of two sub-groups. Per department: 24 teachers with 16
+    periods each, 10 lecture rooms (fewer than its 12 sections), 4 labs and one tutorial room.
+    """
+    t = Tiny(periods=8, lunch_after=4, lunch_minutes=40)
+    t.fixed_slot(5, 8, 8, label="Library")
+    for d, dept in enumerate(departments):
+        t.department(dept)
+        teachers = [
+            t.teacher(
+                f"Dr. {dept} Teacher {i + 1}",
+                max_day=5,
+                max_week=18,
+                # Every fourth teacher is away on one morning.
+                unavailable=((1 + i % 5, 1), (1 + i % 5, 2)) if i % 4 == 0 else (),
+            )
+            for i in range(24)
+        ]
+        lecture_rooms = [t.room(f"{dept}-LT{r + 1}", capacity=66) for r in range(10)]
+        t.room(f"{dept}-TR1", "tutorial", 66)
+        lab_kind = f"{dept} lab"
+        for r in range(4):
+            t.room(f"{dept}-Lab{r + 1}", "lab", 32, (lab_kind,))
+        theory_n = lab_n = 0
+        for sem in semesters:
+            t.new_cohort(f"{dept} S{sem}", sem)
+            theory = [t.course(f"{dept}{sem}0{c + 1}", lectures=3, tutorials=1) for c in range(6)]
+            labs = [t.course(f"{dept}{sem}L{c + 1}", practicals=2, lab=lab_kind) for c in range(2)]
+            for k in range(sections_per_semester):
+                name = f"{dept}{d} {sem}{'ABCDEFG'[k]}"
+                n = len(t.sections) - d * len(semesters) * sections_per_semester
+                home = lecture_rooms[n] if n < len(lecture_rooms) else None
+                sec = t.section(name, strength=60, subgroups=("G1", "G2"), home=home)
+                for c in theory:
+                    teacher = teachers[theory_n % 24]
+                    theory_n += 1
+                    t.assign(c, "lecture", ("section", sec), [teacher], periods=3)
+                    t.assign(c, "tutorial", ("section", sec), [teacher], periods=1)
+                for c in labs:
+                    for g in ("G1", "G2"):
+                        teacher = teachers[lab_n % 24]
+                        lab_n += 1
+                        t.assign(c, "practical", ("subgroup", t.subgroup(name, g)), [teacher])
+    return t

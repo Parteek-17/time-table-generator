@@ -52,8 +52,13 @@ class Occupancy:
 
     def fits(self, s: Session, o: Option, room: str) -> bool:
         atoms = self.p.atoms(o)
-        if any(a in self.room[room] for a in atoms):
-            return False
+        return self.room_free(room, atoms) and self.time_free(s, o, atoms)
+
+    def room_free(self, room: str, atoms: list[Atom]) -> bool:
+        return not any(a in self.room[room] for a in atoms)
+
+    def time_free(self, s: Session, o: Option, atoms: list[Atom]) -> bool:
+        """Teachers and students are free at `o` (rooms aside)."""
         for fid in s.faculty_ids:
             f = self.p.faculty.get(fid)
             if any(a in self.faculty[fid] for a in atoms):
@@ -101,15 +106,14 @@ def greedy(problem: Problem) -> dict[str, tuple[Option, str]]:
         s = sessions[i]
         used = days_used[(s.course_id, s.target_id)]
         opts = sorted(s.options, key=lambda o: (o.weekday in used, o.start_index, o.weekday))
-        done = False
         for o in opts:
-            for r in s.rooms:
-                if occ.fits(s, o, r):
-                    occ.add(s, o, r)
-                    out[s.id] = (o, r)
-                    used.add(o.weekday)
-                    done = True
-                    break
-            if done:
+            atoms = problem.atoms(o)
+            if not occ.time_free(s, o, atoms):
+                continue
+            r = next((r for r in s.rooms if occ.room_free(r, atoms)), None)
+            if r is not None:
+                occ.add(s, o, r)
+                out[s.id] = (o, r)
+                used.add(o.weekday)
                 break
     return out

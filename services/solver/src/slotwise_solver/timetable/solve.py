@@ -11,6 +11,9 @@ from .problem import Json, build_problem
 from .relax import diagnose
 from .score import DEFAULT_WEIGHTS, Placed, score
 
+# Share of the time limit kept for the relaxation pass, messages and score.
+AFTER_SHARE = 0.05
+
 
 def solve(request: Json) -> Json:
     started = time.perf_counter()
@@ -20,7 +23,10 @@ def solve(request: Json) -> Json:
     weights = {**DEFAULT_WEIGHTS, **(options.get("weights") or {})}
 
     problem = build_problem(request)
-    result = solve_model(problem, time_limit, seed, weights)
+    # The whole answer must come within the limit: building the problem counts, and a share
+    # is kept for the relaxation pass and the score.
+    left = time_limit * (1 - AFTER_SHARE) - (time.perf_counter() - started)
+    result = solve_model(problem, max(0.1, left), seed, weights)
 
     placed = [
         Placed(s, *result.placements[s.id]) for s in problem.sessions if s.id in result.placements

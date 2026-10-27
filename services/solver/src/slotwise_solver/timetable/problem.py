@@ -219,9 +219,14 @@ class Problem:
     faculty_busy_load: dict[str, dict[int, int]]
     # Atoms: per weekday, the minute boundaries every bell uses; [b[k], b[k+1]) is atom k.
     boundaries: dict[int, list[int]]
+    _atoms: dict[Option, list[tuple[int, int]]] = field(default_factory=dict, repr=False)
 
     def atoms(self, o: Option) -> list[tuple[int, int]]:
-        return self.atoms_between(o.weekday, o.start, o.end)
+        """Cached: large institutes ask for the same few hundred options many times."""
+        out = self._atoms.get(o)
+        if out is None:
+            out = self._atoms[o] = self.atoms_between(o.weekday, o.start, o.end)
+        return out
 
     def atoms_between(self, weekday: int, start: int, end: int) -> list[tuple[int, int]]:
         """Time atoms that [start, end) overlaps on a weekday."""

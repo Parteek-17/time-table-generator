@@ -33,7 +33,7 @@ from dataclasses import dataclass
 from ortools.sat.python import cp_model
 
 from .greedy import Occupancy, greedy
-from .problem import Bell, Option, Problem, Session
+from .problem import Option, Problem, Session
 from .score import MAX_CONSECUTIVE, theory_per_day_cap
 
 LOCKED_WEIGHT = 1000
@@ -50,6 +50,10 @@ DTIME_PER_SECOND = 0.15
 SUB_DTIME = 0.2
 NEIGHBOURHOOD_START = 25
 NEIGHBOURHOOD_MIN = 15
+# The room model takes about as long to build as the times model did (one variable per
+# session and room vs per session and time). With less time left than this many times that
+# build, plus a second to solve, the greedy room placer gives the rooms instead.
+ROOM_BUILD_FACTOR = 1.0
 # Soft weights are numbers; CP-SAT needs whole coefficients.
 WEIGHT_SCALE = 100
 Atom = tuple[int, int]
@@ -93,16 +97,22 @@ def solve_model(
     weight = {s.id: (LOCKED_WEIGHT if s.locked else 1) * s.length for s in sessions}
     fallback = ModelResult("FEASIBLE", False, False, start)
 
-    times_deadline = time.perf_counter() + time_limit * (1 - ROOM_SHARE)
+    # The greedy start already used part of the limit: the times stage ends at a fixed point
+    # before the overall deadline, so the room stage always keeps its share.
+    times_deadline = deadline - time_limit * ROOM_SHARE
     times = _solve_times(problem, sessions, chains, start, weight, w, times_deadline, seed, workers)
     if times is None or _value(times.options, weight) < _value(start, weight):
         return fallback
 
-    rooms, rooms_proven = _solve_rooms(
-        problem, sessions, times.options, start, weight, w, deadline, seed, workers
-    )
-    dropped = any(s.id in times.options and s.id not in rooms for s in sessions)
-    placements = _repair(problem, sessions, _greedy_rooms(problem, sessions, times.options, rooms))
+    if deadline - time.perf_counter() > ROOM_BUILD_FACTOR * times.build_seconds + 1:
+        rooms, rooms_proven = _solve_rooms(
+            problem, sessions, times.options, start, weight, w, deadline, seed, workers
+        )
+    else:
+        rooms, rooms_proven = {}, False
+    with_rooms = _greedy_rooms(problem, sessions, times.options, rooms)
+    dropped = any(s.id in times.options and s.id not in with_rooms for s in sessions)
+    placements = _repair(problem, sessions, with_rooms)
     if _value(placements, weight) < _value(start, weight):
         return fallback
     placement_proven = times.placement_proven and not dropped
@@ -137,6 +147,8 @@ class Times:
     options: dict[str, Option]
     placement_proven: bool
     penalty_proven: bool
+    # Seconds spent building the model before pass A (an estimate for the room model).
+    build_seconds: float = 0.0
 
 
 def _solve_times(
@@ -150,14 +162,18 @@ def _solve_times(
     seed: int,
     workers: int,
 ) -> Times | None:
+    began = time.perf_counter()
     m = cp_model.CpModel()
     x: dict[str, list[cp_model.IntVar]] = {}
     for i, s in enumerate(sessions):
         x[s.id] = [m.new_bool_var(f"x{i}_{k}") for k in range(len(s.options))]
         m.add_at_most_one(x[s.id])
+        # Only the chosen option is hinted; at-most-one makes the others false. Hinting all of
+        # them costs seconds of Python on a large institute.
         hinted = start.get(s.id)
         for o, v in zip(s.options, x[s.id], strict=True):
-            m.add_hint(v, hinted is not None and hinted[0] == o)
+            if hinted is not None and hinted[0] == o:
+                m.add_hint(v, True)
 
     covers: dict[str, list[tuple[Atom, cp_model.IntVar]]] = {
         s.id: [(a, v) for o, v in zip(s.options, x[s.id], strict=True) for a in problem.atoms(o)]
@@ -195,6 +211,7 @@ def _solve_times(
     # Pass A: place as many periods as possible. If it finds nothing in time, go on from the
     # greedy timetable (its placement count is then unproven).
     m.maximize(placed_value)
+    built = time.perf_counter() - began
     solver = cp_model.CpSolver()
     _params(solver, _left(deadline, PASS_A_SHARE), seed, workers)
     if len(m.proto.variables) > BIG_MODEL_VARIABLES:
@@ -210,7 +227,7 @@ def _solve_times(
 
     penalties = _time_penalties(m, problem, sessions, x, w)
     if not penalties:
-        return Times(best, placement_proven, True)
+        return Times(best, placement_proven, True, built)
 
     # Pass B: keep that many periods, minimise the time-based penalties.
     m.add(placed_value >= best_value)
@@ -219,7 +236,7 @@ def _solve_times(
         cp_model.LinearExpr.weighted_sum([v for v, _ in penalties], [c for _, c in penalties])
     )
     improved, proven = _improve(m, problem, sessions, x, best, deadline, _left(deadline, 1.0), seed)
-    return Times(improved, placement_proven, proven)
+    return Times(improved, placement_proven, proven, built)
 
 
 def _improve(
@@ -467,23 +484,30 @@ def _time_penalties(
                 if o.start_index + s.length - 1 >= s.bell.last_index:
                     terms.append((v, w["late_slots"]))
 
-    # Busy literals per (owner, bell, day, period) for the two patterns below.
-    def busy_grid(owner_of) -> dict[tuple[str, Bell, int], dict[int, list]]:  # noqa: ANN001
-        grid: dict[tuple[str, Bell, int], dict[int, list]] = defaultdict(lambda: defaultdict(list))
+    # Busy literals per (owner, bell, day, period) for the two patterns below. Keyed by the
+    # bell's id: hashing the Bell itself (all its periods) is slow on a large institute.
+    bells = {b.id: b for b in problem.bells}
+
+    def busy_grid(owner_of) -> dict[tuple[str, str, int], dict[int, list]]:  # noqa: ANN001
+        grid: dict[tuple[str, str, int], dict[int, list]] = defaultdict(lambda: defaultdict(list))
         for s in sessions:
             if s.bell is None:
                 continue
-            for owner in owner_of(s):
-                for o, v in zip(s.options, x[s.id], strict=True):
-                    for p in _periods(o, s.length):
-                        grid[(owner, s.bell, o.weekday)][p].append(v)
+            bell_id = s.bell.id
+            for o, v in zip(s.options, x[s.id], strict=True):
+                periods = _periods(o, s.length)
+                for owner in owner_of(s):
+                    row = grid[(owner, bell_id, o.weekday)]
+                    for p in periods:
+                        row[p].append(v)
         return grid
 
     # faculty_consecutive: every window of MAX_CONSECUTIVE + 1 back-to-back busy periods.
     if w["faculty_consecutive"]:
         window = MAX_CONSECUTIVE + 1
-        for (_fid, bell, _day), by_p in busy_grid(lambda s: s.faculty_ids).items():
-            for first in bell.block_starts(window):
+        starts = {bid: b.block_starts(window) for bid, b in bells.items()}
+        for (_fid, bell_id, _day), by_p in busy_grid(lambda s: s.faculty_ids).items():
+            for first in starts[bell_id]:
                 ps = range(first, first + window)
                 if not all(p in by_p for p in ps):
                     continue
@@ -495,8 +519,8 @@ def _time_penalties(
 
     # section_idle_gaps: free periods with a class before and after, per section and day.
     if w["section_idle_gaps"]:
-        for (_sid, bell, _day), by_p in busy_grid(lambda s: s.section_ids).items():
-            indexes = [p.index for p in bell.periods]
+        for (_sid, bell_id, _day), by_p in busy_grid(lambda s: s.section_ids).items():
+            indexes = [p.index for p in bells[bell_id].periods]
             if len([p for p in indexes if p in by_p]) < 2:
                 continue
             busy = {}
@@ -585,8 +609,8 @@ def _solve_rooms(
             y[s.id][r] = v
             for at in atoms:
                 rows[(r, at)].append(v)
-            hinted = start.get(s.id)
-            m.add_hint(v, hinted is not None and hinted == (times[s.id], r))
+            if start.get(s.id) == (times[s.id], r):
+                m.add_hint(v, True)
             if s.component == "practical":
                 labs[s.assignment_id][r].append(v)
             elif home and r != home and w["home_room"]:
