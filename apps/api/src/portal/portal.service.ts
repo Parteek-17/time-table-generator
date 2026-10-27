@@ -5,6 +5,10 @@ import {
   buildToday,
   buildWeek,
   CHANGES_DAYS_AHEAD,
+  FEED_DAYS_AFTER,
+  FEED_DAYS_BEFORE,
+  feedEvents,
+  icsCalendar,
   localNow,
   weekStartOf,
   type PortalWeekV1,
@@ -40,6 +44,21 @@ export class PortalService {
       return [start, addDays(start, 6)];
     });
     return buildWeek({ ...input, versionId });
+  }
+
+  /** The viewer's calendar feed: last week to about four months ahead, within the term. */
+  async feed(tenant: Tenant, now = new Date()): Promise<string> {
+    const { input } = await this.load(tenant, undefined, now, (d) => [
+      addDays(d, -FEED_DAYS_BEFORE),
+      addDays(d, FEED_DAYS_AFTER),
+    ]);
+    const events = feedEvents(
+      input,
+      addDays(input.date, -FEED_DAYS_BEFORE),
+      addDays(input.date, FEED_DAYS_AFTER),
+    );
+    const name = `Timetable – ${input.viewer.groupLabel || input.viewer.name} (${tenant.institute.name})`;
+    return icsCalendar(name, events, now);
   }
 
   private async load(
