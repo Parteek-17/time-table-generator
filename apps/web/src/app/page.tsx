@@ -1,4 +1,4 @@
-import { canSomewhere, type InstituteDto, type MeResponse } from '@slotwise/shared';
+import { canSomewhere, isFlagOn, type InstituteDto, type MeResponse } from '@slotwise/shared';
 import { Alert, Button, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
@@ -62,6 +62,14 @@ export default async function HomePage({
   const authUser = { id: user.id, memberships: grants };
   const canManageMembers = canSomewhere(authUser, 'member.view', place);
   const canSetUp = canSomewhere(authUser, 'masterdata.view', place);
+  // Students and teachers land on "Today" (CLAUDE.md "Role-shaped home screens"): anyone who
+  // can't edit timetables, run imports or manage members. Add exam permissions here when P6
+  // lands, so exam coordinators keep this home screen.
+  const readsOnly =
+    !canManageMembers &&
+    !canSomewhere(authUser, 'timetable.edit', place) &&
+    !canSomewhere(authUser, 'import.run', place);
+  if (isFlagOn('P5') && !joined && readsOnly) redirect('/today');
   const shellMe = await getMe();
 
   return (
