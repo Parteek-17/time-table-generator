@@ -1,10 +1,11 @@
 import { IsoDate, PORTAL_TODAY_V1_ROUTE, type TodayV1 } from '@slotwise/shared/contracts';
 import { addDays, localNow, VIEWER_EXTRAS } from '@slotwise/shared/portal';
-import { Alert, buttonVariants, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
+import { Alert, buttonVariants, Card, CardDescription, CardHeader } from '@slotwise/ui';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { ExamSeatSlot } from '../../_components/exam-seat-card';
 import {
   ClassItem,
   DayPager,
@@ -72,6 +73,8 @@ export default async function TodayPage({
         <Alert role="status">{t('holidayBody', { name: today.holiday })}</Alert>
       ) : null}
 
+      <ExamSeatSlot today={today} position="top" />
+
       {next ? (
         <PortalSection id="next" title={happening ? t('nowClass') : t('nextClass')}>
           <ul className="flex flex-col gap-2">
@@ -100,6 +103,12 @@ export default async function TodayPage({
         className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
       >
         {t('seeWeek')}
+      </Link>
+      <Link
+        href="/add-to-calendar"
+        className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+      >
+        {t('addToCalendar')}
       </Link>
 
       {VIEWER_EXTRAS[today.viewer.role].availability ? (
@@ -130,12 +139,7 @@ export default async function TodayPage({
         )}
       </PortalSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('examSeat')}</CardTitle>
-          <CardDescription className="text-base">{t('examSeatSoon')}</CardDescription>
-        </CardHeader>
-      </Card>
+      <ExamSeatSlot today={today} position="bottom" />
     </>
   );
 }

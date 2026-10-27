@@ -5,111 +5,39 @@
  *
  * Needs P2T's timetable tables (migrated on main since 20261027000000_p2t_timetable).
  */
-import type { AddressInfo } from 'node:net';
 import type { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import type { Prisma } from '@slotwise/db';
 import { TodayV1 } from '@slotwise/shared/contracts';
-import { demoPublishedTimetable, demoTermSnapshot } from '@slotwise/shared/fixtures';
-import { PortalWeekV1 } from '@slotwise/shared/portal';
+import { addDays, localNow, PortalWeekV1 } from '@slotwise/shared/portal';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { FakeMail, Fixtures, signToken } from '../../test/helpers';
-import { AppModule } from '../app.module';
-import { loadEnv } from '../config/env';
-import { MailService } from '../mail/mail.service';
-import { portalMasterData } from './portal.test-data';
-import { PORTAL_API_BASE } from './timetable.client';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { Fixtures } from '../../test/helpers';
+import {
+  fixtureTeacher,
+  portalFixture as fixture,
+  portalMasterData,
+  publishFixtureWeek,
+  startPortalApp,
+} from './portal-test-data.test';
+import { PublishedTimetableClient } from './timetable.client';
 
 const fx = new Fixtures();
-const snapshot = demoTermSnapshot();
-const fixture = demoPublishedTimetable();
-const fixtureSection = fixture.slots
-  .map((s) => s.sectionIds)
-  .reduce((acc, ids) => acc.filter((id) => ids.includes(id)))[0]!;
-const fixtureTeacher = fixture.slots[0]!.faculty[0]!;
 /** A Monday inside the fixture's term. */
 const MONDAY = '2026-08-10';
 const TUESDAY = '2026-08-11';
 
 let app: INestApplication;
 let a: Awaited<ReturnType<Fixtures['institute']>>;
-const tokens = new Map<string, string>();
+let tokens = new Map<string, string>();
 const u = {} as Record<'student' | 'teacher' | 'admin' | 'stranger', { id: string; email: string }>;
 let sectionId: string;
 let studentId: string;
 let facultyId: string;
-
-/** Real HTTP server so the portal's call to timetable-read.v1 goes through the network. */
-async function startApp(): Promise<INestApplication> {
-  const env = loadEnv({ ...process.env, NODE_ENV: 'test' });
-  let base = '';
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule.forRoot(env)] })
-    .overrideProvider(MailService)
-    .useValue(new FakeMail())
-    .overrideProvider(PORTAL_API_BASE)
-    .useValue(() => base)
-    .compile();
-  const nest = moduleRef.createNestApplication({ logger: false });
-  await nest.listen(0, '127.0.0.1');
-  base = `http://127.0.0.1:${(nest.getHttpServer().address() as AddressInfo).port}`;
-  for (const user of Object.values(u)) tokens.set(user.id, await signToken(env, user.id));
-  return nest;
-}
 
 const get = (path: string, user: { id: string } = u.student) =>
   request(app.getHttpServer())
     .get(path)
     .set('x-institute-slug', a.institute.slug)
     .set('authorization', `Bearer ${tokens.get(user.id)}`);
-
-/** The fixture's published week, re-pointed at this test's section and teacher. */
-async function publish(instituteId: string, termId: string, createdById: string) {
-  const snap = await fx.owner.timetableSnapshot.create({
-    data: { instituteId, termId, hash: `p5-${instituteId}`, data: {} },
-  });
-  const version = await fx.owner.timetableVersion.create({
-    data: { instituteId, termId, snapshotId: snap.id, cohortIds: [], createdById },
-  });
-  const swapSection = (id: string) => (id === fixtureSection ? sectionId : id);
-  await fx.owner.timetableSlot.createMany({
-    data: fixture.slots.map((s, i) => ({
-      instituteId,
-      versionId: version.id,
-      sessionId: `s${i}`,
-      assignmentId: s.assignmentId,
-      component: s.component,
-      courseId: s.course.id,
-      courseCode: s.course.code,
-      courseShortName: s.course.shortName,
-      courseTitle: s.course.title,
-      targetKind: s.target.kind,
-      targetId: swapSection(s.target.id),
-      targetName: s.target.name,
-      sectionIds: s.sectionIds.map(swapSection),
-      facultyIds: s.faculty.map((f) => (f.id === fixtureTeacher.id ? facultyId : f.id)),
-      faculty: s.faculty.map((f) =>
-        f.id === fixtureTeacher.id ? { ...f, id: facultyId } : f,
-      ) as unknown as Prisma.InputJsonValue,
-      roomId: s.room?.id ?? null,
-      roomCode: s.room?.code ?? null,
-      weekday: s.weekday,
-      startPeriod: s.startPeriodIndex,
-      length: s.length,
-      startMinute: s.startMinute,
-      endMinute: s.endMinute,
-    })),
-  });
-  await fx.owner.timetableVersion.update({
-    where: { id: version.id },
-    data: {
-      status: 'published',
-      number: 1,
-      publishedAt: new Date(),
-      validFrom: new Date(`${snapshot.term.startDate}T00:00:00Z`),
-    },
-  });
-}
 
 describe('portal Today and week', () => {
   beforeAll(async () => {
@@ -157,11 +85,17 @@ describe('portal Today and week', () => {
         sectionId,
       },
     });
-    await publish(a.institute.id, md.term.id, u.admin.id);
+    await publishFixtureWeek(fx, {
+      instituteId: a.institute.id,
+      termId: md.term.id,
+      createdById: u.admin.id,
+      sectionId,
+      facultyId,
+    });
     await fx.grant(u.student.id, 'student', a.institute.id, { type: 'institute' });
     await fx.grant(u.teacher.id, 'faculty', a.institute.id, { type: 'department', id: a.cse.id });
     await fx.grant(u.admin.id, 'institute_admin', a.institute.id, { type: 'institute' });
-    app = await startApp();
+    ({ app, tokens } = await startPortalApp(Object.values(u).map((x) => x.id)));
   }, 120_000);
 
   afterAll(async () => {
@@ -180,6 +114,37 @@ describe('portal Today and week', () => {
     // Tomorrow's section trip is listed as a change.
     expect(today.changes[0]).toMatchObject({ kind: 'holiday' });
     expect(today.changes[0]!.message).toContain('Section trip');
+  });
+
+  it("shows a student's next exam seat from P6, and none when P6 has nothing", async () => {
+    // On this branch P6's GET /exams/me isn't there yet (404): Today still works, no seat.
+    expect(TodayV1.parse((await get('/portal/today')).body).examSeat).toBeNull();
+
+    const soon = addDays(localNow('Asia/Kolkata').date, 3);
+    const spy = vi.spyOn(app.get(PublishedTimetableClient), 'myExams').mockResolvedValueOnce({
+      seats: [
+        {
+          date: soon,
+          sessionLabel: 'Morning',
+          startMinute: 600,
+          paperCode: 'CS303',
+          paperTitle: 'Operating Systems',
+          hallCode: 'G16',
+          building: 'Main block',
+          floor: 0,
+          seatLabel: 'G16-R3-C2',
+        },
+      ],
+    });
+    const today = TodayV1.parse((await get('/portal/today')).body);
+    expect(today.examSeat).toMatchObject({ date: soon, hallCode: 'G16', seatLabel: 'G16-R3-C2' });
+    expect(spy).toHaveBeenCalledWith(a.institute.slug, u.student.id);
+
+    // Teachers' Today doesn't ask for seats.
+    spy.mockClear();
+    await get('/portal/today', u.teacher);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it('shows the holiday and struck-through classes on the day itself', async () => {

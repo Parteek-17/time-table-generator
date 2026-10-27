@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { isFlagOn } from '@slotwise/shared';
 import type { TimetableReadResponseV1, TodayV1 } from '@slotwise/shared/contracts';
 import {
   addDays,
   buildToday,
   buildWeek,
   CHANGES_DAYS_AHEAD,
+  examSeatFrom,
+  VIEWER_EXTRAS,
+  FEED_DAYS_AFTER,
+  FEED_DAYS_BEFORE,
+  feedEvents,
+  icsCalendar,
   localNow,
   weekStartOf,
   type PortalWeekV1,
@@ -31,7 +38,12 @@ export class PortalService {
       d,
       addDays(d, CHANGES_DAYS_AHEAD),
     ]);
-    return buildToday(input);
+    // Students' next exam seat from P6, when exams are switched on.
+    const mine =
+      isFlagOn('P6') && VIEWER_EXTRAS[input.viewer.kind].examSeat
+        ? await this.timetable.myExams(tenant.institute.slug, tenant.user.id)
+        : null;
+    return buildToday({ ...input, examSeat: mine ? examSeatFrom(mine, input.now.date) : null });
   }
 
   async week(tenant: Tenant, date?: string, now = new Date()): Promise<PortalWeekV1> {
@@ -40,6 +52,21 @@ export class PortalService {
       return [start, addDays(start, 6)];
     });
     return buildWeek({ ...input, versionId });
+  }
+
+  /** The viewer's calendar feed: last week to about four months ahead, within the term. */
+  async feed(tenant: Tenant, now = new Date()): Promise<string> {
+    const { input } = await this.load(tenant, undefined, now, (d) => [
+      addDays(d, -FEED_DAYS_BEFORE),
+      addDays(d, FEED_DAYS_AFTER),
+    ]);
+    const events = feedEvents(
+      input,
+      addDays(input.date, -FEED_DAYS_BEFORE),
+      addDays(input.date, FEED_DAYS_AFTER),
+    );
+    const name = `Timetable – ${input.viewer.groupLabel || input.viewer.name} (${tenant.institute.name})`;
+    return icsCalendar(name, events, now);
   }
 
   private async load(

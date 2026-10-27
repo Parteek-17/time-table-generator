@@ -5,6 +5,7 @@ import {
   TimetableReadResponseV1,
   type TimetableReadQueryV1,
 } from '@slotwise/shared/contracts';
+import { MY_EXAMS_ROUTE, MyExamsAdapter } from '@slotwise/shared/portal';
 import { SignJWT } from 'jose';
 import { ENV, type Env } from '../config/env';
 
@@ -26,9 +27,9 @@ export interface PublishedWeekRequest {
 const UNAVAILABLE = 'Your timetable can’t be loaded right now. Please try again in a minute.';
 
 /**
- * The viewer's published week through P2T's timetable-read.v1. P2T's route lives in this same
- * API; it is called over HTTP as the viewer so its permission checks apply and P5 never reads
- * P2T's tables (docs/coordination/CONTRACTS.md).
+ * Other streams' routes in this same API, called over HTTP as the viewer so their permission
+ * checks apply and P5 never reads their tables (docs/coordination/CONTRACTS.md): P2T's
+ * timetable-read.v1 and P6's "my exams".
  */
 @Injectable()
 export class PublishedTimetableClient {
@@ -37,37 +38,53 @@ export class PublishedTimetableClient {
     @Inject(PORTAL_API_BASE) private readonly baseUrl: () => string,
   ) {}
 
-  async week(req: PublishedWeekRequest): Promise<TimetableReadResponseV1> {
+  /** GET as the user; null when the API can't be reached. */
+  private async get(path: string, userId: string, instituteSlug: string, timeoutMs: number) {
     const token = await new SignJWT({})
       .setProtectedHeader({ alg: 'HS256' })
-      .setSubject(req.userId)
+      .setSubject(userId)
       .setIssuer(API_JWT_ISSUER)
       .setAudience(API_JWT_AUDIENCE)
       .setIssuedAt()
       .setExpirationTime('5m')
       .sign(new TextEncoder().encode(this.env.API_JWT_SECRET));
+    try {
+      return await fetch(`${this.baseUrl()}${path}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+          [INSTITUTE_SLUG_HEADER]: instituteSlug,
+          accept: 'application/json',
+        },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async week(req: PublishedWeekRequest): Promise<TimetableReadResponseV1> {
     const params = new URLSearchParams(
       Object.entries(req.query).filter((e): e is [string, string] => typeof e[1] === 'string'),
     );
     const path = TIMETABLE_READ_V1_ROUTE.replace(':termId', req.termId);
-    let res: Response;
-    try {
-      res = await fetch(`${this.baseUrl()}${path}?${params}`, {
-        headers: {
-          authorization: `Bearer ${token}`,
-          [INSTITUTE_SLUG_HEADER]: req.instituteSlug,
-          accept: 'application/json',
-        },
-        signal: AbortSignal.timeout(20_000),
-      });
-    } catch {
-      throw new ServiceUnavailableException(UNAVAILABLE);
-    }
+    const res = await this.get(`${path}?${params}`, req.userId, req.instituteSlug, 20_000);
+    if (!res) throw new ServiceUnavailableException(UNAVAILABLE);
     // P2T's flag off: nothing published to show yet.
     if (res.status === 404) return { contract: 'timetable-read.v1', version: null, slots: [] };
     if (!res.ok) throw new ServiceUnavailableException(UNAVAILABLE);
     const parsed = TimetableReadResponseV1.safeParse(await res.json());
     if (!parsed.success) throw new ServiceUnavailableException(UNAVAILABLE);
     return parsed.data;
+  }
+
+  /**
+   * The viewer's published exam seats from P6's `GET /exams/me`, or null when P6 is off, not
+   * deployed, slow or answers in a shape P5 doesn't know. Never fails "Today".
+   */
+  async myExams(instituteSlug: string, userId: string): Promise<MyExamsAdapter | null> {
+    const res = await this.get(MY_EXAMS_ROUTE, userId, instituteSlug, 5_000);
+    if (!res?.ok) return null;
+    const parsed = MyExamsAdapter.safeParse(await res.json().catch(() => null));
+    return parsed.success ? parsed.data : null;
   }
 }

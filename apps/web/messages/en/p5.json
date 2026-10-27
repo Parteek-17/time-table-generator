@@ -10,7 +10,9 @@
       "group": "My timetable",
       "today": "Today",
       "week": "Week",
-      "label": "My timetable"
+      "label": "My timetable",
+      "calendar": "Add to calendar",
+      "share": "Notice-board links"
     },
     "common": {
       "component": {
@@ -48,8 +50,6 @@
       "classesCount": "{count, plural, =0 {No classes} one {# class} other {# classes}}",
       "changes": "Changes this week",
       "noChanges": "No changes in the next 7 days.",
-      "examSeat": "Exam seat",
-      "examSeatSoon": "Your exam hall and seat will appear here when the date sheet is out.",
       "previousDay": "Previous day",
       "nextDay": "Next day",
       "backToToday": "Back to today",
@@ -57,7 +57,8 @@
       "dayNav": "Change day",
       "nothingPublished": "Your timetable hasn’t been published yet. Check again later.",
       "availability": "Set the periods you can’t teach",
-      "availabilityHint": "The timetable in-charge uses this when making the next timetable."
+      "availabilityHint": "The timetable in-charge uses this when making the next timetable.",
+      "addToCalendar": "Add your timetable to your phone’s calendar"
     },
     "week": {
       "title": "This week",
@@ -89,6 +90,58 @@
       "otherRoll": "Use another roll number",
       "staff": "Staff or teacher?",
       "staffLink": "Sign in with your email"
+    },
+    "calendar": {
+      "title": "Add to your calendar",
+      "subtitle": "Your classes appear in your phone’s calendar and update by themselves when there are changes, cancellations or holidays.",
+      "google": "Add to Google Calendar",
+      "phone": "Open in my phone’s calendar",
+      "address": "Calendar address",
+      "copy": "Copy",
+      "copied": "Copied",
+      "privateNote": "This address is just for you. Anyone who has it can see your classes, so don’t share it.",
+      "resetTitle": "Shared it by mistake?",
+      "resetBody": "Make a new address. The old one stops working at once; add the new one to your calendar again.",
+      "reset": "Make a new address"
+    },
+    "share": {
+      "title": "Notice-board links",
+      "subtitle": "Anyone with the link or QR code can see the published timetable, without signing in. Print the QR code for a notice board or classroom door, or paste the link in a WhatsApp group. It always shows the latest published version.",
+      "pick": "Section or room",
+      "pickPlaceholder": "Choose a section or room",
+      "sections": "Sections",
+      "rooms": "Rooms",
+      "make": "Make a link",
+      "none": "No links yet. Choose a section or room above.",
+      "qrLabel": "QR code for the {label} timetable",
+      "downloadQr": "Download QR code",
+      "address": "Link",
+      "copy": "Copy",
+      "copied": "Copied",
+      "open": "Open",
+      "stop": "Stop this link"
+    },
+    "public": {
+      "title": "Timetable: {label}",
+      "version": "Version {number}, from {date}",
+      "notPublished": "No timetable has been published yet.",
+      "liveNote": "This page always shows the latest published timetable.",
+      "noClasses": "No classes",
+      "goneTitle": "This link doesn’t work any more",
+      "goneBody": "Ask your institute for the new link or QR code."
+    },
+    "exam": {
+      "title": "Exam seat",
+      "nextExam": "Your next exam",
+      "when": "{day}, {session} session, starts {time}",
+      "hall": "Hall",
+      "seat": "Seat",
+      "allExams": "All my exams",
+      "none": "No exams in the next {days} days.",
+      "soon": "Your exam hall and seat will appear here when the date sheet is out.",
+      "dutiesTitle": "Exam duties",
+      "dutiesHint": "See the halls and sessions you invigilate.",
+      "duties": "My exam duties"
     }
   }
 }

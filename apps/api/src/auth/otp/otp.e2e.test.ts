@@ -9,7 +9,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp, type FakeMail, Fixtures } from '../../../test/helpers';
-import { portalMasterData } from '../../portal/portal.test-data';
+import { portalMasterData } from '../../portal/portal-test-data.test';
 
 const fx = new Fixtures();
 /** False until INT's migration adds portal_login_codes (CI before it): tests skip. */

@@ -27,3 +27,48 @@ model PortalLoginCode {
   @@index([instituteId])
   @@map("portal_login_codes")
 }
+
+/// A person's calendar subscription link (iCal). Revoked when they make a new link.
+model PortalCalendarFeed {
+  id          String    @id @default(uuid()) @db.Uuid
+  instituteId String    @map("institute_id") @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at")
+  revokedAt   DateTime? @map("revoked_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([instituteId])
+  @@map("portal_calendar_feeds")
+}
+
+enum PortalLinkKind {
+  section
+  room
+
+  @@map("portal_link_kind")
+}
+
+/// A public read-only link (and QR code) to a section's or room's published timetable,
+/// for notice boards, classroom doors and WhatsApp groups. Anyone with the link can read it.
+model PortalPublicLink {
+  id          String         @id @default(uuid()) @db.Uuid
+  instituteId String         @map("institute_id") @db.Uuid
+  kind        PortalLinkKind
+  /// Section or room id (P1's master data; no foreign key across the two kinds).
+  targetId    String         @map("target_id") @db.Uuid
+  /// e.g. "CS A" or "Room G16", copied when the link was made.
+  label       String
+  /// The timetable is read with this person's permissions; the link stops if they lose access.
+  createdById String         @map("created_by_id") @db.Uuid
+  createdAt   DateTime       @default(now()) @map("created_at")
+  revokedAt   DateTime?      @map("revoked_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+  createdBy User      @relation(fields: [createdById], references: [id])
+
+  @@index([instituteId, kind, targetId])
+  @@map("portal_public_links")
+}

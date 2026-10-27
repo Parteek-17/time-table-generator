@@ -141,6 +141,8 @@ model Institute {
   seatAssignments           SeatAssignment[]
   invigilationDuties        InvigilationDuty[]
   invigilatorUnavailability InvigilatorUnavailability[]
+  portalCalendarFeeds PortalCalendarFeed[]
+  portalPublicLinks PortalPublicLink[]
 
   @@map("institutes")
 }
@@ -165,6 +167,8 @@ model User {
   facultyRecords  Faculty[]
   timetableScopes TimetableScope[]
   importJobs      ImportJob[]
+  portalCalendarFeeds PortalCalendarFeed[]
+  portalPublicLinks PortalPublicLink[]
 
   @@map("users")
 }

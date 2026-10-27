@@ -137,7 +137,7 @@ export class PortalViewerService {
   }
 
   /** The active term on the date, else any term on the date, else the latest active term. */
-  private async termOn(tx: TxClient, date: string): Promise<string | null> {
+  async termOn(tx: TxClient, date: string): Promise<string | null> {
     const day = new Date(`${date}T00:00:00Z`);
     const terms = await tx.term.findMany({
       where: { deletedAt: null, status: { not: 'closed' } },
@@ -252,7 +252,7 @@ export class PortalViewerService {
    * Working days from the bell schedule (the programme's own one if it has one, else the
    * default); without a bell schedule, the weekdays the published week uses.
    */
-  private async workingDays(
+  async workingDays(
     tx: TxClient,
     programme: ResolvedViewer['programme'],
     slotWeekdays: readonly number[],
