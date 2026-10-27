@@ -10,6 +10,8 @@ export const TENANT_TABLES_DELETE_ORDER = [
   'institute_subscriptions',
   'import_rows',
   'import_jobs',
+  'portal_calendar_feeds',
+  'portal_public_links',
   // Plans before their seats and duties (ON DELETE CASCADE passes the published-plan trigger).
   'seating_plans',
   'seat_assignments',
