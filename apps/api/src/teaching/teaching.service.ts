@@ -22,7 +22,7 @@ import {
 } from '@slotwise/shared';
 import type { Tenant } from '../common/request-context';
 import { fieldError, type EntityContext } from '../masterdata/entity';
-import { MasterDataService } from '../masterdata/masterdata.service';
+import { MasterDataService, SNAPSHOT_TX } from '../masterdata/masterdata.service';
 
 const live = { deletedAt: null };
 
@@ -47,7 +47,7 @@ export class TeachingService {
 
   /** Running cohorts of a term with how many cells still need a teacher. */
   overview(tenant: Tenant, termId: string): Promise<TeachingCohortDto[]> {
-    return this.md.run(tenant, async ({ tx }) => {
+    return this.run(tenant, async ({ tx }) => {
       const snapshot = await loadReadinessSnapshot(tx, termId);
       if (!snapshot.term) throw new NotFoundException('We could not find this term.');
       const groups = groupsOf(snapshot);
@@ -74,12 +74,12 @@ export class TeachingService {
   }
 
   grid(tenant: Tenant, cohortId: string): Promise<TeachingGridDto> {
-    return this.md.run(tenant, async ({ tx }) => this.load(tx, cohortId));
+    return this.run(tenant, async ({ tx }) => this.load(tx, cohortId));
   }
 
   /** Sets (or clears) the teachers of one cell, then returns the refreshed grid. */
   setCell(tenant: Tenant, cohortId: string, input: TeachingCellInput): Promise<TeachingGridDto> {
-    return this.md.run(tenant, async (ctx) => {
+    return this.run(tenant, async (ctx) => {
       const { tx } = ctx;
       const { cohort, snapshot } = await this.cohortAndSnapshot(tx, cohortId);
       if (cohort.joinsCohortId) {
@@ -132,7 +132,7 @@ export class TeachingService {
 
   /** Sets (or clears) a course's subject mentor for the cohort. */
   setMentor(tenant: Tenant, cohortId: string, input: SubjectMentorInput): Promise<TeachingGridDto> {
-    return this.md.run(tenant, async (ctx) => {
+    return this.run(tenant, async (ctx) => {
       const { tx } = ctx;
       const { cohort, snapshot } = await this.cohortAndSnapshot(tx, cohortId);
       const course = coursesForCohort(cohort, snapshot.courses).find(
@@ -195,6 +195,11 @@ export class TeachingService {
   }
 
   // ---- Helpers --------------------------------------------------------------------------
+
+  /** Every call loads the whole term's snapshot, so it gets the longer limit. */
+  private run<T>(tenant: Tenant, fn: (ctx: EntityContext) => Promise<T>): Promise<T> {
+    return this.md.run(tenant, fn, undefined, SNAPSHOT_TX);
+  }
 
   private async cohortAndSnapshot(
     tx: TxClient,

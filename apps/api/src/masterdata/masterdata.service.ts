@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Prisma, type TxClient } from '@slotwise/db';
+import { Prisma, type TenantTxOptions, type TxClient } from '@slotwise/db';
 import {
   can,
   type Action,
@@ -21,6 +21,12 @@ import { PrismaService } from '../db/prisma.service';
 import { changes, toDto, type BaseRow, type EntityContext, type EntityDef } from './entity';
 
 const NOT_ALLOWED = 'You don’t have permission to change this. Ask your institute admin.';
+
+/**
+ * For reads of a whole term (readiness snapshot, teaching grid): about 15 queries, which can
+ * pass Prisma's 5-second default on a slow host.
+ */
+export const SNAPSHOT_TX: TenantTxOptions = { timeout: 20_000 };
 
 /**
  * Every master-data write goes through here: one tenant transaction that checks can(),
@@ -39,6 +45,7 @@ export class MasterDataService {
     tenant: Tenant,
     fn: (ctx: EntityContext) => Promise<T>,
     duplicate: (target: string) => string = () => 'This already exists.',
+    options?: TenantTxOptions,
   ): Promise<T> {
     const pending: { name: EventNameV1; payload: unknown }[] = [];
     let result: T;
@@ -52,6 +59,7 @@ export class MasterDataService {
             // Validated now, so a bad payload fails the write instead of the listener.
             emit: (name, payload) => pending.push({ name, payload: parseEvent(name, payload) }),
           }),
+        options,
       );
     } catch (error) {
       throw this.friendly(error, duplicate);

@@ -19,7 +19,8 @@ test('readiness → fix button → teaching grid pick with Undo', async ({ page 
   await expect(missing).toBeVisible();
   await missing.getByRole('link', { name: 'Pick teachers' }).click();
 
-  await expect(page).toHaveURL(/\/teaching\/[0-9a-f-]{36}$/);
+  // A cold dev server compiles the grid page on first visit (25 s on the dev laptop).
+  await expect(page).toHaveURL(/\/teaching\/[0-9a-f-]{36}$/, { timeout: 60_000 });
   await expect(page.getByRole('heading', { level: 1, name: /ECE S3/ })).toBeVisible();
   const picker = page.getByLabel('Teacher for EC201 T in EC A');
   await expect(picker).toHaveValue('');
