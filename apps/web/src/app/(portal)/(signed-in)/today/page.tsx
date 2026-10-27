@@ -101,6 +101,12 @@ export default async function TodayPage({
       >
         {t('seeWeek')}
       </Link>
+      <Link
+        href="/calendar"
+        className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+      >
+        {t('addToCalendar')}
+      </Link>
 
       {VIEWER_EXTRAS[today.viewer.role].availability ? (
         <Card>

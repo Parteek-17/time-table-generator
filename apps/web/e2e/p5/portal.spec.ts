@@ -88,3 +88,45 @@ test('a student signs in with roll number and the emailed code, no password', as
   await expect(page).toHaveURL(/\/today/);
   await expect(page.getByText('Demo Student')).toBeVisible();
 });
+
+test('a student adds the timetable to a calendar; the address serves iCalendar', async ({
+  page,
+  request,
+}) => {
+  await signIn(page, STUDENT);
+  await page.goto('/today');
+  await page.getByRole('link', { name: 'Add your timetable to your phone’s calendar' }).click();
+  await expect(page.getByRole('heading', { name: 'Add to your calendar' })).toBeVisible();
+  const address = await page.getByLabel('Calendar address').inputValue();
+  expect(address).toMatch(/\/ical\/.+\.ics$/);
+  const ics = await request.get(address);
+  expect(ics.headers()['content-type']).toContain('text/calendar');
+  expect(await ics.text()).toContain('BEGIN:VCALENDAR');
+
+  await page.getByRole('button', { name: 'Make a new address' }).click();
+  await expect(page.getByLabel('Calendar address')).not.toHaveValue(address);
+  expect((await request.get(address)).status()).toBe(404);
+});
+
+test('a coordinator makes a notice-board link with a QR code; anyone can open it', async ({
+  page,
+  browser,
+}) => {
+  await signIn(page, 'coordinator@demo.slotwise.test');
+  await page.goto('/share');
+  await page.getByLabel('Section or room').selectOption({ label: 'CS B' });
+  await page.getByRole('button', { name: 'Make a link' }).click();
+  await expect(page.getByRole('img', { name: 'QR code for the CS B timetable' })).toBeVisible();
+  const link = await page.getByLabel('Link').first().inputValue();
+
+  const visitor = await browser.newPage();
+  await visitor.goto(link);
+  await expect(visitor.getByRole('heading', { name: 'Timetable: CS B' })).toBeVisible();
+  await visitor.close();
+
+  await page.getByRole('button', { name: 'Stop this link' }).first().click();
+  const after = await browser.newPage();
+  await after.goto(link);
+  await expect(after.getByText('This link doesn’t work any more')).toBeVisible();
+  await after.close();
+});
