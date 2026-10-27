@@ -3,14 +3,104 @@
     "marketing": {
       "title": "Slotwise",
       "description": "Timetables, rescheduling and exam seating for colleges.",
+      "heroTitle": "Clash-free timetables for your college, in an afternoon",
+      "heroBody": "Start from the Excel sheets you already have. Slotwise builds the timetable, moves classes around holidays and fests, and plans exam seating. Students and faculty see it on their phones.",
+      "start": "Start free trial",
+      "signIn": "Sign in",
+      "trialNote": "30 days free. No card needed.",
+      "featuresTitle": "What it does",
+      "features": {
+        "timetable": {
+          "title": "Timetable in one click",
+          "body": "No section, teacher or room is ever double-booked. Labs get consecutive periods. Drag to adjust; clashes are explained in plain words."
+        },
+        "reschedule": {
+          "title": "Holidays and events",
+          "body": "Add a holiday or a fest and Slotwise finds make-up periods that suit the section, the teacher and a free room."
+        },
+        "exams": {
+          "title": "Exam seating",
+          "body": "Seating plans where no two students with the same paper sit side by side, plus fair invigilation duties."
+        },
+        "phones": {
+          "title": "On every phone",
+          "body": "Students and faculty see today's classes, changes and their exam seat in two taps. Notice-board links and QR codes too."
+        }
+      },
+      "stepsTitle": "How it works",
+      "steps": {
+        "one": "Sign up and get your own address, like your-college.slotwise.app.",
+        "two": "Upload your department, faculty, room and scheme sheets.",
+        "three": "Generate, adjust, and publish. Everyone gets the link."
+      },
+      "plansTitle": "Plans",
+      "plansBody": "Every institute starts on the free trial. Move to a paid plan when you are ready; write to us for pricing.",
+      "unlimited": "No limit",
+      "trialDays": "{days} days free",
+      "paid": "Paid yearly",
+      "limit": {
+        "departments": "Departments",
+        "sections": "Sections",
+        "faculty": "Faculty",
+        "students": "Students"
+      },
       "comingSoon": "Coming soon",
       "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    },
+    "signup": {
+      "title": "Start your free trial",
+      "description": "Tell us about your institute. We'll email you a link to sign in.",
+      "instituteName": "Institute name",
+      "instituteNameHint": "As it appears on your letterhead.",
+      "slug": "Your Slotwise address",
+      "slugHint": "Lower-case letters, digits and hyphens.",
+      "slugFree": "{address} is free.",
+      "slugTaken": "{address} is already taken. Try another.",
+      "type": "Type",
+      "typeCollege": "College",
+      "typeUniversity": "University",
+      "affiliatingUniversity": "Affiliating university (optional)",
+      "adminName": "Your name",
+      "adminEmail": "Your email",
+      "adminEmailHint": "Use your institute email if you have one. You'll be the first admin.",
+      "submit": "Create my institute",
+      "submitting": "Creating…",
+      "doneTitle": "Check your email",
+      "doneBody": "We sent a sign-in link to {email}. Open it to start setting up {address}.",
+      "doneHint": "Didn't get it? Check spam, or sign up again in a few minutes.",
+      "website": "Leave this empty"
     },
     "platform": {
       "title": "Platform",
       "description": "Institutes, plans and support.",
       "comingSoon": "Coming soon",
-      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet.",
+      "noAccessTitle": "Platform admins only",
+      "noAccessBody": "This page is for the Slotwise team. Open your institute's own address instead.",
+      "institutes": "Institutes",
+      "newInstitute": "New institute",
+      "search": "Search by name or address",
+      "searchButton": "Search",
+      "empty": "No institutes match.",
+      "sample": "Sample",
+      "noPlan": "No plan yet (free trial limits)",
+      "trialEnds": "Trial ends {date}",
+      "plan": "Plan for {name}",
+      "changePlan": "Save plan",
+      "planSaved": "Plan saved.",
+      "created": "Created {date}",
+      "newTitle": "New institute",
+      "newDescription": "Creates the institute and emails its first admin an invite.",
+      "firstAdminName": "First admin's name",
+      "firstAdminEmail": "First admin's email",
+      "planLabel": "Plan",
+      "withSampleData": "Fill it with the sample data (for demos)",
+      "create": "Create institute",
+      "creating": "Creating…",
+      "createdTitle": "{name} is ready",
+      "createdBody": "We sent an invite to {email}. The address is {url}.",
+      "planNotSaved": "The institute was created, but its plan could not be saved: {message}",
+      "back": "All institutes"
     }
   }
 }
