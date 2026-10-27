@@ -2,6 +2,13 @@
 
 ## Current milestone
 
+2026-10-27, evening (local `main`, not pushed): merged UI kit, P2E M1–M5, P5 M1 (Today/week,
+`FLAG_P5`) and P1 1e. No schema changes. Lint, typecheck, UI 20, shared 227, db 17 and ruff pass.
+**Not yet green:** the API e2e run after these merges failed with timeouts and "Can't reach
+database server" while ~10 sessions loaded the laptop (383 MB free); and solver
+`test_demo_fixture_solves` misses its timing/score bounds at 100 % CPU. Re-run both on a quiet
+machine before pushing.
+
 2026-10-27: P1 1d (Excel/CSV import) and P2T 2T-a…2T-e (timetable module, behind `FLAG_P2T`)
 merged into `main`. P2T merged ahead of UI and P2E under MERGE-ORDER's flag rule.
 Migrations `20261027000000_p2t_timetable` (P2T's tables + its RLS, publish and immutability
