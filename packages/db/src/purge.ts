@@ -20,6 +20,7 @@ export const TENANT_TABLES_DELETE_ORDER = [
   'subject_mentors',
   'teaching_assignment_faculty',
   'teaching_assignments',
+  'portal_login_codes',
   'student_electives',
   'students',
   'elective_section_sources',
