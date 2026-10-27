@@ -52,12 +52,12 @@ export default async function SharePage() {
 
       <form action={createLink} className="flex flex-col gap-2">
         <Label htmlFor="target">{t('pick')}</Label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           <NativeSelect
             id="target"
             name="target"
             required
-            className="min-w-0 flex-1"
+            className="w-full min-w-0 sm:flex-1"
             defaultValue=""
           >
             <option value="" disabled>

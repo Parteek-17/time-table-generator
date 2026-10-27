@@ -22,7 +22,7 @@ export default async function CalendarPage() {
   if (!res.ok) {
     return (
       <>
-        <PortalTabs active="today" />
+        <PortalTabs />
         <PortalProblem status={res.status} message={res.message} />
       </>
     );
@@ -33,7 +33,7 @@ export default async function CalendarPage() {
 
   return (
     <>
-      <PortalTabs active="today" />
+      <PortalTabs />
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
         <p className="text-muted-foreground">{t('subtitle')}</p>

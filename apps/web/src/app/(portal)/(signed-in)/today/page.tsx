@@ -98,18 +98,20 @@ export default async function TodayPage({
         )}
       </PortalSection>
 
-      <Link
-        href={`/week?date=${today.date}`}
-        className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
-      >
-        {t('seeWeek')}
-      </Link>
-      <Link
-        href="/add-to-calendar"
-        className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
-      >
-        {t('addToCalendar')}
-      </Link>
+      <div className="flex flex-col">
+        <Link
+          href={`/week?date=${today.date}`}
+          className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+        >
+          {t('seeWeek')}
+        </Link>
+        <Link
+          href="/add-to-calendar"
+          className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
+        >
+          {t('addToCalendar')}
+        </Link>
+      </div>
 
       {VIEWER_EXTRAS[today.viewer.role].availability ? (
         <Card>

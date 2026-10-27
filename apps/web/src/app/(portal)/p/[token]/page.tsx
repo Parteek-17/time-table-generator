@@ -1,10 +1,11 @@
 import { isFlagOn } from '@slotwise/shared';
 import { clock, PublicTimetableV1 } from '@slotwise/shared/portal';
 import type { Metadata } from 'next';
-import { getFormatter, getTranslations } from 'next-intl/server';
+import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { PageShell } from '@/components/page-shell';
 import { Problem } from '@/components/problem';
+import { formatDay } from '../../_components/portal-ui';
 import { publicApi } from '../../_components/public-api';
 
 export const metadata: Metadata = { title: 'Timetable', robots: { index: false } };
@@ -22,10 +23,9 @@ export default async function PublicTimetablePage({
 }) {
   if (!isFlagOn('P5')) notFound();
   const { token } = await params;
-  const [t, tCommon, format] = await Promise.all([
+  const [t, tCommon] = await Promise.all([
     getTranslations('p5.public'),
     getTranslations('p5.common'),
-    getFormatter(),
   ]);
   if (!TOKEN.test(token)) {
     return (
@@ -47,25 +47,25 @@ export default async function PublicTimetablePage({
     );
   }
   const week = parsed.data;
-  const dayName = (weekday: number) =>
-    // 2024-01-01 was a Monday.
-    format.dateTime(new Date(Date.UTC(2024, 0, weekday)), { weekday: 'long', timeZone: 'UTC' });
+  // 2024-01-01 was a Monday, so 2024-01-0N is ISO weekday N.
+  const dayNames = new Map(
+    await Promise.all(
+      week.workingDays.map(
+        async (d) => [d, await formatDay(`2024-01-0${d}`, 'long', { weekday: 'long' })] as const,
+      ),
+    ),
+  );
+  const validFrom = week.validFrom
+    ? await formatDay(week.validFrom, 'long', { day: 'numeric', month: 'long', year: 'numeric' })
+    : null;
 
   return (
     <PageShell instituteName={week.instituteName}>
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold">{t('title', { label: week.label })}</h1>
         <p className="text-muted-foreground">
-          {week.versionNumber !== null && week.validFrom
-            ? t('version', {
-                number: week.versionNumber,
-                date: format.dateTime(new Date(`${week.validFrom}T00:00:00Z`), {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                  timeZone: 'UTC',
-                }),
-              })
+          {week.versionNumber !== null && validFrom
+            ? t('version', { number: week.versionNumber, date: validFrom })
             : t('notPublished')}
         </p>
         <p className="text-sm text-muted-foreground print:hidden">{t('liveNote')}</p>
@@ -81,7 +81,7 @@ export default async function PublicTimetablePage({
             className="flex flex-col gap-2 break-inside-avoid"
           >
             <h2 id={id} className="text-lg font-semibold">
-              {dayName(weekday)}
+              {dayNames.get(weekday)}
             </h2>
             {classes.length === 0 ? (
               <p className="text-muted-foreground">{t('noClasses')}</p>

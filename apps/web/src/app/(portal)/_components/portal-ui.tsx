@@ -1,13 +1,16 @@
 import type { TodayClassV1 } from '@slotwise/shared/contracts';
 import { clock } from '@slotwise/shared/portal';
 import { Badge, buttonVariants, cn } from '@slotwise/ui';
-import { getFormatter, getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Problem } from '@/components/problem';
 
-/** Today | Week, as plain links (no JavaScript); the current one is marked for screen readers. */
-export async function PortalTabs({ active }: { active: 'today' | 'week' }) {
+/**
+ * Today | Week, as plain links (no JavaScript); the current one is marked for screen readers.
+ * Other portal pages pass no `active`, so neither tab claims to be the page.
+ */
+export async function PortalTabs({ active }: { active?: 'today' | 'week' }) {
   const t = await getTranslations('p5.nav');
   const tabs = [
     { key: 'today', href: '/today', label: t('today') },
@@ -34,15 +37,24 @@ export async function PortalTabs({ active }: { active: 'today' | 'week' }) {
   );
 }
 
-/** "Monday, 10 August" for a `YYYY-MM-DD` date. */
-export async function formatDay(date: string, style: 'long' | 'short' = 'long'): Promise<string> {
-  const format = await getFormatter();
-  return format.dateTime(new Date(`${date}T00:00:00Z`), {
-    weekday: style,
-    day: 'numeric',
-    month: style,
+/**
+ * Locale for dates: the UI language as written in India ("Monday, 10 August", not the US
+ * "Monday, August 10" that plain `en` gives).
+ */
+async function dateLocale(): Promise<string> {
+  return `${(await getLocale()).split('-')[0]}-IN`;
+}
+
+/** "Monday, 10 August" for a `YYYY-MM-DD` date (`dateStyle` options for other shapes). */
+export async function formatDay(
+  date: string,
+  style: 'long' | 'short' = 'long',
+  options?: Intl.DateTimeFormatOptions,
+): Promise<string> {
+  return new Intl.DateTimeFormat(await dateLocale(), {
+    ...(options ?? { weekday: style, day: 'numeric', month: style }),
     timeZone: 'UTC',
-  });
+  }).format(new Date(`${date}T00:00:00Z`));
 }
 
 /** One class: what, when, where, with whom. Cancelled classes say so in words, not colour only. */
