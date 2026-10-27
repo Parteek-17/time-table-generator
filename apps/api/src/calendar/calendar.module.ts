@@ -4,17 +4,20 @@ import {
   bellSchedules,
   calendarWindows,
   extraWorkingDays,
+  fixedSlots,
   holidays,
   sessions,
   termCohortWindows,
   terms,
 } from './calendar.entities';
 import { HolidaysController } from './holidays.controller';
+import { TermsController } from './terms.controller';
 
 /** Sessions, terms, cohort windows, calendar windows, holidays, working days, bell schedules. */
 @Module({
   controllers: [
     HolidaysController,
+    TermsController,
     crudController(sessions),
     crudController(terms),
     crudController(termCohortWindows),
@@ -22,6 +25,7 @@ import { HolidaysController } from './holidays.controller';
     crudController(holidays),
     crudController(extraWorkingDays),
     crudController(bellSchedules),
+    crudController(fixedSlots),
   ],
 })
 export class CalendarModule {}

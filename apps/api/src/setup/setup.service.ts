@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import type { Prisma } from '@slotwise/db';
+import { loadReadinessSnapshot, type Prisma } from '@slotwise/db';
 import {
+  readiness,
   SETUP_STEPS,
   type SetupAttentionDto,
   type SetupStateDto,
@@ -10,9 +11,6 @@ import {
 } from '@slotwise/shared';
 import type { Tenant } from '../common/request-context';
 import { MasterDataService } from '../masterdata/masterdata.service';
-
-/** Steps whose screens arrive in milestone 1e (teaching grid, readiness). */
-const LATER: readonly SetupStep[] = ['teaching', 'ready'];
 
 /** Shape of Institute.setup_state (see core.prisma). */
 interface StoredState {
@@ -59,7 +57,7 @@ export class SetupService {
           tx.room.count({ where: live }),
           tx.bellSchedule.count({ where: { ...live, isDefault: true } }),
         ]);
-      const [cohorts, cohortsWithoutSections, holidays] = activeTerm
+      const [cohorts, cohortsWithoutSections, holidays, assignments] = activeTerm
         ? await Promise.all([
             tx.cohort.count({ where: { termId: activeTerm.id, ...live } }),
             tx.cohort.count({
@@ -78,8 +76,16 @@ export class SetupService {
                 startDate: { lte: activeTerm.endDate },
               },
             }),
+            tx.teachingAssignment.count({
+              where: { termId: activeTerm.id, ...live, faculty: { some: {} } },
+            }),
           ])
-        : [0, 0, 0];
+        : [0, 0, 0, 0];
+      // Issues of the readiness check, once there is something to check.
+      const readinessErrors =
+        activeTerm && cohorts > 0
+          ? readiness(await loadReadinessSnapshot(tx, activeTerm.id)).errorCount
+          : 0;
 
       const counts: Record<SetupStep, number> = {
         profile: 1,
@@ -92,8 +98,8 @@ export class SetupService {
         rooms,
         bell: bells,
         calendar: holidays,
-        teaching: 0,
-        ready: 0,
+        teaching: assignments,
+        ready: readinessErrors,
       };
       const steps: SetupStepDto[] = SETUP_STEPS.map((id) => ({
         id,
@@ -102,9 +108,14 @@ export class SetupService {
           : marks.skipped.includes(id)
             ? 'skipped'
             : 'todo',
-        hasData: id === 'term' ? activeTerm != null : counts[id] > 0,
+        hasData:
+          id === 'term'
+            ? activeTerm != null
+            : id === 'ready'
+              ? activeTerm != null && cohorts > 0 && readinessErrors === 0
+              : counts[id] > 0,
         count: counts[id],
-        available: !LATER.includes(id),
+        available: true,
       }));
       const available = steps.filter((s) => s.available);
       const finished = available.filter((s) => s.status !== 'todo').length;
@@ -129,6 +140,11 @@ export class SetupService {
       need(faculty === 0, { code: 'no_faculty', count: 0, href: '/setup/faculty' });
       need(rooms === 0, { code: 'no_rooms', count: 0, href: '/setup/rooms' });
       need(bells === 0, { code: 'no_bell_schedule', count: 0, href: '/setup/bell' });
+      need(readinessErrors > 0, {
+        code: 'readiness_issues',
+        count: readinessErrors,
+        href: '/readiness',
+      });
 
       return {
         steps,

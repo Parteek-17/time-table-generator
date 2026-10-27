@@ -12,8 +12,8 @@ export const STEP_HOME: Readonly<Record<SetupStep, string | null>> = {
   rooms: '/rooms',
   bell: '/bell-schedules',
   calendar: '/calendar',
-  teaching: null,
-  ready: null,
+  teaching: '/teaching',
+  ready: '/readiness',
 };
 
 /** Sheets that fill a step, offered as "Have this in Excel already? Import …". */
@@ -25,6 +25,7 @@ export const STEP_IMPORTS: Readonly<Partial<Record<SetupStep, readonly ImportKin
   faculty: ['faculty'],
   rooms: ['rooms'],
   calendar: ['holidays'],
+  teaching: ['teaching_assignments'],
 };
 
 export function isStep(value: string): value is SetupStep {

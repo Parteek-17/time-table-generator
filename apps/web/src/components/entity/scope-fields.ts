@@ -74,6 +74,7 @@ export function scopeLabel(
     departmentId: string | null;
     programmeId: string | null;
     cohortId: string | null;
+    sectionId?: string | null;
   },
   options: ScopeOptions,
   wholeInstitute: string,
@@ -87,6 +88,8 @@ export function scopeLabel(
       return find(options.programmes, row.programmeId);
     case 'cohort':
       return find(options.cohorts, row.cohortId);
+    case 'section':
+      return find(options.sections ?? [], row.sectionId ?? null);
     default:
       return wholeInstitute;
   }

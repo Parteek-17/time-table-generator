@@ -5,6 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma, type TxClient } from '@slotwise/db';
 import {
   can,
@@ -13,6 +14,7 @@ import {
   type Resource,
   type ResourceType,
 } from '@slotwise/shared';
+import { parseEvent, type EventNameV1 } from '@slotwise/shared/contracts';
 import { AuditService, type AuditAction } from '../audit/audit.service';
 import type { Tenant } from '../common/request-context';
 import { PrismaService } from '../db/prisma.service';
@@ -29,6 +31,7 @@ export class MasterDataService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly events: EventEmitter2,
   ) {}
 
   /** Runs fn in a tenant transaction; maps database constraint errors to plain messages. */
@@ -37,14 +40,24 @@ export class MasterDataService {
     fn: (ctx: EntityContext) => Promise<T>,
     duplicate: (target: string) => string = () => 'This already exists.',
   ): Promise<T> {
+    const pending: { name: EventNameV1; payload: unknown }[] = [];
+    let result: T;
     try {
-      return await this.prisma.tenant(
+      result = await this.prisma.tenant(
         { instituteId: tenant.institute.id, userId: tenant.user.id },
-        (tx) => fn({ tx, tenant }),
+        (tx) =>
+          fn({
+            tx,
+            tenant,
+            // Validated now, so a bad payload fails the write instead of the listener.
+            emit: (name, payload) => pending.push({ name, payload: parseEvent(name, payload) }),
+          }),
       );
     } catch (error) {
       throw this.friendly(error, duplicate);
     }
+    for (const e of pending) this.events.emit(e.name, e.payload);
+    return result;
   }
 
   /** The can() resource for something owned by `departmentId` (null = institute). */
@@ -161,7 +174,7 @@ export class MasterDataService {
     this.assertCan(tenant, def.manage, this.resource(tenant, def.resourceType, newDept));
     const data = await def.toData(ctx, input, existing);
     const updated: R = await def.model(ctx.tx).update({ where: { id }, data });
-    await def.afterWrite?.(ctx, updated, input, false);
+    await def.afterWrite?.(ctx, updated, input, false, existing);
     const row = await this.find(def, ctx.tx, id, false);
     const diff = changes(json(before), json(def.toInput(row)));
     await this.audit(ctx, `${def.name}.updated`, def.name, id, { changes: json(diff) });

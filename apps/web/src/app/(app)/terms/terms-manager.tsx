@@ -13,6 +13,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { EntityForm, type FieldSpec, type Values } from '@/components/entity/entity-form';
 import { AddPanel, EntityList } from '@/components/entity/entity-list';
+import { MakeCurrent } from './make-current';
 
 export function TermsManager({
   sessions,
@@ -162,9 +163,14 @@ export function TermsManager({
           empty={t('noTerms')}
           actions={(r) =>
             r.archivedAt ? null : (
-              <Link href={`/terms/${r.id}`} className={buttonVariants({ size: 'sm' })}>
-                {t('open')}
-              </Link>
+              <>
+                {canManage && r.status !== 'active' ? (
+                  <MakeCurrent id={r.id} label={r.label} />
+                ) : null}
+                <Link href={`/terms/${r.id}`} className={buttonVariants({ size: 'sm' })}>
+                  {t('open')}
+                </Link>
+              </>
             )
           }
           edit={(r, close) => (

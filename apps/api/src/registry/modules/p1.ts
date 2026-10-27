@@ -6,8 +6,10 @@ import { FacultyModule } from '../../faculty/faculty.module';
 import { ImportsModule } from '../../imports/imports.module';
 import { InfrastructureModule } from '../../infrastructure/infrastructure.module';
 import { InstituteModule } from '../../institute/institute.module';
+import { ReadinessModule } from '../../readiness/readiness.module';
 import { SetupModule } from '../../setup/setup.module';
 import { SnapshotModule } from '../../snapshot/snapshot.module';
+import { TeachingModule } from '../../teaching/teaching.module';
 
 /** P1's Nest modules (institute setup and master data). */
 export const P1_MODULES: Type[] = [
@@ -20,4 +22,6 @@ export const P1_MODULES: Type[] = [
   SnapshotModule,
   SetupModule,
   ImportsModule,
+  TeachingModule,
+  ReadinessModule,
 ];

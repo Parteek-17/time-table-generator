@@ -1,12 +1,13 @@
 /**
- * Setup wizard happy path (milestone 1c), entered by hand: an institute admin walks the ten
- * steps at phone width, adds a department on the way (and archives it again with Undo
- * available), and the overview shows every step done.
+ * Setup wizard happy path (milestones 1c and 1e), entered by hand: an institute admin walks
+ * the twelve steps at phone width, adds a department on the way (and archives it again with
+ * Undo available), sees the teaching grid overview and the readiness check, and the overview
+ * shows every step done.
  */
 import { expect, test } from '@playwright/test';
 import { ADMIN, signIn } from './sign-in';
 
-/** Steps the admin completes in the wizard, in order (steps 11 and 12 come with 1e). */
+/** Steps the admin completes in the wizard, in order. */
 const STEPS = [
   ['profile', 'Institute profile'],
   ['departments', 'Departments'],
@@ -18,6 +19,8 @@ const STEPS = [
   ['rooms', 'Buildings and rooms'],
   ['bell', 'Bell schedule'],
   ['calendar', 'Calendar'],
+  ['teaching', 'Who teaches what'],
+  ['ready', 'Ready to generate?'],
 ] as const;
 
 test('an admin walks the setup wizard and the overview shows every step done', async ({ page }) => {
@@ -45,7 +48,19 @@ test('an admin walks the setup wizard and the overview shows every step done', a
       await expect(page.getByRole('button', { name: 'Undo' })).toBeVisible();
     }
 
-    await page.getByRole('button', { name: 'Save and continue' }).click();
+    if (step === 'teaching') {
+      await expect(page.getByRole('heading', { name: 'Cohorts running this term' })).toBeVisible();
+    }
+    if (step === 'ready') {
+      // The seven check groups, and either the problems to fix or "Nothing is missing".
+      await expect(
+        page.getByRole('heading', { name: '3. Teachers for every class' }),
+      ).toBeVisible();
+      await expect(page.getByText(/problems? to fix|Nothing is missing/)).toBeVisible();
+    }
+
+    const last = i === STEPS.length - 1;
+    await page.getByRole('button', { name: last ? 'Finish' : 'Save and continue' }).click();
     await expect(page).not.toHaveURL(new RegExp(`/setup/${step}$`));
   }
 

@@ -9,11 +9,13 @@ import { BatchesSection } from '../../batches/section';
 import { DefaultBellSection } from '../../bell-schedules/section';
 import { CalendarSection } from '../../calendar/section';
 import { CohortsSection } from '../../cohorts/section';
+import { ReadinessSection } from '../../readiness/section';
 import { DepartmentsSection } from '../../departments/section';
 import { FacultySection } from '../../faculty/section';
 import { ProgrammesSection } from '../../programmes/section';
 import { RoomsSection } from '../../rooms/section';
 import { SchemesSection } from '../../schemes/section';
+import { BeforeGenerating, TeachingSection } from '../../teaching/section';
 import { InstituteSection } from '../../settings/institute/section';
 import { TermStartsSection } from '../../terms/[id]/section';
 import { TermsSection } from '../../terms/section';
@@ -90,7 +92,8 @@ export default async function SetupStepPage({ params }: { params: Promise<{ step
 
 async function StepContent({ step }: { step: SetupStep }): Promise<ReactNode> {
   const t = await getTranslations('p1.setup');
-  const needsTerm = step === 'cohorts' || step === 'calendar';
+  const needsTerm =
+    step === 'cohorts' || step === 'calendar' || step === 'teaching' || step === 'ready';
   const { term } = step === 'term' || needsTerm ? await pickTerm(undefined) : { term: null };
   if (needsTerm && !term)
     return (
@@ -102,8 +105,6 @@ async function StepContent({ step }: { step: SetupStep }): Promise<ReactNode> {
       />
     );
 
-  // Only "teaching" and "ready" have a laterBody, so build it when one of them is shown.
-  const later = () => <Notice title={t('laterTitle')} body={t(`step.${step}.laterBody`)} />;
   // A map rather than a switch: one step is called "faculty", which the lint rule against
   // inline role checks would (wrongly) flag.
   const content: Record<SetupStep, () => ReactNode> = {
@@ -145,12 +146,23 @@ async function StepContent({ step }: { step: SetupStep }): Promise<ReactNode> {
     bell: () => (
       <>
         <DefaultBellSection />
-        <p className="text-sm text-muted-foreground">{t('fixedSlotsLater')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t('fixedSlotsLater')}{' '}
+          <Link className="text-primary underline" href="/teaching/fixed-slots">
+            {t('fixedSlotsLink')}
+          </Link>
+          .
+        </p>
       </>
     ),
     calendar: () => <CalendarSection term={term!} />,
-    teaching: later,
-    ready: later,
+    teaching: () => <TeachingSection term={term!} />,
+    ready: () => (
+      <>
+        <ReadinessSection termId={term!.id} />
+        <BeforeGenerating termId={term!.id} />
+      </>
+    ),
   };
   return content[step]();
 }
