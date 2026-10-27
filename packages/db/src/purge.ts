@@ -7,6 +7,7 @@ import type { PrismaClient } from '@prisma/client';
 
 /** Tenant tables in an order that respects foreign keys (children before parents). */
 export const TENANT_TABLES_DELETE_ORDER = [
+  'institute_subscriptions',
   'import_rows',
   'import_jobs',
   // Versions before slots: their slots go with them (ON DELETE CASCADE), which the
