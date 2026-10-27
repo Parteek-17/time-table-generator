@@ -431,6 +431,9 @@ model Term {
   timetableSnapshots  TimetableSnapshot[]
   timetableVersions   TimetableVersion[]
   solveJobs           SolveJob[]
+  disruptions         Disruption[]
+  cancellations       Cancellation[]
+  makeUps             MakeUp[]
 
   @@unique([sessionId, kind])
   @@index([instituteId])
