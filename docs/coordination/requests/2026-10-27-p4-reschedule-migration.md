@@ -9,7 +9,7 @@
 
 1. Write the migration for `packages/db/prisma/schema/reschedule.prisma` (three tables:
    `disruptions`, `cancellations`, `make_ups`; two enums `disruption_kind`,
-   `disruption_scope`) plus the back-relation lines on `Institute` (core.prisma) and `Term`
+   `disruption_scope`; `make_ups.room_code` added with M2) plus the back-relation lines on `Institute` (core.prisma) and `Term`
    (setup.prisma). `prisma migrate diff` against a database at `main` shows only additions.
 2. Append the SQL below: RLS on the three tables and a few CHECKs.
 3. Add the three tables to `TENANT_TABLES_DELETE_ORDER` (before `terms` and `institutes`) so

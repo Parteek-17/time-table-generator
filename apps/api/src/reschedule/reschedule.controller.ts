@@ -1,12 +1,15 @@
 import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { idParam } from '@slotwise/shared';
 import {
+  BookMakeUpInput,
   CancelClassInput,
   CancellationsQuery,
   CreateDisruptionInput,
   type CancellationDto,
   type CreateDisruptionResult,
   type DisruptionDto,
+  type MakeUpDto,
+  type MakeUpOptionsDto,
   type UndoDisruptionResult,
 } from '@slotwise/shared/reschedule';
 import { CurrentTenant, RequirePermission } from '../common/decorators';
@@ -15,6 +18,7 @@ import type { Tenant } from '../common/request-context';
 import { ZodPipe } from '../common/zod.pipe';
 import { CancellationsService } from './cancellations.service';
 import { DisruptionsService } from './disruptions.service';
+import { MakeUpsService } from './makeups.service';
 
 const id = new ZodPipe(idParam);
 
@@ -26,6 +30,9 @@ const id = new ZodPipe(idParam);
  *   POST   /terms/:termId/cancellations    cancel one class on one date
  *   GET    /terms/:termId/cancellations    cancelled classes (?from&to&sectionId|facultyId)
  *   DELETE /cancellations/:id              undo a class cancelled by hand
+ *   GET    /cancellations/:id/make-up-options  free times and rooms, this week first
+ *   POST   /cancellations/:id/make-up      book (or move) its make-up
+ *   DELETE /make-ups/:id                   undo a make-up
  * Changes need timetable.edit where they apply (checked with can() in the services); reading
  * is open to everyone who reads timetables, as cancelled classes are part of the timetable.
  */
@@ -35,6 +42,7 @@ export class RescheduleController {
   constructor(
     private readonly disruptions: DisruptionsService,
     private readonly cancellations: CancellationsService,
+    private readonly makeUps: MakeUpsService,
   ) {}
 
   @Post('terms/:termId/disruptions')
@@ -92,5 +100,33 @@ export class RescheduleController {
     @Param('id', id) cancellationId: string,
   ): Promise<{ restored: true }> {
     return this.cancellations.undo(tenant, cancellationId);
+  }
+
+  @Get('cancellations/:id/make-up-options')
+  @RequirePermission('timetable.edit')
+  makeUpOptions(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', id) cancellationId: string,
+  ): Promise<MakeUpOptionsDto> {
+    return this.makeUps.options(tenant, cancellationId);
+  }
+
+  @Post('cancellations/:id/make-up')
+  @RequirePermission('timetable.edit')
+  bookMakeUp(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', id) cancellationId: string,
+    @Body(new ZodPipe(BookMakeUpInput)) input: BookMakeUpInput,
+  ): Promise<MakeUpDto> {
+    return this.makeUps.book(tenant, cancellationId, input);
+  }
+
+  @Delete('make-ups/:id')
+  @RequirePermission('timetable.edit')
+  removeMakeUp(
+    @CurrentTenant() tenant: Tenant,
+    @Param('id', id) makeUpId: string,
+  ): Promise<{ removed: true }> {
+    return this.makeUps.undo(tenant, makeUpId);
   }
 }

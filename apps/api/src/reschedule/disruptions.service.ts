@@ -29,6 +29,7 @@ import {
 import { randomUUID } from 'node:crypto';
 import type { Tenant } from '../common/request-context';
 import { PrismaService } from '../db/prisma.service';
+import { asDate, isoDate } from './access';
 import type { Disruption } from './db-types';
 import { tenantTx } from './tenant-tx';
 import { TermSource, type SlotQuery } from './term-source';
@@ -38,9 +39,6 @@ const NOT_ALLOWED =
 const NOT_FOUND = 'We can’t find this holiday or event. It may have been undone already.';
 
 type Pending = { [N in EventNameV1]: { name: N; payload: EventPayloadV1<N> } }[EventNameV1];
-
-export const isoDate = (d: Date) => d.toISOString().slice(0, 10);
-export const asDate = (date: string) => new Date(`${date}T00:00:00Z`);
 
 /**
  * Holidays, events and faculty leave (disruptions). Creating one cancels the published
@@ -309,7 +307,7 @@ function slotQuery(d: CreateDisruptionInput, cal: RescheduleCalendar): SlotQuery
   return { sectionIds: all.map(([id]) => id) };
 }
 
-function matchOf(d: Disruption): DisruptionMatch {
+export function matchOf(d: Disruption): DisruptionMatch {
   return {
     // room_unavailable is not offered yet; activeOverlapping() leaves those rows out.
     kind: d.kind as DisruptionMatch['kind'],

@@ -6,3 +6,5 @@ export * from './dates';
 export * from './calendar';
 export * from './disruption';
 export * from './dto';
+export * from './makeup';
+export * from './makeup-input';

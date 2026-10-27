@@ -1,6 +1,7 @@
 /** Shapes the P4 API returns to the web app. */
 import type { TimetableSlotV1 } from '../contracts';
 import type { DisruptionKind, DisruptionScope } from './disruption';
+import type { MakeUpOption } from './makeup';
 
 export interface DisruptionDto {
   id: string;
@@ -59,4 +60,12 @@ export interface CancellationDto {
   /** The class as published. */
   slot: TimetableSlotV1;
   makeUp: MakeUpDto | null;
+}
+
+export interface MakeUpOptionsDto {
+  cancellation: CancellationDto;
+  /** Free choices, the cancelled class's week first. */
+  options: MakeUpOption[];
+  /** When there are none: why, in plain words. */
+  problem: string | null;
 }

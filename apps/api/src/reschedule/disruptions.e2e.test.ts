@@ -5,13 +5,12 @@
  * class, and who may do what.
  *
  * The term's setup and published timetable come from the fixtures (CS B's week) through a
- * fake TermSource; P4 reads them only through the contracts anyway. Needs P4's tables; skipped
+ * fake TermSource (fake-term-source.ts); P4 reads them only through the contracts anyway. Needs P4's tables; skipped
  * until INT's migration is in (requests/2026-10-27-p4-reschedule-migration.md).
  */
 import type { INestApplication } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import type { EventPayloadV1, TimetableSlotV1 } from '@slotwise/shared/contracts';
-import { demoPublishedTimetable, demoTermSnapshot } from '@slotwise/shared/fixtures';
+import type { EventPayloadV1 } from '@slotwise/shared/contracts';
 import type {
   CancellationDto,
   CreateDisruptionResult,
@@ -21,7 +20,13 @@ import type {
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createTestApp, Fixtures, signToken } from '../../test/helpers';
-import { TermSource, type SlotQuery } from './term-source';
+import {
+  csB,
+  csBDepartment,
+  fixturePublished,
+  fixtureSnapshot,
+  useFixtureTermSource,
+} from './fake-term-source';
 
 const fx = new Fixtures();
 let hasTables = false;
@@ -37,26 +42,10 @@ function live(name: string, fn: () => Promise<void>): void {
   );
 }
 
-const snapshot = demoTermSnapshot();
-const published = demoPublishedTimetable();
-const csB = published.slots[0]!.sectionIds[0]!;
-const csBDept = snapshot.cohorts.find(
-  (c) => c.id === snapshot.sections.find((s) => s.id === csB)!.cohortId,
-)!.departmentId;
+const snapshot = fixtureSnapshot;
+const published = fixturePublished;
+const csBDept = csBDepartment;
 const onDay = (weekday: number) => published.slots.filter((s) => s.weekday === weekday);
-
-class FakeTermSource {
-  snapshot = (_tenant: unknown, termId: string) =>
-    Promise.resolve({ ...snapshot, term: { ...snapshot.term, id: termId } });
-  published = (_tenant: unknown, _termId: string, q: SlotQuery) => {
-    const slots = published.slots.filter((s: TimetableSlotV1) =>
-      'facultyId' in q
-        ? s.faculty.some((f) => f.id === q.facultyId)
-        : s.sectionIds.some((id) => q.sectionIds.includes(id)),
-    );
-    return Promise.resolve({ version: published.version, slots });
-  };
-}
 
 let app: INestApplication;
 let a: Awaited<ReturnType<Fixtures['institute']>>;
@@ -93,8 +82,7 @@ describe('holidays, events and cancelled classes', () => {
     if (!hasTables) return;
     let env;
     ({ app, env } = await createTestApp());
-    // createTestApp() (INT's) has no override hook; swap the singleton's reads instead.
-    Object.assign(app.get(TermSource), new FakeTermSource());
+    useFixtureTermSource(app);
     const events = app.get(EventEmitter2);
     events.on('disruption.created', (e: EventPayloadV1<'disruption.created'>) => disrupted.push(e));
     events.on('class.cancelled', (e: EventPayloadV1<'class.cancelled'>) => cancelled.push(e));
@@ -255,8 +243,8 @@ describe('holidays, events and cancelled classes', () => {
     expect(res.body.fieldErrors.endDate).toEqual(['The last day is before the first day.']);
     const outside = await as(u.coord.id).post(`/terms/${termId}/disruptions`, {
       ...fest,
-      startDate: '2027-01-04',
-      endDate: '2027-01-05',
+      startDate: '2027-08-02',
+      endDate: '2027-08-03',
     });
     expect(outside.status).toBe(400);
     expect(outside.body.message).toMatch(/inside the term/);

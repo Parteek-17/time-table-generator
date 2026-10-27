@@ -114,6 +114,8 @@ model MakeUp {
   startMinute      Int      @map("start_minute")
   endMinute        Int      @map("end_minute")
   roomId           String   @map("room_id") @db.Uuid
+  /// e.g. "G16", copied from the setup when booked.
+  roomCode         String   @map("room_code")
   /// Copied from the cancellation, for clash lookups.
   sectionIds       String[] @map("section_ids") @db.Uuid
   facultyIds       String[] @map("faculty_ids") @db.Uuid

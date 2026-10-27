@@ -1,12 +1,10 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@slotwise/db';
-import { can } from '@slotwise/shared';
 import type { TimetableSlotV1 } from '@slotwise/shared/contracts';
 import {
   calendarFromSnapshot,
@@ -14,16 +12,13 @@ import {
   type CancelClassInput,
   type CancellationDto,
   type CancellationsQuery,
-  type RescheduleCalendar,
 } from '@slotwise/shared/reschedule';
 import type { Tenant } from '../common/request-context';
 import { PrismaService } from '../db/prisma.service';
 import type { Cancellation, MakeUp } from './db-types';
-import { asDate, DisruptionsService, isoDate } from './disruptions.service';
+import { asDate, assertMayChangeClass, isoDate } from './access';
+import { DisruptionsService } from './disruptions.service';
 import { TermSource } from './term-source';
-
-const NOT_ALLOWED =
-  'You don’t have permission to cancel this class. Ask your HOD or the timetable in-charge.';
 
 /** Single classes: cancel one by hand, list cancelled classes, undo a hand cancellation. */
 @Injectable()
@@ -44,7 +39,7 @@ export class CancellationsService {
     if (!published.version || !slot) {
       throw new NotFoundException('We can’t find this class in the published timetable.');
     }
-    this.assertMayChange(tenant, slot, cal);
+    assertMayChangeClass(tenant, slot, cal);
     if (!classMeetsOn(slot, input.date, published.version, cal)) {
       throw new BadRequestException({
         statusCode: 400,
@@ -95,7 +90,7 @@ export class CancellationsService {
       );
     }
     const snapshot = await this.source.snapshot(tenant, existing.termId);
-    this.assertMayChange(
+    assertMayChangeClass(
       tenant,
       existing.slot as unknown as TimetableSlotV1,
       calendarFromSnapshot(snapshot),
@@ -130,19 +125,6 @@ export class CancellationsService {
     });
   }
 
-  /** timetable.edit for the department of every section in the class. */
-  private assertMayChange(tenant: Tenant, slot: TimetableSlotV1, cal: RescheduleCalendar): void {
-    const allowed = slot.sectionIds.every((sectionId) =>
-      can(tenant.authUser, 'timetable.edit', {
-        type: 'timetable',
-        instituteId: tenant.institute.id,
-        departmentId: cal.sections.get(sectionId)?.departmentId ?? null,
-        sectionId,
-      }),
-    );
-    if (!allowed) throw new ForbiddenException(NOT_ALLOWED);
-  }
-
   private ctx(tenant: Tenant) {
     return { instituteId: tenant.institute.id, userId: tenant.user.id };
   }
@@ -163,7 +145,7 @@ export function toDto(c: Cancellation, makeUp: MakeUp | null): CancellationDto {
       startMinute: makeUp.startMinute,
       endMinute: makeUp.endMinute,
       roomId: makeUp.roomId,
-      roomCode: null,
+      roomCode: makeUp.roomCode,
     },
   };
 }

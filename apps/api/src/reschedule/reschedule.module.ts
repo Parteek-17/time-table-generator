@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CancellationsService } from './cancellations.service';
 import { DisruptionsService } from './disruptions.service';
+import { MakeUpsService } from './makeups.service';
 import { loadRescheduleConfig, RESCHEDULE_CONFIG } from './reschedule.config';
 import { RescheduleController } from './reschedule.controller';
 import { RescheduleHealthController } from './reschedule-health.controller';
@@ -14,6 +15,7 @@ import { TermSource } from './term-source';
     TermSource,
     DisruptionsService,
     CancellationsService,
+    MakeUpsService,
   ],
 })
 export class RescheduleModule {}
