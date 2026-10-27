@@ -52,38 +52,41 @@ export default async function seedP2T(prisma: PrismaClient): Promise<void> {
   });
 
   const publishedAt = new Date();
-  await prisma.$transaction(async (tx) => {
-    // Slots can only be written while the version is a draft (timetable_slots_draft_only).
-    const version = await tx.timetableVersion.create({
-      data: {
-        instituteId: institute.id,
-        termId: term.id,
-        cohortIds: snapshot.cohorts.filter((c) => c.isRunning).map((c) => c.id),
-        snapshotId: stored.id,
-        unplaced: solution.unplaced as unknown as Prisma.InputJsonValue,
-        score: solution.score as unknown as Prisma.InputJsonValue,
-        createdById: author.userId,
-      },
-    });
-    await tx.timetableSlot.createMany({
-      data: slotsFromPlacements(snapshot, solution.placed).map((slot) => ({
-        ...slot,
-        faculty: slot.faculty as unknown as Prisma.InputJsonValue,
-        instituteId: institute.id,
-        versionId: version.id,
-      })),
-    });
-    await tx.timetableVersion.update({
-      where: { id: version.id },
-      data: {
-        status: 'published',
-        number: 1,
-        publishedAt,
-        publishedById: author.userId,
-        validFrom: term.startDate,
-      },
-    });
-  });
+  await prisma.$transaction(
+    async (tx) => {
+      // Slots can only be written while the version is a draft (timetable_slots_draft_only).
+      const version = await tx.timetableVersion.create({
+        data: {
+          instituteId: institute.id,
+          termId: term.id,
+          cohortIds: snapshot.cohorts.filter((c) => c.isRunning).map((c) => c.id),
+          snapshotId: stored.id,
+          unplaced: solution.unplaced as unknown as Prisma.InputJsonValue,
+          score: solution.score as unknown as Prisma.InputJsonValue,
+          createdById: author.userId,
+        },
+      });
+      await tx.timetableSlot.createMany({
+        data: slotsFromPlacements(snapshot, solution.placed).map((slot) => ({
+          ...slot,
+          faculty: slot.faculty as unknown as Prisma.InputJsonValue,
+          instituteId: institute.id,
+          versionId: version.id,
+        })),
+      });
+      await tx.timetableVersion.update({
+        where: { id: version.id },
+        data: {
+          status: 'published',
+          number: 1,
+          publishedAt,
+          publishedById: author.userId,
+          validFrom: term.startDate,
+        },
+      });
+    },
+    { timeout: 120_000 },
+  );
   console.log(
     `  p2t: published version 1 of "${term.label}" (${solution.placed.length} classes, ` +
       `${solution.unplaced.length} not placed).`,
