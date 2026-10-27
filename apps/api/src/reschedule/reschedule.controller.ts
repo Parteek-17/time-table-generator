@@ -4,12 +4,15 @@ import {
   BookMakeUpInput,
   CancelClassInput,
   CancellationsQuery,
+  CoverageQuery,
   CreateDisruptionInput,
   type CancellationDto,
+  type CoverageDto,
   type CreateDisruptionResult,
   type DisruptionDto,
   type MakeUpDto,
   type MakeUpOptionsDto,
+  type RescheduleChoicesDto,
   type UndoDisruptionResult,
 } from '@slotwise/shared/reschedule';
 import { CurrentTenant, RequirePermission } from '../common/decorators';
@@ -17,6 +20,8 @@ import { FeatureFlag } from '../common/feature-flag';
 import type { Tenant } from '../common/request-context';
 import { ZodPipe } from '../common/zod.pipe';
 import { CancellationsService } from './cancellations.service';
+import { ChoicesService } from './choices.service';
+import { CoverageService } from './coverage.service';
 import { DisruptionsService } from './disruptions.service';
 import { MakeUpsService } from './makeups.service';
 
@@ -33,6 +38,8 @@ const id = new ZodPipe(idParam);
  *   GET    /cancellations/:id/make-up-options  free times and rooms, this week first
  *   POST   /cancellations/:id/make-up      book (or move) its make-up
  *   DELETE /make-ups/:id                   undo a make-up
+ *   GET    /terms/:termId/coverage         syllabus coverage (?sectionId | departmentId)
+ *   GET    /terms/:termId/reschedule/choices  sections and teachers for the forms
  * Changes need timetable.edit where they apply (checked with can() in the services); reading
  * is open to everyone who reads timetables, as cancelled classes are part of the timetable.
  */
@@ -43,6 +50,8 @@ export class RescheduleController {
     private readonly disruptions: DisruptionsService,
     private readonly cancellations: CancellationsService,
     private readonly makeUps: MakeUpsService,
+    private readonly coverageService: CoverageService,
+    private readonly choicesService: ChoicesService,
   ) {}
 
   @Post('terms/:termId/disruptions')
@@ -128,5 +137,24 @@ export class RescheduleController {
     @Param('id', id) makeUpId: string,
   ): Promise<{ removed: true }> {
     return this.makeUps.undo(tenant, makeUpId);
+  }
+
+  @Get('terms/:termId/coverage')
+  @RequirePermission('timetable.view')
+  coverage(
+    @CurrentTenant() tenant: Tenant,
+    @Param('termId', id) termId: string,
+    @Query(new ZodPipe(CoverageQuery)) query: CoverageQuery,
+  ): Promise<CoverageDto> {
+    return this.coverageService.coverage(tenant, termId, query);
+  }
+
+  @Get('terms/:termId/reschedule/choices')
+  @RequirePermission('timetable.edit')
+  choices(
+    @CurrentTenant() tenant: Tenant,
+    @Param('termId', id) termId: string,
+  ): Promise<RescheduleChoicesDto> {
+    return this.choicesService.choices(tenant, termId);
   }
 }

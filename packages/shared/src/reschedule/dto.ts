@@ -69,3 +69,15 @@ export interface MakeUpOptionsDto {
   /** When there are none: why, in plain words. */
   problem: string | null;
 }
+
+/** Pick-lists for the "Add a holiday or event" form, from the term's setup. */
+export interface RescheduleChoicesDto {
+  termStart: string;
+  termEnd: string;
+  /** Today in the institute's time zone. */
+  today: string;
+  /** Departments that have sections this term (names come from the departments list). */
+  departmentIds: string[];
+  sections: { id: string; name: string; departmentId: string }[];
+  faculty: { id: string; name: string; departmentId: string }[];
+}

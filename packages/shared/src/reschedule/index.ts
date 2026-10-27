@@ -8,3 +8,4 @@ export * from './disruption';
 export * from './dto';
 export * from './makeup';
 export * from './makeup-input';
+export * from './coverage';
