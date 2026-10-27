@@ -862,7 +862,8 @@ model Student {
   section   Section?  @relation(fields: [sectionId], references: [id])
   subGroup  SubGroup? @relation(fields: [subGroupId], references: [id])
 
-  electives StudentElective[]
+  electives  StudentElective[]
+  loginCodes PortalLoginCode[]
 
   @@unique([instituteId, classRollNo])
   @@index([instituteId])

@@ -18,6 +18,7 @@ import { FakeMail, Fixtures, signToken } from '../../test/helpers';
 import { AppModule } from '../app.module';
 import { loadEnv } from '../config/env';
 import { MailService } from '../mail/mail.service';
+import { portalMasterData } from './portal.test-data';
 import { PORTAL_API_BASE } from './timetable.client';
 
 const fx = new Fixtures();
@@ -61,51 +62,6 @@ const get = (path: string, user: { id: string } = u.student) =>
     .get(path)
     .set('x-institute-slug', a.institute.slug)
     .set('authorization', `Bearer ${tokens.get(user.id)}`);
-
-async function masterData(instituteId: string, departmentId: string) {
-  const session = await fx.owner.academicSession.create({
-    data: { instituteId, name: '2026-27', startYear: 2026 },
-  });
-  const term = await fx.owner.term.create({
-    data: {
-      instituteId,
-      sessionId: session.id,
-      kind: 'odd',
-      label: snapshot.term.label,
-      status: 'active',
-      startDate: new Date(`${snapshot.term.startDate}T00:00:00Z`),
-      endDate: new Date(`${snapshot.term.endDate}T00:00:00Z`),
-    },
-  });
-  const programme = await fx.owner.programme.create({
-    data: { instituteId, code: 'BTECH', name: 'B.Tech', level: 'ug', totalSemesters: 8 },
-  });
-  const branch = await fx.owner.branch.create({
-    data: { instituteId, programmeId: programme.id, code: 'CSE', name: 'CSE', departmentId },
-  });
-  const scheme = await fx.owner.schemeVersion.create({
-    data: { instituteId, programmeId: programme.id, name: '2024' },
-  });
-  const batch = await fx.owner.batch.create({
-    data: {
-      instituteId,
-      programmeId: programme.id,
-      branchId: branch.id,
-      admissionYear: 2025,
-      schemeVersionId: scheme.id,
-    },
-  });
-  const cohort = await fx.owner.cohort.create({
-    data: { instituteId, batchId: batch.id, termId: term.id, semester: 3, displayCode: 'D2 CSE' },
-  });
-  const section = await fx.owner.section.create({
-    data: { instituteId, cohortId: cohort.id, name: 'A', displayName: 'CS A', strength: 60 },
-  });
-  await fx.owner.bellSchedule.create({
-    data: { instituteId, name: 'Default', workingDays: [1, 2, 3, 4, 5], isDefault: true },
-  });
-  return { term, batch, section };
-}
 
 /** The fixture's published week, re-pointed at this test's section and teacher. */
 async function publish(instituteId: string, termId: string, createdById: string) {
@@ -162,7 +118,7 @@ describe('portal Today and week', () => {
     u.teacher = await fx.user('p5-teacher');
     u.admin = await fx.user('p5-admin');
     u.stranger = await fx.user('p5-stranger');
-    const md = await masterData(a.institute.id, a.cse.id);
+    const md = await portalMasterData(fx, a.institute.id, a.cse.id);
     sectionId = md.section.id;
     const student = await fx.owner.student.create({
       data: {

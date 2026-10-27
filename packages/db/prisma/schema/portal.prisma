@@ -4,3 +4,26 @@
 // the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
 // requires; see docs/coordination/OWNERSHIP.md.
 // Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).
+
+/// A one-time sign-in code for a student: roll number + code, no passwords (CLAUDE.md
+/// "Access and login"; docs/adr/0070-student-one-time-code-sign-in.md).
+model PortalLoginCode {
+  id          String    @id @default(uuid()) @db.Uuid
+  instituteId String    @map("institute_id") @db.Uuid
+  studentId   String    @map("student_id") @db.Uuid
+  /// hashCode(code, API_JWT_SECRET) from @slotwise/shared/portal; never the code itself.
+  codeHash    String    @map("code_hash")
+  expiresAt   DateTime  @map("expires_at")
+  /// Wrong tries so far.
+  attempts    Int       @default(0)
+  /// Set when the code was used, or replaced by a newer one.
+  usedAt      DateTime? @map("used_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, createdAt])
+  @@index([instituteId])
+  @@map("portal_login_codes")
+}
