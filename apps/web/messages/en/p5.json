@@ -55,7 +55,9 @@
       "backToToday": "Back to today",
       "seeWeek": "See the whole week",
       "dayNav": "Change day",
-      "nothingPublished": "Your timetable hasn’t been published yet. Check again later."
+      "nothingPublished": "Your timetable hasn’t been published yet. Check again later.",
+      "availability": "Set the periods you can’t teach",
+      "availabilityHint": "The timetable in-charge uses this when making the next timetable."
     },
     "week": {
       "title": "This week",
@@ -68,6 +70,25 @@
       "noClasses": "No classes",
       "notTeaching": "No classes (not a teaching day)",
       "openDay": "Open {date}"
+    },
+    "signIn": {
+      "title": "Sign in to {institute}",
+      "titleGeneric": "Student sign-in",
+      "subtitle": "Use your roll number. We’ll email you a 6-digit code — no password needed.",
+      "rollLabel": "Roll number",
+      "rollHint": "Your class or university roll number, as on your ID card.",
+      "sendCode": "Send me a code",
+      "sending": "Sending…",
+      "sent": "We sent a 6-digit code to {email}. It works for 10 minutes.",
+      "sentAgain": "We sent a new code to {email}. Only the newest code works.",
+      "codeLabel": "Code from the email",
+      "codeHint": "For roll number {roll}. Check your spam folder if it isn’t there.",
+      "signIn": "Sign in",
+      "checking": "Checking…",
+      "resend": "Send a new code",
+      "otherRoll": "Use another roll number",
+      "staff": "Staff or teacher?",
+      "staffLink": "Sign in with your email"
     }
   }
 }

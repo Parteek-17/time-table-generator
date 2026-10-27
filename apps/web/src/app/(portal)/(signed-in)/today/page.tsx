@@ -1,6 +1,6 @@
 import { IsoDate, PORTAL_TODAY_V1_ROUTE, type TodayV1 } from '@slotwise/shared/contracts';
-import { addDays, localNow } from '@slotwise/shared/portal';
-import { Alert, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
+import { addDays, localNow, VIEWER_EXTRAS } from '@slotwise/shared/portal';
+import { Alert, buttonVariants, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ import {
   PortalProblem,
   PortalSection,
   PortalTabs,
-} from '../_components/portal-ui';
+} from '../../_components/portal-ui';
 
 export const metadata: Metadata = { title: 'Today' };
 
@@ -101,6 +101,20 @@ export default async function TodayPage({
       >
         {t('seeWeek')}
       </Link>
+
+      {VIEWER_EXTRAS[today.viewer.role].availability ? (
+        <Card>
+          <CardHeader>
+            <CardDescription className="text-base">{t('availabilityHint')}</CardDescription>
+            <Link
+              href="/me/availability"
+              className={buttonVariants({ variant: 'outline', className: 'mt-2 self-start' })}
+            >
+              {t('availability')}
+            </Link>
+          </CardHeader>
+        </Card>
+      ) : null}
 
       <PortalSection id="changes" title={t('changes')}>
         {today.changes.length === 0 ? (

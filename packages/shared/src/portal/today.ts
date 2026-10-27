@@ -235,3 +235,9 @@ export const PortalDateQuery = z.object({
   date: IsoDate.optional(),
 });
 export type PortalDateQuery = z.infer<typeof PortalDateQuery>;
+
+/** What the portal offers each viewer kind besides their timetable. A lookup, not a role check. */
+export const VIEWER_EXTRAS: Record<ViewerKind, { availability: boolean }> = {
+  student: { availability: false },
+  faculty: { availability: true },
+};

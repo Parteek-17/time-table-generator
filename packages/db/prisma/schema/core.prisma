@@ -127,6 +127,7 @@ model Institute {
   timetableVersions         TimetableVersion[]
   timetableSlots            TimetableSlot[]
   solveJobs                 SolveJob[]
+  portalLoginCodes          PortalLoginCode[]
 
   @@map("institutes")
 }
