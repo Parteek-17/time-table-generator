@@ -1,6 +1,6 @@
 /**
  * Setup wizard API (milestone 1c): progress that is saved and resumed, "needs attention",
- * permissions, and "Try with sample data" (provisioning mock → institute.created → P1's
+ * permissions, and "Try with sample data" (institute provisioning → institute.created → P1's
  * sample-data queue → the sample institute's master data).
  */
 import { connect } from 'node:net';

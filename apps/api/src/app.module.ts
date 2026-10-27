@@ -5,6 +5,7 @@ import { AuthGuard } from './auth/auth.guard';
 import type { Env } from './config/env';
 import { CoreModule } from './core/core.module';
 import { HealthController } from './health/health.controller';
+import { InstituteProvisioningModule } from './institute-provisioning/institute-provisioning.module';
 import { InvitesController } from './invites/invites.controller';
 import { InvitesService } from './invites/invites.service';
 import { InstituteController } from './me/institute.controller';
@@ -25,6 +26,8 @@ export class AppModule {
         // Domain events between streams (packages/shared/src/contracts/events.v1.ts).
         EventEmitterModule.forRoot(),
         QueueModule,
+        // institute-provisioning.v1 (POST /platform/institutes), used by P1 and P7.
+        InstituteProvisioningModule,
         // Stream modules (apps/api/src/registry/modules/<stream>.ts).
         ...REGISTRY_MODULES,
       ],

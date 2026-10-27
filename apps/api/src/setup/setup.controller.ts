@@ -8,11 +8,11 @@ import {
   type SetupStep,
   type SetupStepUpdateInput,
 } from '@slotwise/shared';
+import { InstituteProvisioningService } from '../institute-provisioning/institute-provisioning.service';
 import { CurrentTenant, RequirePermission } from '../common/decorators';
 import type { Tenant } from '../common/request-context';
 import { ZodPipe } from '../common/zod.pipe';
 import { MasterDataService } from '../masterdata/masterdata.service';
-import { InstituteProvisionerMock } from './provisioning.mock';
 import { SetupService } from './setup.service';
 
 /** Setup wizard progress and "Try with sample data". */
@@ -20,7 +20,7 @@ import { SetupService } from './setup.service';
 export class SetupController {
   constructor(
     private readonly setup: SetupService,
-    private readonly provisioner: InstituteProvisionerMock,
+    private readonly provisioning: InstituteProvisioningService,
     private readonly md: MasterDataService,
   ) {}
 
@@ -49,7 +49,7 @@ export class SetupController {
   async sample(@CurrentTenant() tenant: Tenant): Promise<SampleInstituteDto> {
     this.md.assertCan(tenant, 'institute.manage', this.md.resource(tenant, 'institute', null));
     const base = tenant.institute.slug.slice(0, 40);
-    const res = await this.provisioner.provision(
+    const res = await this.provisioning.provision(
       {
         version: 'institute-provisioning.v1',
         name: 'Demo Institute of Engineering (sample)',
@@ -60,7 +60,7 @@ export class SetupController {
         firstAdmin: { email: tenant.user.email, name: tenant.user.name ?? tenant.user.email },
         withSampleData: true,
       },
-      tenant.user.id,
+      { actorUserId: tenant.user.id, via: 'sample', grantNow: true },
     );
     await this.md.run(tenant, (ctx) =>
       this.md.audit(ctx, 'setup.sample_created', 'institute', res.instituteId, { slug: res.slug }),
