@@ -1,0 +1,106 @@
+# Render Blueprint for an evaluation deploy on free plans (docs/deployment-render.md).
+# Render → New → Blueprint → this repository. Values marked sync: false are asked for once.
+services:
+  - type: web
+    name: slotwise-solver
+    runtime: docker
+    plan: free
+    rootDir: services/solver
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+
+  - type: web
+    name: slotwise-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL # the restricted slotwise_app login (guide, step 2)
+        sync: false
+      - key: API_JWT_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: slotwise-redis
+          property: connectionString
+      - key: SOLVER_URL # https://slotwise-solver.onrender.com (free services can't use private networking)
+        sync: false
+      - key: SNAPSHOT_SOURCE
+        value: api
+      - key: SOLVER_SOURCE
+        value: http
+      - key: RESCHEDULE_SOURCE
+        value: api
+      - key: EMAIL_SERVER
+        value: smtp://localhost:1025
+      - key: EMAIL_FROM
+        value: Slotwise <no-reply@slotwise.test>
+      - key: WEB_URL_TEMPLATE # https://slotwise-web.onrender.com/?institute={slug}
+        sync: false
+      - key: ANTHROPIC_API_KEY # "Ask Slotwise"; leave empty to hide the chat
+        sync: false
+      - key: FLAG_UI
+        value: '1'
+      - key: FLAG_P2T
+        value: '1'
+      - key: FLAG_P4
+        value: '1'
+      - key: FLAG_P5
+        value: '1'
+      - key: FLAG_P6
+        value: '1'
+      - key: FLAG_P7
+        value: '1'
+
+  - type: web
+    name: slotwise-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./apps/web/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_URL # same restricted login as the api
+        sync: false
+      - key: API_URL # https://slotwise-api.onrender.com
+        sync: false
+      - key: API_JWT_SECRET # same value as the api
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: AUTH_TRUST_HOST
+        value: 'true'
+      - key: WEB_ROOT_DOMAIN # slotwise-web.onrender.com
+        sync: false
+      - key: SINGLE_INSTITUTE_SLUG
+        value: demo
+      - key: DEMO_LOGINS # evaluation only
+        value: 'true'
+      - key: EMAIL_SERVER
+        value: smtp://localhost:1025
+      - key: EMAIL_FROM
+        value: Slotwise <no-reply@slotwise.test>
+      - key: FLAG_UI
+        value: '1'
+      - key: FLAG_P2T
+        value: '1'
+      - key: FLAG_P4
+        value: '1'
+      - key: FLAG_P5
+        value: '1'
+      - key: FLAG_P6
+        value: '1'
+      - key: FLAG_P7
+        value: '1'
+
+  - type: keyvalue
+    name: slotwise-redis
+    plan: free
+    ipAllowList: [] # only Render services may connect
+
+databases:
+  - name: slotwise-db
+    plan: free
+    postgresMajorVersion: '16'
