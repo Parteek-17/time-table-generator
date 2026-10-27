@@ -228,3 +228,10 @@ export function buildWeek(input: TodayInput & { versionId: string | null }): Por
     versionId: input.versionId,
   });
 }
+
+/** Query of `GET /portal/today` and `GET /portal/week`: the day (default: today). */
+export const PortalDateQuery = z.object({
+  /** `YYYY-MM-DD`; default today in the institute's time zone. */
+  date: IsoDate.optional(),
+});
+export type PortalDateQuery = z.infer<typeof PortalDateQuery>;
