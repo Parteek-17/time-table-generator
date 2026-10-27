@@ -1,12 +1,16 @@
 /**
  * Test-only master data for P5's e2e tests: term → programme → branch → batch → cohort →
  * section, written with the owner role (Fixtures.owner).
+ *
+ * Named `*.test.ts` so the production build (tsconfig.build.json) leaves it out; it imports
+ * test-only packages. Its own check below runs in every file that imports it (cheap, no I/O).
  */
 import type { AddressInfo } from 'node:net';
 import type { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import type { Prisma } from '@slotwise/db';
 import { demoPublishedTimetable, demoTermSnapshot } from '@slotwise/shared/fixtures';
+import { describe, expect, it } from 'vitest';
 import { FakeMail, signToken, type Fixtures } from '../../test/helpers';
 import { AppModule } from '../app.module';
 import { loadEnv } from '../config/env';
@@ -20,6 +24,13 @@ export const fixtureSection = portalFixture.slots
   .map((s) => s.sectionIds)
   .reduce((acc, ids) => acc.filter((id) => ids.includes(id)))[0]!;
 export const fixtureTeacher = portalFixture.slots[0]!.faculty[0]!;
+
+describe('P5 test data', () => {
+  it('has one section every fixture class is for, and a teacher on the first class', () => {
+    expect(portalFixture.slots.every((s) => s.sectionIds.includes(fixtureSection))).toBe(true);
+    expect(fixtureTeacher.id).toBeTruthy();
+  });
+});
 
 export async function portalMasterData(fx: Fixtures, instituteId: string, departmentId: string) {
   const session = await fx.owner.academicSession.create({

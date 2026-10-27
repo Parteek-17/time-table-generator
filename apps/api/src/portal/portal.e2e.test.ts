@@ -17,7 +17,7 @@ import {
   portalMasterData,
   publishFixtureWeek,
   startPortalApp,
-} from './portal.test-data';
+} from './portal-test-data.test';
 import { PublishedTimetableClient } from './timetable.client';
 
 const fx = new Fixtures();

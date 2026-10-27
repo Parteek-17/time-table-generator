@@ -15,7 +15,7 @@ import {
   portalMasterData,
   publishFixtureWeek,
   startPortalApp,
-} from './portal.test-data';
+} from './portal-test-data.test';
 
 const fx = new Fixtures();
 let hasTables = false;
