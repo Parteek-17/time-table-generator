@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { isFlagOn } from '@slotwise/shared';
 import type { TimetableReadResponseV1, TodayV1 } from '@slotwise/shared/contracts';
 import {
   addDays,
   buildToday,
   buildWeek,
   CHANGES_DAYS_AHEAD,
+  examSeatFrom,
+  VIEWER_EXTRAS,
   FEED_DAYS_AFTER,
   FEED_DAYS_BEFORE,
   feedEvents,
@@ -35,7 +38,12 @@ export class PortalService {
       d,
       addDays(d, CHANGES_DAYS_AHEAD),
     ]);
-    return buildToday(input);
+    // Students' next exam seat from P6, when exams are switched on.
+    const mine =
+      isFlagOn('P6') && VIEWER_EXTRAS[input.viewer.kind].examSeat
+        ? await this.timetable.myExams(tenant.institute.slug, tenant.user.id)
+        : null;
+    return buildToday({ ...input, examSeat: mine ? examSeatFrom(mine, input.now.date) : null });
   }
 
   async week(tenant: Tenant, date?: string, now = new Date()): Promise<PortalWeekV1> {

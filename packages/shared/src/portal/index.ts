@@ -8,3 +8,4 @@ export * from './today';
 export * from './otp';
 export * from './ical';
 export * from './links';
+export * from './exam-seat';

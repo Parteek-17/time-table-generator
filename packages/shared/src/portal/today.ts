@@ -10,6 +10,7 @@ import {
   TodayClassV1,
   TodayV1,
   type TimetableSlotV1,
+  type ExamSeatV1,
   type TodayChangeV1,
 } from '../contracts';
 import { addDays, clock, isoWeekday, shortDay, weekStartOf } from './calendar';
@@ -80,6 +81,8 @@ export interface TodayInput {
   /** The viewer's published week (timetable-read.v1 slots); empty when nothing is published. */
   slots: readonly TimetableSlotV1[];
   calendar: PortalCalendar;
+  /** The next exam seat within 14 days (examSeatFrom()), for students. */
+  examSeat?: ExamSeatV1 | null;
 }
 
 /** Days ahead (after the day shown) whose changes are listed. */
@@ -168,8 +171,7 @@ export function buildToday(input: TodayInput): TodayV1 {
     nextClassId: nextClassId(input, classes),
     classes,
     changes: upcomingChanges(input),
-    // P6's seats are not readable yet (milestone 4).
-    examSeat: null,
+    examSeat: input.examSeat ?? null,
   });
 }
 
@@ -242,7 +244,7 @@ export const PortalDateQuery = z.object({
 export type PortalDateQuery = z.infer<typeof PortalDateQuery>;
 
 /** What the portal offers each viewer kind besides their timetable. A lookup, not a role check. */
-export const VIEWER_EXTRAS: Record<ViewerKind, { availability: boolean }> = {
-  student: { availability: false },
-  faculty: { availability: true },
+export const VIEWER_EXTRAS: Record<ViewerKind, { availability: boolean; examSeat: boolean }> = {
+  student: { availability: false, examSeat: true },
+  faculty: { availability: true, examSeat: false },
 };

@@ -7,9 +7,9 @@
  */
 import type { INestApplication } from '@nestjs/common';
 import { TodayV1 } from '@slotwise/shared/contracts';
-import { PortalWeekV1 } from '@slotwise/shared/portal';
+import { addDays, localNow, PortalWeekV1 } from '@slotwise/shared/portal';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { Fixtures } from '../../test/helpers';
 import {
   fixtureTeacher,
@@ -18,6 +18,7 @@ import {
   publishFixtureWeek,
   startPortalApp,
 } from './portal.test-data';
+import { PublishedTimetableClient } from './timetable.client';
 
 const fx = new Fixtures();
 /** A Monday inside the fixture's term. */
@@ -113,6 +114,37 @@ describe('portal Today and week', () => {
     // Tomorrow's section trip is listed as a change.
     expect(today.changes[0]).toMatchObject({ kind: 'holiday' });
     expect(today.changes[0]!.message).toContain('Section trip');
+  });
+
+  it("shows a student's next exam seat from P6, and none when P6 has nothing", async () => {
+    // On this branch P6's GET /exams/me isn't there yet (404): Today still works, no seat.
+    expect(TodayV1.parse((await get('/portal/today')).body).examSeat).toBeNull();
+
+    const soon = addDays(localNow('Asia/Kolkata').date, 3);
+    const spy = vi.spyOn(app.get(PublishedTimetableClient), 'myExams').mockResolvedValueOnce({
+      seats: [
+        {
+          date: soon,
+          sessionLabel: 'Morning',
+          startMinute: 600,
+          paperCode: 'CS303',
+          paperTitle: 'Operating Systems',
+          hallCode: 'G16',
+          building: 'Main block',
+          floor: 0,
+          seatLabel: 'G16-R3-C2',
+        },
+      ],
+    });
+    const today = TodayV1.parse((await get('/portal/today')).body);
+    expect(today.examSeat).toMatchObject({ date: soon, hallCode: 'G16', seatLabel: 'G16-R3-C2' });
+    expect(spy).toHaveBeenCalledWith(a.institute.slug, u.student.id);
+
+    // Teachers' Today doesn't ask for seats.
+    spy.mockClear();
+    await get('/portal/today', u.teacher);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 
   it('shows the holiday and struck-through classes on the day itself', async () => {
