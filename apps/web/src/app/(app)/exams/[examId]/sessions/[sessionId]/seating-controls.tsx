@@ -18,11 +18,14 @@ export function BuildSeating({
   rooms,
   students,
   running,
+  hasPlan,
 }: {
   sessionId: string;
   rooms: Room[];
   students: number;
   running: string | null;
+  /** A finished plan is on screen: keep this panel closed so the plan shows first. */
+  hasPlan: boolean;
 }) {
   const t = useTranslations('p6.build');
   const router = useRouter();
@@ -49,7 +52,7 @@ export function BuildSeating({
 
   if (rooms.length === 0) return <Alert>{t('noRooms')}</Alert>;
   return (
-    <details className="rounded-md border p-3" open={!running}>
+    <details className="rounded-md border p-3" open={!running && !hasPlan}>
       <summary className="cursor-pointer font-medium">{t('title')}</summary>
       <fieldset className="mt-3 flex flex-col gap-2">
         <legend className="text-sm text-muted-foreground">{t('halls', { seats, students })}</legend>

@@ -167,7 +167,7 @@ export interface DateSheetChoicesDto {
   /** Courses taught in the term, with the sections they are taught to (pre-selected). */
   courses: { id: string; code: string; title: string; semester: number; sectionIds: string[] }[];
   /** Regular sections of the term's cohorts. */
-  sections: { id: string; name: string; studentCount: number }[];
+  sections: { id: string; name: string; semester: number; studentCount: number }[];
   /** Rooms with exam seats, ground floor first. */
   rooms: { id: string; code: string; floor: number; examSeats: number; isAccessible: boolean }[];
 }

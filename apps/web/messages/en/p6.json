@@ -69,7 +69,9 @@
       "session": "Session",
       "sections": "Sections writing it",
       "add": "Add paper",
-      "adding": "Adding…"
+      "adding": "Adding…",
+      "sectionDetail": "Sem {semester} · {count}",
+      "allSemesters": "Show sections of every semester"
     },
     "seating": {
       "notFound": "We couldn’t find this exam session",
@@ -85,10 +87,9 @@
       "andMore": "…and {count} more.",
       "hallsCaption": "Halls in this plan",
       "hall": "Hall",
-      "used": "Seats used",
       "papers": "Papers",
       "invigilators": "Invigilators",
-      "usedOf": "{used} of {capacity} ({reserved} kept free)",
+      "usedOf": "{used} of {capacity} seats",
       "noInvigilator": "None yet",
       "downloads": "Print or download",
       "doc": {
@@ -96,7 +97,8 @@
         "notice": "Where to sit (notice board)",
         "attendance": "Attendance sheets",
         "duties": "Invigilation duties"
-      }
+      },
+      "usedOfReserved": "{used} of {capacity} seats ({reserved} kept free)"
     },
     "build": {
       "title": "Build the seating plan",

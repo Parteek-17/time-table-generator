@@ -73,6 +73,7 @@ export default async function SeatingPage({
           rooms={choices.data.rooms}
           students={students}
           running={latest?.status === 'queued' || latest?.status === 'running' ? latest.id : null}
+          hasPlan={plans.some((p) => p.status === 'ready' || p.status === 'published')}
         />
       ) : null}
 
@@ -117,41 +118,33 @@ export default async function SeatingPage({
             </Alert>
           ) : null}
 
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[32rem] border-collapse text-left text-sm">
-              <caption className="sr-only">{t('hallsCaption')}</caption>
-              <thead>
-                <tr className="border-b">
-                  <th scope="col" className="p-2">
-                    {t('hall')}
-                  </th>
-                  <th scope="col" className="p-2">
-                    {t('used')}
-                  </th>
-                  <th scope="col" className="p-2">
-                    {t('papers')}
-                  </th>
-                  <th scope="col" className="p-2">
-                    {t('invigilators')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {shown.halls.map((h) => (
-                  <tr key={h.hallId} className="border-b">
-                    <th scope="row" className="p-2 font-medium">
-                      {h.code}
-                    </th>
-                    <td className="p-2">
-                      {t('usedOf', { used: h.used, capacity: h.capacity, reserved: h.reserved })}
-                    </td>
-                    <td className="p-2">{h.papers.join(', ')}</td>
-                    <td className="p-2">{h.invigilators.join(', ') || t('noInvigilator')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* One card per hall rather than a table: four columns do not fit a phone. */}
+          <ul aria-label={t('hallsCaption')} className="grid gap-2 sm:grid-cols-2">
+            {shown.halls.map((h) => (
+              <li key={h.hallId} className="rounded-md border p-3 text-sm">
+                <p className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-base font-semibold">
+                    {t('hall')} {h.code}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {h.reserved > 0
+                      ? t('usedOfReserved', {
+                          used: h.used,
+                          capacity: h.capacity,
+                          reserved: h.reserved,
+                        })
+                      : t('usedOf', { used: h.used, capacity: h.capacity })}
+                  </span>
+                </p>
+                <p>
+                  {t('papers')}: {h.papers.join(', ')}
+                </p>
+                <p>
+                  {t('invigilators')}: {h.invigilators.join(', ') || t('noInvigilator')}
+                </p>
+              </li>
+            ))}
+          </ul>
 
           <div className="flex flex-col gap-2">
             <h3 className="font-medium">{t('downloads')}</h3>

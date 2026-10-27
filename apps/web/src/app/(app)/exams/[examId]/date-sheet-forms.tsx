@@ -134,6 +134,12 @@ export function AddPaperForm({
   const [courseId, setCourseId] = useState(courses[0]?.id ?? '');
   const course = courses.find((c) => c.id === courseId);
   const [ticked, setTicked] = useState<string[]>(course?.sectionIds ?? []);
+  // "CS A" exists in every semester: show the course's semester (and anything ticked) unless
+  // asked for all of them.
+  const [allSemesters, setAllSemesters] = useState(false);
+  const sections = choices.sections.filter(
+    (s) => allSemesters || s.semester === course?.semester || ticked.includes(s.id),
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
@@ -193,7 +199,7 @@ export function AddPaperForm({
           <fieldset className="flex flex-col gap-1">
             <legend className="mb-1 text-sm font-medium">{t('sections')}</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {choices.sections.map((s) => (
+              {sections.map((s) => (
                 <label key={s.id} className="flex min-h-11 items-center gap-2 rounded border px-2">
                   <Checkbox
                     checked={ticked.includes(s.id)}
@@ -205,11 +211,20 @@ export function AddPaperForm({
                   />
                   <span>
                     {s.name}{' '}
-                    <span className="text-sm text-muted-foreground">({s.studentCount})</span>
+                    <span className="text-sm text-muted-foreground">
+                      {t('sectionDetail', { semester: s.semester, count: s.studentCount })}
+                    </span>
                   </span>
                 </label>
               ))}
             </div>
+            <label className="mt-1 flex min-h-11 items-center gap-2 text-sm">
+              <Checkbox
+                checked={allSemesters}
+                onChange={(e) => setAllSemesters(e.target.checked)}
+              />
+              {t('allSemesters')}
+            </label>
           </fieldset>
           <Button type="submit" disabled={pending || ticked.length === 0} className="min-h-11">
             {pending ? t('adding') : t('add')}

@@ -116,15 +116,15 @@ export class SeatingService {
    * session's earlier published plan is archived, never deleted.
    */
   async publish(tenant: Tenant, planId: string): Promise<SeatingPlanDto> {
-    const { dto, event } = await this.tx(tenant, async (tx) => {
+    // Only the status changes run in the transaction; the summary is read afterwards. Building
+    // it inside took longer than Prisma's 5-second limit on a slow machine and rolled back.
+    const event = await this.tx(tenant, async (tx) => {
       const plan = await tx.seatingPlan.findFirst({
         where: { id: planId, session: { exam: { deletedAt: null } } },
         include: { session: { include: { papers: { select: { sectionIds: true } } } } },
       });
       if (!plan) throw new NotFoundException(NO_PLAN);
-      if (plan.status === 'published') {
-        return { dto: await this.dto(tx, plan, await this.seated(tx, plan.id)), event: null };
-      }
+      if (plan.status === 'published') return null;
       if (plan.status !== 'ready' && plan.status !== 'archived') {
         throw new ConflictException('Only a finished seating plan can be published.');
       }
@@ -133,12 +133,12 @@ export class SeatingService {
         data: { status: 'archived' },
       });
       const now = new Date();
-      const published = await tx.seatingPlan.update({
+      await tx.seatingPlan.update({
         where: { id: plan.id },
         data: { status: 'published', publishedAt: now },
       });
       const halls = (plan.halls as unknown as StoredHall[]).filter((h) => h.used > 0);
-      const event = parseEvent('exam.seating.published', {
+      return parseEvent('exam.seating.published', {
         eventId: randomUUID(),
         occurredAt: now.toISOString(),
         instituteId: tenant.institute.id,
@@ -150,14 +150,9 @@ export class SeatingService {
         roomIds: halls.map((h) => h.hallId),
         sectionIds: [...new Set(plan.session.papers.flatMap((p) => p.sectionIds))],
       });
-      return { dto: await this.dto(tx, published, await this.seated(tx, plan.id)), event };
     });
     if (event) this.events.emit('exam.seating.published', event);
-    return dto;
-  }
-
-  private seated(tx: TxClient, planId: string): Promise<number> {
-    return tx.seatAssignment.count({ where: { planId } });
+    return this.get(tenant, planId);
   }
 
   forSession(tenant: Tenant, sessionId: string): Promise<SeatingPlanDto[]> {
@@ -209,7 +204,7 @@ export class SeatingService {
         capacity: h.capacity,
         used: h.used,
         reserved: h.reserved,
-        papers: h.paperIds.map((id) => papers.get(id) ?? '(removed paper)'),
+        papers: h.paperIds.map((id) => papers.get(id) ?? '(removed paper)').sort(),
         invigilators: duties.filter((d) => d.hallId === h.hallId).map((d) => d.facultyName),
       }));
     return {

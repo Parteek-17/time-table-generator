@@ -270,9 +270,11 @@ export class DateSheetService {
         tx.section.findMany({
           where: { deletedAt: null, cohort: { termId: exam.termId, deletedAt: null } },
           include: {
+            cohort: { select: { semester: true } },
             _count: { select: { students: { where: { status: 'active', deletedAt: null } } } },
           },
-          orderBy: { displayName: 'asc' },
+          // "CS A" exists in every semester: order by semester, then name.
+          orderBy: [{ cohort: { semester: 'asc' } }, { displayName: 'asc' }],
         }),
         tx.room.findMany({
           where: { deletedAt: null },
@@ -296,6 +298,7 @@ export class DateSheetService {
         sections: sections.map((s) => ({
           id: s.id,
           name: s.displayName,
+          semester: s.cohort.semester,
           studentCount: s._count.students,
         })),
         rooms: rooms.flatMap((r) => {
