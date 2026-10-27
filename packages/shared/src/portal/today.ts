@@ -54,6 +54,11 @@ const VIEW: Record<ViewerKind, (viewer: PortalViewer, calendar: PortalCalendar) 
   }),
 };
 
+/** How this viewer sees classes (who attends, the "with whom" line). */
+export function viewerOptions(viewer: PortalViewer, calendar: PortalCalendar): DayOptions {
+  return VIEW[viewer.kind](viewer, calendar);
+}
+
 /** The slots this viewer attends: a student's electives are narrowed to the ones they chose. */
 export function viewerSlots(
   viewer: PortalViewer,
