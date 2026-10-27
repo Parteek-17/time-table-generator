@@ -136,6 +136,20 @@ describe('classify', () => {
     assert.equal(p2e.denied.length, 1);
   });
 
+  it('allows the lockfile with a package.json the stream owns outright', () => {
+    const ui = classify(
+      get('UI'),
+      [
+        { status: 'M', path: 'packages/ui/package.json' },
+        { status: 'M', path: 'pnpm-lock.yaml' },
+      ],
+      noCtx,
+    );
+    assert.deepEqual(ui.denied, []);
+    const lockOnly = classify(get('UI'), [{ status: 'M', path: 'pnpm-lock.yaml' }], noCtx);
+    assert.equal(lockOnly.denied.length, 1);
+  });
+
   it('allows back-relation fields to own models in another schema file only', () => {
     const diff = [
       '--- a/packages/db/prisma/schema/core.prisma',

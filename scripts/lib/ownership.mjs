@@ -178,6 +178,9 @@ export function classify(entry, changes, ctx) {
   const changedOwnDeps = new Set();
 
   const check = (path, status) => {
+    // A package.json the stream owns outright (UI's packages/ui) also lets it change the lockfile.
+    const ownPkg = /^(.*)\/package\.json$/.exec(path)?.[1];
+    if (ownPkg && packages.includes(ownPkg) && own(path)) changedOwnDeps.add(ownPkg);
     if (own(path) || isOwnAdr(entry.stream, path)) return null;
     const requests = 'docs/coordination/requests/';
     if (path.startsWith(requests) && !path.slice(requests.length).includes('/')) {
