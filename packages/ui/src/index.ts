@@ -4,3 +4,8 @@ export { Badge } from './badge';
 export { Button, buttonVariants, type ButtonProps } from './button';
 export { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 export { Checkbox, FieldError, Input, Label, NativeSelect, Textarea } from './fields';
+export { clampPercent, ProgressBar } from './progress';
+export { SegmentedControl, segmentedKeyTarget, type SegmentedOption } from './segmented';
+export { Skeleton } from './skeleton';
+export { SlotCard, slotPeriods } from './slot-card';
+export { TimetableGrid } from './timetable-grid';
