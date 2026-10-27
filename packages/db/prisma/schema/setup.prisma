@@ -355,6 +355,7 @@ model Course {
   electiveSections    ElectiveSection[]
   teachingAssignments TeachingAssignment[]
   subjectMentors      SubjectMentor[]
+  examPapers          ExamPaper[]
 
   @@unique([schemeVersionId, code])
   @@index([schemeVersionId, semester])
@@ -431,6 +432,7 @@ model Term {
   timetableSnapshots  TimetableSnapshot[]
   timetableVersions   TimetableVersion[]
   solveJobs           SolveJob[]
+  exams               Exam[]
 
   @@unique([sessionId, kind])
   @@index([instituteId])
@@ -863,6 +865,7 @@ model Student {
   subGroup  SubGroup? @relation(fields: [subGroupId], references: [id])
 
   electives StudentElective[]
+  examSeatNeeds ExamSeatNeed[]
 
   @@unique([instituteId, classRollNo])
   @@index([instituteId])
