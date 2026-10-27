@@ -103,11 +103,28 @@ def message(names: Names, s: Session, d: Diagnosis) -> str:
             "Raise the limit or give the class to another teacher."
         )
     if reason == "locked_conflict":
-        if not d.places:
+        if d.invalid == "length":
             return (
-                f"The locked place for {what} is not valid (wrong period, length or room, or "
-                "another locked class is there). Unlock it or move it."
+                f"The lock on {what} has the wrong length (the class is {s.length} "
+                f"period{'s' if s.length > 1 else ''}). Unlock it or lock it again."
             )
+        if d.invalid == "room":
+            return (
+                f"The locked room for {what} is not a {names.need(s.room_need)} that seats "
+                f"{s.strength}. Unlock it or pick another room."
+            )
+        if d.invalid == "place":
+            return (
+                f"The locked place for {what} is not valid (not a working day or period, or "
+                "the block would cross a break). Unlock it or move it."
+            )
+        if s.locked:
+            if not any(hits for _, hits in d.places):
+                return (
+                    f"Time ran out before {what} was placed at its locked place "
+                    f"({_when(d).strip(' ()')}). Try again with more time."
+                )
+            return f"The locked place for {what} is not free ({_details(d)}). Unlock it or move it."
         return (
             f"Locked classes take every period that would work for {what} ({_details(d)}). "
             "Unlock one of them or move it."

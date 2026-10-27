@@ -6,8 +6,9 @@ ignoring it alone would free some place; the first such kind in RELAX_ORDER name
 When no single kind is enough, a kind in the way everywhere still names it (a teacher who is
 never available), and otherwise the session has no free slot.
 
-Reasons found before solving (no suitable room, room too small, lab block does not fit, bad
-lock, no audience) need no relaxation and are kept as they are.
+Reasons found before solving (no suitable room, room too small, lab block does not fit, no
+audience) need no relaxation and are kept as they are. A locked session is only ever checked
+at its locked place: an invalid lock, or what holds that place, explains locked_conflict.
 """
 
 from __future__ import annotations
@@ -48,6 +49,7 @@ class Diagnosis:
     places: list[tuple[str, list[Hit]]] = field(default_factory=list)
     faculty_ids: list[str] = field(default_factory=list)
     limit: str | None = None  # periods-per-day | periods-per-week, for faculty_over_max
+    invalid: str | None = None  # length | place | room, for an invalid lock
 
     def involved(self) -> dict[str, list[str]]:
         out: dict[str, list[str]] = {"facultyIds": [], "sectionIds": [], "roomIds": []}
@@ -80,10 +82,10 @@ def diagnose(problem: Problem, placed: list[Placed], proven: bool) -> dict[str, 
     for s in problem.sessions:
         if s.id in done:
             continue
-        if s.reason is not None and s.detail != "blocked":
+        if s.locked:
+            out[s.id] = _locked(problem, names, s, placed, load)
+        elif s.reason is not None and s.detail != "blocked":
             out[s.id] = Diagnosis(s.reason)
-        elif s.locked:
-            out[s.id] = Diagnosis("locked_conflict")
         else:
             out[s.id] = _relax(problem, names, s, placed, load, proven)
     return out
@@ -132,6 +134,26 @@ def _relax(
     movable = any("placed" in k for k in kinds.values())
     reason = "time_limit" if movable and not proven else "no_free_slot"
     return Diagnosis(reason, show(s.all_options))
+
+
+def _locked(
+    problem: Problem,
+    names: Names,
+    s: Session,
+    placed: list[Placed],
+    load: dict[str, dict[int, int]],
+) -> Diagnosis:
+    """A locked session without a place: the lock is invalid, or something holds its place."""
+    if s.detail in ("length", "place", "room") or not s.all_options:
+        return Diagnosis("locked_conflict", invalid=s.detail or "place")
+    o = s.all_options[0]
+    hits = _hits(problem, names, s, o, placed, load)
+    for fid in s.faculty_ids:
+        f = problem.faculty.get(fid)
+        if f is not None and sum(load[fid].values()) + s.length > f["maxPeriodsPerWeek"]:
+            text = f"{names.teachers([fid])} would go over {f['maxPeriodsPerWeek']} periods a week"
+            hits.append(Hit("week_max", text, faculty_ids=(fid,)))
+    return Diagnosis("locked_conflict", [(at(s, o), hits)])
 
 
 def _hits(

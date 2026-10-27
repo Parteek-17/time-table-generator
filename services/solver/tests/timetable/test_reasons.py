@@ -151,7 +151,7 @@ def test_locked_conflict_for_an_invalid_lock() -> None:
     lock = {"sessionId": f"{aid}#1", "weekday": 1, "startPeriodIndex": 1, "length": 2}
     u = only(solve_ok(t.request(lockedSessions=[{**lock, "roomId": room}])))
     assert u["reason"] == "locked_conflict"
-    assert "not valid" in u["message"]
+    assert "wrong length" in u["message"]
 
 
 def test_time_limit_when_the_search_stops_early(monkeypatch: pytest.MonkeyPatch) -> None:

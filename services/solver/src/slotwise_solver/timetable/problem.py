@@ -461,23 +461,38 @@ def build_problem(request: Json) -> Problem:
                 s.reason = "lab_block_does_not_fit"
                 continue
 
+            # A locked session keeps exactly its place and room, or stays unplaced
+            # (locked_conflict): hard rules win over a lock, and a lock never moves.
             lock = locks.get(s.id)
             if lock is not None:
-                span = bell.span(lock["startPeriodIndex"], lock["length"])
-                if span is not None and lock["length"] == length and lock["roomId"] in rooms:
-                    s.locked = True
-                    s.options = [Option(lock["weekday"], lock["startPeriodIndex"], *span)]
-                    s.rooms = [lock["roomId"]]
+                s.locked = True
+                place = next(
+                    (
+                        o
+                        for o in all_opts
+                        if (o.weekday, o.start_index) == (lock["weekday"], lock["startPeriodIndex"])
+                    ),
+                    None,
+                )
+                if lock["length"] != length:
+                    s.reason, s.detail = "locked_conflict", "length"
                     continue
-                s.reason = "locked_conflict"
-                continue
+                if place is None:
+                    s.reason, s.detail = "locked_conflict", "place"
+                    continue
+                if lock["roomId"] not in s.rooms:
+                    s.reason, s.detail = "locked_conflict", "room"
+                    continue
+                all_opts = [place]
+                s.rooms = [lock["roomId"]]
 
             s.all_options = all_opts
             s.blocks = aud_blocks + fac_blocks
             s.options = [o for o in all_opts if not any(b.overlaps(o) for b in s.blocks)]
             if not s.options:
                 # relax.diagnose() finds the real reason (unavailable, fixed slot …).
-                s.reason, s.detail = "no_free_slot", "blocked"
+                s.reason = "locked_conflict" if s.locked else "no_free_slot"
+                s.detail = "blocked"
 
     boundaries: dict[int, list[int]] = {}
     for day in range(1, 8):
