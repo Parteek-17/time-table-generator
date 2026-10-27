@@ -30,6 +30,15 @@ const nav: NavSource = async (me) => {
         { href: '/rooms', label: t('rooms') },
       ],
     },
+    {
+      label: t('teaching'),
+      items: [
+        { href: '/teaching', label: t('teaching') },
+        { href: '/teaching/fixed-slots', label: t('fixedSlots') },
+        { href: '/teaching/scope', label: t('timetableScope') },
+        ...(me.may('readiness.view') ? [{ href: '/readiness', label: t('readiness') }] : []),
+      ],
+    },
   ];
 };
 

@@ -139,6 +139,25 @@
       "seminar": "Seminar hall",
       "drawing_hall": "Drawing hall",
       "workshop": "Workshop"
+    },
+    "fixedSlotKind": {
+      "mentoring": "Mentoring",
+      "minor_degree": "Minor degree",
+      "honours": "Honours",
+      "remedial": "Remedial class",
+      "library": "Library",
+      "sports_ncc": "Sports / NCC",
+      "other": "Other"
+    },
+    "componentLetter": {
+      "lecture": "L",
+      "tutorial": "T",
+      "practical": "P"
+    },
+    "componentName": {
+      "lecture": "Lecture",
+      "tutorial": "Tutorial",
+      "practical": "Lab"
     }
   },
   "institute": {
@@ -304,7 +323,9 @@
     "rowSections": "{count, plural, one {# section} other {# sections}}: {names}",
     "rowReviewCode": "check the code; the year changes",
     "promoteConfirm": "{count, plural, one {Promote # batch} other {Promote # batches}}",
-    "promoted": "{created} cohorts created, {graduated} batches finished, {skipped} left as they were."
+    "promoted": "{created} cohorts created, {graduated} batches finished, {skipped} left as they were.",
+    "makeCurrent": "Make current",
+    "makeCurrentFor": "Make {label} the current term (the current one is closed)"
   },
   "calendar": {
     "title": "Calendar",
@@ -573,7 +594,11 @@
     "students": "Students",
     "faculty": "Faculty",
     "rooms": "Rooms",
-    "imports": "Import from Excel"
+    "imports": "Import from Excel",
+    "teaching": "Who teaches what",
+    "fixedSlots": "Fixed slots",
+    "timetableScope": "Timetable scope",
+    "readiness": "Ready to generate?"
   },
   "p1": {
     "setup": {
@@ -595,7 +620,8 @@
         "cohorts_without_sections": "{count, plural, one {# cohort has} other {# cohorts have}} no sections yet.",
         "no_faculty": "No faculty yet.",
         "no_rooms": "No rooms yet.",
-        "no_bell_schedule": "No bell schedule yet."
+        "no_bell_schedule": "No bell schedule yet.",
+        "readiness_issues": "{count, plural, one {# problem stops} other {# problems stop}} the timetable from being generated."
       },
       "fix": "Fix",
       "stepsTitle": "Steps",
@@ -622,13 +648,12 @@
       "needTermTitle": "Add the current term first",
       "needTermBody": "This step belongs to a term. Add the term you are planning in the term step, then come back.",
       "goToTermStep": "Go to the term step",
-      "laterTitle": "Coming next",
       "schemesCourses": "Open a scheme to add its courses per semester. You can add courses later too.",
       "batchesHeading": "Batches",
       "batchesHint": "One batch per branch and admission year (and lateral entry). Each follows a scheme.",
       "cohortsHeading": "Sections in {term}",
       "cohortsHint": "Create the term's cohorts from the batches, then add sections to each.",
-      "fixedSlotsLater": "Fixed slots (mentoring, library, sports) come with the teaching grid.",
+      "fixedSlotsLater": "Mentoring, library or sports periods that no class may use go in",
       "sampleTitle": "Try with sample data",
       "sampleHint": "Explore a complete, fictional college before entering your own: departments, schemes, sections, 44 teachers, rooms and a calendar. It is a separate institute; your data is not touched.",
       "sampleButton": "Create a sample institute",
@@ -690,16 +715,15 @@
         "teaching": {
           "title": "Who teaches what",
           "hint": "Pick a teacher for each course and section.",
-          "summary": "Coming soon",
-          "laterBody": "The teaching grid (who teaches each course to each section and sub-group) is being built. Skip this step for now; it will appear here."
+          "summary": "Teachers for each course and section"
         },
         "ready": {
           "title": "Ready to generate?",
           "hint": "Check everything a timetable needs and choose which cohorts to include.",
-          "summary": "Coming soon",
-          "laterBody": "The readiness check is being built. When it is ready, this step will list anything missing and link to the screen that fixes it."
+          "summary": "Everything a timetable needs"
         }
-      }
+      },
+      "fixedSlotsLink": "Fixed slots"
     },
     "imports": {
       "title": "Import from Excel",
@@ -845,6 +869,122 @@
       "notAllowed": "Only institute admins, heads of department and timetable coordinators can import.",
       "uploadFailed": "The file could not be uploaded. Check your connection and try again.",
       "edit": "Edit"
+    },
+    "teaching": {
+      "title": "Who teaches what",
+      "subtitle": "Pick a teacher for each course and section in {term}.",
+      "noTermTitle": "No term yet",
+      "noTermBody": "Add the term you are planning first.",
+      "cohortsHeading": "Cohorts running this term",
+      "noCohorts": "No cohorts are running in this term yet. Add them on the Cohorts page.",
+      "cohortLine": "Semester {semester} · {sections, plural, =0 {no sections yet} one {# section} other {# sections}}",
+      "allSet": "All teachers picked",
+      "missing": "{count, plural, one {# needs a teacher} other {# need a teacher}}",
+      "joins": "Sits in the sections of {code}",
+      "open": "Open",
+      "openFor": "Open who teaches {code}",
+      "moreHeading": "Also before generating",
+      "fixedSlotsHint": "Keep periods free for mentoring, library or sports.",
+      "scopeHint": "Choose which cohorts one timetable covers.",
+      "readinessHint": "Check that nothing is missing.",
+      "gridSubtitle": "Semester {semester}. Each teacher shows their periods a week this term against their limit.",
+      "back": "All cohorts",
+      "joinsBody": "{code} sits in the sections of {host}. Pick its teachers there.",
+      "openHost": "Open {host}",
+      "noSections": "This cohort has no sections yet, so there is nobody to teach. Add sections first.",
+      "addSections": "Add sections",
+      "noCourses": "The scheme has no courses for this semester. Add them on the Schemes page.",
+      "progress": "{done} of {total} picked",
+      "periods": "{count, plural, one {# period} other {# periods}} a week",
+      "teacher": "Teacher for {course} {part} in {group}",
+      "coTeachers": "Co-teachers",
+      "addCoTeacher": "Add a co-teacher for {course} {part} in {group}",
+      "removeCoTeacher": "Remove {name}",
+      "nobody": "Nobody yet",
+      "facultyOption": "{name} ({code}, {dept}) · {assigned}/{max}",
+      "load": "{assigned}/{max}",
+      "loadOver": "Over the limit",
+      "loadUnder": "Has spare periods",
+      "loadOk": "Within the limit",
+      "saved": "Saved.",
+      "undo": "Undo",
+      "mentorsHeading": "Subject mentors",
+      "mentorsHint": "The teacher students go to for help with a course. Optional.",
+      "mentorFor": "Subject mentor for {course}",
+      "notAllowed": "You can see who teaches what but not change it."
+    },
+    "fixedSlots": {
+      "title": "Fixed slots",
+      "subtitle": "Periods in {term} that no regular class may use.",
+      "add": "Add a fixed slot",
+      "none": "No fixed slots yet.",
+      "kind": "What it is for",
+      "label": "Label",
+      "weekday": "Day",
+      "from": "From period",
+      "to": "To period",
+      "faculty": "Teachers busy in it",
+      "facultyHint": "They get no classes in these periods.",
+      "when": "{day}, {periods}",
+      "teachers": "{count, plural, one {# teacher} other {# teachers}}",
+      "notAllowed": "Only the institute admin or a timetable coordinator can change fixed slots."
+    },
+    "scope": {
+      "title": "Timetable scope",
+      "subtitle": "Which cohorts of {term} one timetable covers. Most institutes need just one.",
+      "add": "Add a timetable scope",
+      "none": "No timetable scope yet. Generating covers every running cohort.",
+      "name": "Name",
+      "notes": "Notes",
+      "cohorts": "Cohorts to include",
+      "line": "{count, plural, one {# cohort} other {# cohorts}}",
+      "check": "Check this scope",
+      "checkFor": "Check {name}",
+      "notAllowed": "Only the institute admin or a timetable coordinator can change this."
+    },
+    "readiness": {
+      "title": "Ready to generate?",
+      "subtitle": "Everything a timetable for {term} needs.",
+      "scopeSubtitle": "Everything the {scope} timetable for {term} needs.",
+      "wholeTerm": "Whole term",
+      "noTermTitle": "No term yet",
+      "noTermBody": "Add the term you are planning first.",
+      "ready": "Ready to generate",
+      "readyBody": "Nothing is missing. You can generate the timetable.",
+      "notReady": "{count, plural, one {# problem to fix} other {# problems to fix}}",
+      "notReadyBody": "Fix these first. Each one has a button that opens the right screen.",
+      "warnings": "{count, plural, one {# thing to look at} other {# things to look at}} (these do not stop you)",
+      "groupOk": "All good",
+      "groupErrors": "{count, plural, one {# problem} other {# problems}}",
+      "groupWarnings": "{count, plural, one {# note} other {# notes}}",
+      "error": "Problem",
+      "warning": "Note",
+      "category": {
+        "setup": "Term and bell schedule",
+        "sections": "Sections and sub-groups",
+        "assignments": "Teachers for every class",
+        "load": "Teacher load",
+        "periods": "Enough periods in the week",
+        "rooms": "Rooms and labs",
+        "calendar": "Teaching days"
+      },
+      "fix": {
+        "terms": "Open terms",
+        "bell-schedules": "Open bell schedule",
+        "cohort": "Open cohort",
+        "teaching": "Pick teachers",
+        "faculty": "Open teacher",
+        "rooms": "Open rooms",
+        "calendar": "Open calendar",
+        "scheme": "Open schemes"
+      },
+      "loadHeading": "Teacher load this term",
+      "loadHint": "Periods a week across all departments.",
+      "showLoad": "Show all teachers",
+      "daysHeading": "Teaching days per cohort",
+      "daysLine": "{days} of {minimum}",
+      "generate": "Go to timetable",
+      "recheck": "Check again"
     }
   }
 }
