@@ -1332,6 +1332,12 @@ export const SAMPLE_USERS = [
     department: null,
   },
   {
+    email: 'exams@demo.slotwise.test',
+    name: 'Demo Exam Coordinator',
+    role: 'exam_coordinator' as const,
+    department: null,
+  },
+  {
     email: 'faculty@demo.slotwise.test',
     name: 'Demo Faculty',
     role: 'faculty' as const,
