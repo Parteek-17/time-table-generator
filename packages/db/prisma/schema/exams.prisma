@@ -26,6 +26,7 @@ enum SeatingPlanStatus {
   ready
   failed
   published
+  archived
 
   @@map("seating_plan_status")
 }
@@ -126,6 +127,8 @@ model SeatingPlan {
   instituteId  String            @map("institute_id") @db.Uuid
   sessionId    String            @map("session_id") @db.Uuid
   status       SeatingPlanStatus @default(queued)
+  /// Rooms offered as halls, in fill order.
+  hallIds      String[]          @map("hall_ids") @db.Uuid
   /// solver-seating.v1 status (OPTIMAL, FEASIBLE, INFEASIBLE, TIMEOUT), once solved.
   solverStatus String?           @map("solver_status")
   /// { unseated, invigilationProblems } from the solver response.

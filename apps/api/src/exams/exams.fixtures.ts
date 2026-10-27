@@ -1,6 +1,6 @@
 /**
  * Test data for P6's e2e tests, written with the owner role: one term, a scheme with three
- * courses, two sections with students, and rooms. Fictional (CLAUDE.md).
+ * courses, two sections with students (5 + 4 active), and three rooms. Fictional (CLAUDE.md).
  */
 import type { PrismaClient } from '@slotwise/db';
 
@@ -83,12 +83,35 @@ export async function examWorld(owner: PrismaClient, instituteId: string, depart
       })),
     ],
   });
+  const building = await owner.building.create({
+    data: { instituteId, name: 'Exam Block', floors: 2 },
+  });
+  const room = (code: string, floor: number, examSeatsPerBench: number | null) =>
+    owner.room.create({
+      data: {
+        instituteId,
+        buildingId: building.id,
+        code,
+        floor,
+        type: 'lecture',
+        rows: 3,
+        seatsPerRow: 4,
+        examSeatsPerBench,
+        isAccessible: floor === 0,
+      },
+    });
+  // 3 rows × 2 benches × 1 seat = 6 exam seats each; the lab has none.
+  const rooms = {
+    f1: await room('F1', 1, 1),
+    g1: await room('G1', 0, 1),
+    lab: await room('LAB', 0, null),
+  };
   const [cs301, cs303, ma301] = courses as [
     (typeof courses)[0],
     (typeof courses)[0],
     (typeof courses)[0],
   ];
-  return { term, courses: { cs301, cs303, ma301 }, sections: { a, b } };
+  return { term, courses: { cs301, cs303, ma301 }, sections: { a, b }, rooms };
 }
 
 /** P6's rows go before purgeInstitute(), which does not know them yet (INT request). */

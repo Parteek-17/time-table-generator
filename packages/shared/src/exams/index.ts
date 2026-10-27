@@ -3,3 +3,4 @@
  * `@slotwise/shared/exams`. Owned by P6; other streams use `@slotwise/shared/contracts`.
  */
 export * from './date-sheet';
+export * from './seating';

@@ -43,6 +43,15 @@ seats used per hall (capacity − reserve), so it comes out of seats the adjacen
 empty anyway. Students needing accessible seats are placed first in the front-most free seat of
 an accessible hall, ground floor first. Unseated students get a reason and a plain message.
 
+**The seating job** (`apps/api/src/exams/seating`, BullMQ queue `p6.seating`) builds the
+request inside the API from the date sheet, active students of the papers' sections, seat
+needs and rooms, reading P1's tables read-only through Prisma under RLS (no import of P1's
+code). A room is a hall when it has rows, seats per row and exam seats per bench; class seats
+per row are on two-seater benches, so `benchesPerRow = ceil(seatsPerRow / 2)`
+(`hallFromRoom()`). Halls are the rooms the coordinator picked, in that order, or every exam
+room, ground floor first. Roll numbers on seats are the university roll number, else the class
+roll number. A section writing two papers in the session fails the job with a plain message.
+
 **Permissions** go through `can()` with `exam.view` / `exam.manage`, requested from INT
 (`requests/2026-10-27-p6-exam-permissions.md`); until then `apps/api/src/exams/exam-permissions.ts`
 maps them to `masterdata.view` / `institute.manage`.
