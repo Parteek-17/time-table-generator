@@ -4,3 +4,126 @@
 // the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
 // requires; see docs/coordination/OWNERSHIP.md.
 // Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).
+//
+// Design: docs/adr/0060-disruptions-cancellations-make-ups.md. P4 reads published timetables
+// only through timetable-read.v1, so slot, section, faculty and room ids here are plain uuids
+// (no foreign keys into P2T's or P1's tables), and a cancellation keeps a copy of the class it
+// cancels (TimetableSlotV1) so it reads the same after a newer timetable is published.
+
+enum DisruptionKind {
+  holiday
+  event
+  faculty_leave
+  room_unavailable
+  other
+
+  @@map("disruption_kind")
+}
+
+/// Where a disruption applies. institute = everyone; department and section name one id.
+enum DisruptionScope {
+  institute
+  department
+  section
+
+  @@map("disruption_scope")
+}
+
+/// A holiday, event (fest, visit, exam) or a faculty member's leave that cancels classes.
+/// Undo sets deletedAt and gives back the classes it cancelled.
+model Disruption {
+  id           String          @id @default(uuid()) @db.Uuid
+  instituteId  String          @map("institute_id") @db.Uuid
+  termId       String          @map("term_id") @db.Uuid
+  kind         DisruptionKind
+  /// Plain words, e.g. "Annual fest".
+  title        String
+  scopeType    DisruptionScope @map("scope_type")
+  /// Set when scopeType is department.
+  departmentId String?         @map("department_id") @db.Uuid
+  /// Set when scopeType is section.
+  sectionId    String?         @map("section_id") @db.Uuid
+  /// For faculty_leave.
+  facultyId    String?         @map("faculty_id") @db.Uuid
+  /// For room_unavailable.
+  roomId       String?         @map("room_id") @db.Uuid
+  startDate    DateTime        @map("start_date") @db.Date
+  /// Inclusive.
+  endDate      DateTime        @map("end_date") @db.Date
+  /// Minutes from midnight on each day; both null = whole day.
+  startMinute  Int?            @map("start_minute")
+  endMinute    Int?            @map("end_minute")
+  /// User ids (no foreign key: audit-style references).
+  createdById  String          @map("created_by_id") @db.Uuid
+  createdAt    DateTime        @default(now()) @map("created_at")
+  deletedById  String?         @map("deleted_by_id") @db.Uuid
+  deletedAt    DateTime?       @map("deleted_at")
+
+  institute     Institute      @relation(fields: [instituteId], references: [id])
+  term          Term           @relation(fields: [termId], references: [id])
+  cancellations Cancellation[]
+
+  @@index([instituteId, termId, startDate])
+  @@map("disruptions")
+}
+
+/// One class (a published timetable slot) not held on one date.
+model Cancellation {
+  id           String   @id @default(uuid()) @db.Uuid
+  instituteId  String   @map("institute_id") @db.Uuid
+  termId       String   @map("term_id") @db.Uuid
+  /// The disruption that caused it; null when a single class was cancelled by hand.
+  disruptionId String?  @map("disruption_id") @db.Uuid
+  /// TimetableSlotV1.id and its version.
+  slotId       String   @map("slot_id") @db.Uuid
+  versionId    String   @map("version_id") @db.Uuid
+  date         DateTime @db.Date
+  /// Copied from the slot, for lookups without reading the timetable again.
+  courseId     String   @map("course_id") @db.Uuid
+  sectionIds   String[] @map("section_ids") @db.Uuid
+  facultyIds   String[] @map("faculty_ids") @db.Uuid
+  /// Periods lost (the slot's length).
+  periods      Int
+  /// The whole TimetableSlotV1 as it was published.
+  slot         Json
+  /// Plain words shown to students and faculty, e.g. "Annual fest".
+  reason       String
+  createdById  String   @map("created_by_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  institute  Institute   @relation(fields: [instituteId], references: [id])
+  term       Term        @relation(fields: [termId], references: [id])
+  disruption Disruption? @relation(fields: [disruptionId], references: [id])
+  makeUp     MakeUp?
+
+  @@unique([instituteId, slotId, date])
+  @@index([instituteId, termId, date])
+  @@index([disruptionId])
+  @@map("cancellations")
+}
+
+/// The replacement class for a cancellation: a date, periods and a room free for everyone in it.
+model MakeUp {
+  id               String   @id @default(uuid()) @db.Uuid
+  instituteId      String   @map("institute_id") @db.Uuid
+  termId           String   @map("term_id") @db.Uuid
+  cancellationId   String   @unique @map("cancellation_id") @db.Uuid
+  date             DateTime @db.Date
+  startPeriodIndex Int      @map("start_period")
+  length           Int
+  startMinute      Int      @map("start_minute")
+  endMinute        Int      @map("end_minute")
+  roomId           String   @map("room_id") @db.Uuid
+  /// Copied from the cancellation, for clash lookups.
+  sectionIds       String[] @map("section_ids") @db.Uuid
+  facultyIds       String[] @map("faculty_ids") @db.Uuid
+  createdById      String   @map("created_by_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  institute    Institute    @relation(fields: [instituteId], references: [id])
+  term         Term         @relation(fields: [termId], references: [id])
+  cancellation Cancellation @relation(fields: [cancellationId], references: [id], onDelete: Cascade)
+
+  @@index([instituteId, termId, date])
+  @@map("make_ups")
+}

@@ -127,6 +127,9 @@ model Institute {
   timetableVersions         TimetableVersion[]
   timetableSlots            TimetableSlot[]
   solveJobs                 SolveJob[]
+  disruptions               Disruption[]
+  cancellations             Cancellation[]
+  makeUps                   MakeUp[]
 
   @@map("institutes")
 }
