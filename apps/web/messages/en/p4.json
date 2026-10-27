@@ -1,13 +1,124 @@
 {
   "p4": {
     "nav": {
-      "reschedule": "Changes and make-ups"
+      "group": "Changes",
+      "reschedule": "Changes and make-ups",
+      "coverage": "Syllabus coverage"
     },
     "placeholder": {
       "title": "Changes and make-ups",
       "description": "Holidays, events, cancelled classes and make-up periods.",
       "comingSoon": "Coming soon",
       "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    },
+    "page": {
+      "title": "Changes and make-ups",
+      "description": "Holidays, events and teacher leave cancel classes. Book a make-up for each one.",
+      "term": "Term",
+      "coverageLink": "Syllabus coverage",
+      "noTermTitle": "No term yet",
+      "noTermBody": "Add the term in the setup first. Then holidays and events can cancel its classes.",
+      "errorTitle": "We couldn’t load this page"
+    },
+    "add": {
+      "title": "Add a holiday or event",
+      "kind": "What is it?",
+      "kinds": {
+        "holiday": "Holiday",
+        "event": "Event (fest, visit, exam)",
+        "faculty_leave": "Teacher on leave",
+        "other": "Something else"
+      },
+      "name": "Name",
+      "namePlaceholder": "e.g. Annual fest",
+      "who": "Who does it affect?",
+      "scopes": {
+        "institute": "Everyone",
+        "department": "One department",
+        "section": "One section"
+      },
+      "department": "Department",
+      "section": "Section",
+      "teacher": "Teacher",
+      "pick": "Choose…",
+      "from": "First day",
+      "to": "Last day",
+      "partDay": "Only part of the day",
+      "startTime": "From",
+      "endTime": "Until",
+      "submit": "Add and cancel classes",
+      "adding": "Adding…",
+      "hint": "Classes in these dates are cancelled straight away. You can undo it."
+    },
+    "notice": {
+      "added": "“{title}” added. {count, plural, =0 {No classes were cancelled} one {# class cancelled} other {# classes cancelled}}.",
+      "alreadyCancelled": "{count, plural, one {# class was} other {# classes were}} already cancelled.",
+      "noTimetable": "Nothing is published for this term yet, so no classes were cancelled.",
+      "undone": "Undone. {count, plural, =0 {No classes came back} one {# class is back} other {# classes are back}}.",
+      "keptByOther": "{count, plural, one {# class stays} other {# classes stay}} cancelled for another holiday or event.",
+      "undo": "Undo",
+      "undoing": "Undoing…",
+      "dismiss": "Close"
+    },
+    "disruptions": {
+      "title": "Holidays and events",
+      "empty": "None yet this term.",
+      "dates": "{from} to {to}",
+      "hours": "{from}–{to}",
+      "everyone": "Everyone",
+      "cancelled": "{count, plural, =0 {No classes cancelled} one {# class cancelled} other {# classes cancelled}}",
+      "undo": "Undo",
+      "kinds": {
+        "holiday": "Holiday",
+        "event": "Event",
+        "faculty_leave": "Leave",
+        "room_unavailable": "Room closed",
+        "other": "Other"
+      }
+    },
+    "cancelled": {
+      "title": "Cancelled classes",
+      "description": "From today on. Book a make-up so the syllabus is still covered.",
+      "empty": "No cancelled classes from today on.",
+      "time": "{period}, {from}–{to}",
+      "makeUp": "Make-up: {date}, {period}, room {room}",
+      "noMakeUp": "No make-up yet",
+      "find": "Find a make-up",
+      "move": "Move make-up",
+      "finding": "Looking for free periods…",
+      "hide": "Hide",
+      "sameWeek": "Same week",
+      "nextWeek": "Next week",
+      "option": "{date}, {period}, room {room}",
+      "book": "Book",
+      "booked": "Make-up booked.",
+      "removeMakeUp": "Remove make-up",
+      "removed": "Make-up removed.",
+      "undo": "Undo"
+    },
+    "coverage": {
+      "title": "Syllabus coverage",
+      "description": "Periods each section gets this term after cancellations and make-ups, against the syllabus hours.",
+      "filter": "Section",
+      "all": "All sections",
+      "course": "Course",
+      "section": "Section",
+      "delivered": "Will deliver",
+      "syllabus": "Syllabus hours",
+      "lost": "Lost",
+      "madeUp": "Made up",
+      "heldSoFar": "Held so far",
+      "periods": "{count, plural, one {# period} other {# periods}}",
+      "ofHours": "{delivered} of {hours} hours",
+      "noHours": "{delivered} periods",
+      "empty": "Nothing to show: no published timetable for these sections yet.",
+      "status": {
+        "ok": "On track",
+        "warn": "Below syllabus",
+        "flag": "Well below",
+        "unknown": "No syllabus hours"
+      },
+      "summary": "{flag} well below, {warn} below syllabus, {ok} on track."
     }
   }
 }
