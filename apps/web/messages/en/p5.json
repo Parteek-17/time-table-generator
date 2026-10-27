@@ -5,6 +5,69 @@
       "description": "Your next class, today’s changes and your exam seat.",
       "comingSoon": "Coming soon",
       "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    },
+    "nav": {
+      "group": "My timetable",
+      "today": "Today",
+      "week": "Week",
+      "label": "My timetable"
+    },
+    "common": {
+      "component": {
+        "lecture": "Lecture",
+        "tutorial": "Tutorial",
+        "practical": "Lab"
+      },
+      "time": "{start} to {end}",
+      "room": "Room {room}",
+      "noRoom": "Room not set",
+      "cancelled": "Cancelled",
+      "cancelledBecause": "Cancelled: {reason}",
+      "makeup": "Make-up",
+      "now": "Now",
+      "next": "Next",
+      "holiday": "Holiday: {name}",
+      "notLinkedTitle": "We couldn’t find your timetable",
+      "problemTitle": "Your timetable can’t be shown right now",
+      "problemBody": "Something went wrong while loading it. Check your connection and try again.",
+      "goHome": "Go to home",
+      "tryAgain": "Try again",
+      "loading": "Loading your timetable…"
+    },
+    "today": {
+      "title": "Today",
+      "titleOn": "{date}",
+      "hello": "Hello, {name}",
+      "group": "{group}",
+      "nextClass": "Next class",
+      "nowClass": "Happening now",
+      "noMoreToday": "No more classes today.",
+      "noClasses": "No classes on this day.",
+      "holidayBody": "No classes today: {name}.",
+      "classes": "Classes",
+      "classesCount": "{count, plural, =0 {No classes} one {# class} other {# classes}}",
+      "changes": "Changes this week",
+      "noChanges": "No changes in the next 7 days.",
+      "examSeat": "Exam seat",
+      "examSeatSoon": "Your exam hall and seat will appear here when the date sheet is out.",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "backToToday": "Back to today",
+      "seeWeek": "See the whole week",
+      "dayNav": "Change day",
+      "nothingPublished": "Your timetable hasn’t been published yet. Check again later."
+    },
+    "week": {
+      "title": "This week",
+      "titleOf": "Week of {date}",
+      "previousWeek": "Previous week",
+      "nextWeek": "Next week",
+      "thisWeek": "This week",
+      "weekNav": "Change week",
+      "todayBadge": "Today",
+      "noClasses": "No classes",
+      "notTeaching": "No classes (not a teaching day)",
+      "openDay": "Open {date}"
     }
   }
 }
