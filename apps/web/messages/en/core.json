@@ -103,7 +103,8 @@
     "errorVerification": "That sign-in link has expired or was already used. Ask for a new one below.",
     "errorDefault": "We couldn’t sign you in. Please try again.",
     "student": "Student?",
-    "studentLink": "Sign in with your roll number"
+    "studentLink": "Sign in with your roll number",
+    "demoLink": "Evaluating Slotwise? Use a demo account"
   },
   "checkEmail": {
     "title": "Check your email",
@@ -131,5 +132,44 @@
     "send": "Send",
     "you": "You",
     "thinking": "Thinking…"
+  },
+  "demoLogin": {
+    "title": "Demo accounts",
+    "subtitle": "Sign in as any role of the fictional Demo Institute of Engineering. No email needed.",
+    "signInAs": "Sign in as {role}",
+    "missing": "That demo account is not in the database yet. Run the seed, then try again.",
+    "link": "Evaluating Slotwise? Use a demo account",
+    "roles": {
+      "institute": {
+        "name": "Institute admin",
+        "sees": "Setup wizard, Excel import, readiness, members, everything"
+      },
+      "hod": {
+        "name": "HOD (CSE)",
+        "sees": "Who teaches what for CSE, teacher loads, timetables"
+      },
+      "coordinator": {
+        "name": "Timetable coordinator",
+        "sees": "Generate, edit, publish and download timetables; changes and make-ups"
+      },
+      "exams": {
+        "name": "Exam coordinator",
+        "sees": "Date sheets, seating plans, invigilation duties"
+      },
+      "faculty": {
+        "name": "Teacher",
+        "sees": "Today, my week, my availability"
+      },
+      "student": {
+        "name": "Student",
+        "sees": "Today, my week, exam seat, calendar and QR links"
+      },
+      "platform": {
+        "name": "Platform admin",
+        "sees": "All institutes, create an institute, plans"
+      }
+    },
+    "onMainSite": "Sign in on the main site (platform pages live there)",
+    "onDemoInstitute": "Sign in on the Demo Institute’s address"
   }
 }

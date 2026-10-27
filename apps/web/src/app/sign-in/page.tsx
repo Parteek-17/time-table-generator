@@ -8,6 +8,7 @@ import { auth } from '@/auth';
 import { PageShell } from '@/components/page-shell';
 import { SignInForm } from '@/components/sign-in-form';
 import { api, getInstituteSlug } from '@/lib/api';
+import { demoLoginsEnabled } from '@/lib/demo-logins';
 import { googleSignInEnabled } from '@/lib/env';
 import { safeRedirectPath } from '@/lib/redirect';
 
@@ -43,6 +44,13 @@ export default async function SignInPage({
             </Alert>
           ) : null}
           <SignInForm redirectTo={redirectTo} googleEnabled={googleSignInEnabled()} />
+          {demoLoginsEnabled() ? (
+            <p className="text-sm">
+              <Link href="/demo-login" className="text-primary underline underline-offset-4">
+                {t('demoLink')}
+              </Link>
+            </p>
+          ) : null}
           {slug && isFlagOn('P5') ? (
             <p className="text-sm text-muted-foreground">
               {t('student')}{' '}
