@@ -6,7 +6,10 @@ import {
   NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { randomUUID } from 'node:crypto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { Prisma, TxClient } from '@slotwise/db';
+import { parseEvent } from '@slotwise/shared/contracts';
 import type {
   BuildSeatingInput,
   SeatingHallDto,
@@ -23,7 +26,7 @@ const NO_PLAN = 'We could not find this seating plan.';
 type SeatingPlan = Prisma.SeatingPlanGetPayload<object>;
 
 /** Stored per hall from the solver response, with the hall code. */
-interface StoredHall {
+export interface StoredHall {
   hallId: string;
   code: string;
   capacity: number;
@@ -31,6 +34,8 @@ interface StoredHall {
   reserved: number;
   paperIds: string[];
   invigilatorIds: string[];
+  rows: number;
+  columns: number;
 }
 
 /** Seating plans: start one (a background job), and read it back. */
@@ -41,6 +46,7 @@ export class SeatingService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly worker: SeatingWorker,
+    private readonly events: EventEmitter2,
   ) {}
 
   private tx<T>(tenant: Tenant, fn: (tx: TxClient) => Promise<T>): Promise<T> {
@@ -103,6 +109,55 @@ export class SeatingService {
       throw new ServiceUnavailableException(message);
     }
     return { planId: plan.id };
+  }
+
+  /**
+   * Publishes a ready plan (or an archived one again, which undoes a later publish). The
+   * session's earlier published plan is archived, never deleted.
+   */
+  async publish(tenant: Tenant, planId: string): Promise<SeatingPlanDto> {
+    const { dto, event } = await this.tx(tenant, async (tx) => {
+      const plan = await tx.seatingPlan.findFirst({
+        where: { id: planId, session: { exam: { deletedAt: null } } },
+        include: { session: { include: { papers: { select: { sectionIds: true } } } } },
+      });
+      if (!plan) throw new NotFoundException(NO_PLAN);
+      if (plan.status === 'published') {
+        return { dto: await this.dto(tx, plan, await this.seated(tx, plan.id)), event: null };
+      }
+      if (plan.status !== 'ready' && plan.status !== 'archived') {
+        throw new ConflictException('Only a finished seating plan can be published.');
+      }
+      await tx.seatingPlan.updateMany({
+        where: { sessionId: plan.sessionId, status: 'published' },
+        data: { status: 'archived' },
+      });
+      const now = new Date();
+      const published = await tx.seatingPlan.update({
+        where: { id: plan.id },
+        data: { status: 'published', publishedAt: now },
+      });
+      const halls = (plan.halls as unknown as StoredHall[]).filter((h) => h.used > 0);
+      const event = parseEvent('exam.seating.published', {
+        eventId: randomUUID(),
+        occurredAt: now.toISOString(),
+        instituteId: tenant.institute.id,
+        actorUserId: tenant.user.id,
+        seatingPlanId: plan.id,
+        examSessionId: plan.sessionId,
+        date: plan.session.date.toISOString().slice(0, 10),
+        sessionLabel: plan.session.label,
+        roomIds: halls.map((h) => h.hallId),
+        sectionIds: [...new Set(plan.session.papers.flatMap((p) => p.sectionIds))],
+      });
+      return { dto: await this.dto(tx, published, await this.seated(tx, plan.id)), event };
+    });
+    if (event) this.events.emit('exam.seating.published', event);
+    return dto;
+  }
+
+  private seated(tx: TxClient, planId: string): Promise<number> {
+    return tx.seatAssignment.count({ where: { planId } });
   }
 
   forSession(tenant: Tenant, sessionId: string): Promise<SeatingPlanDto[]> {

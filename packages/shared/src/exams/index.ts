@@ -5,3 +5,4 @@
 export * from './date-sheet';
 export * from './seating';
 export * from './outputs';
+export * from './me';

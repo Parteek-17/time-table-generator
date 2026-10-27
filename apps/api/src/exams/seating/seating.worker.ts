@@ -106,7 +106,17 @@ export class SeatingWorker implements OnModuleInit {
         })),
         invigilationProblems: response.invigilationProblems,
       };
-      const halls = response.halls.map((h) => ({ ...h, code: built.hallCode.get(h.hallId) ?? '' }));
+      const geometry = new Map(built.request.halls.map((h) => [h.id, h]));
+      // Stored with what charts need, so a published plan prints the same after room edits.
+      const halls = response.halls.map((h) => {
+        const g = geometry.get(h.hallId);
+        return {
+          ...h,
+          code: built.hallCode.get(h.hallId) ?? '',
+          rows: g?.rows ?? 0,
+          columns: g ? g.benchesPerRow * g.seatsPerBench : 0,
+        };
+      });
       // One batch transaction, not an interactive one: a few thousand seats can take longer
       // than Prisma's 5-second interactive limit on a slow machine. RLS settings go first.
       await this.prisma.$transaction([

@@ -15,6 +15,7 @@ const id = new ZodPipe(idParam);
  *   POST /exams/sessions/:sessionId/seating   build a plan in the background (202, poll it)
  *   GET  /exams/sessions/:sessionId/seating   the session's plans, newest first
  *   GET  /exams/seating/:planId               one plan: status, halls, problems
+ *   POST /exams/seating/:planId/publish       publish it (the earlier one is archived)
  */
 @Controller('exams')
 @FeatureFlag('P6')
@@ -48,5 +49,15 @@ export class SeatingController {
     @Param('planId', id) planId: string,
   ): Promise<SeatingPlanDto> {
     return this.service.get(tenant, planId);
+  }
+
+  @Post('seating/:planId/publish')
+  @HttpCode(200)
+  @RequirePermission(EXAM_MANAGE)
+  publish(
+    @CurrentTenant() tenant: Tenant,
+    @Param('planId', id) planId: string,
+  ): Promise<SeatingPlanDto> {
+    return this.service.publish(tenant, planId);
   }
 }
