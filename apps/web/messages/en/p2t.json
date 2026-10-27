@@ -1,14 +1,225 @@
 {
   "p2t": {
+    "term": "Term",
     "nav": {
       "group": "Timetable",
-      "timetables": "Timetables"
+      "timetables": "Timetables",
+      "generate": "Generate"
     },
-    "placeholder": {
+    "page": {
       "title": "Timetables",
-      "description": "Generate, adjust and publish class timetables.",
-      "comingSoon": "Coming soon",
-      "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+      "description": "The week for any section, lab group, teacher or room.",
+      "generate": "Generate timetable"
+    },
+    "empty": {
+      "noTermTitle": "No term yet",
+      "noTermBody": "Add the term’s dates first, then come back to make its timetable.",
+      "noTermAction": "Open terms",
+      "noTimetableTitle": "No timetable for {term} yet",
+      "noTimetableEditor": "Generate one from the term’s setup. It takes about a minute, and nobody else sees it until you publish it.",
+      "noTimetableViewer": "Your timetable coordinator has not published one yet. Please check again later.",
+      "nothingTitle": "Nothing to show",
+      "nothingBody": "This timetable has no sections, teachers or rooms in it."
+    },
+    "error": {
+      "title": "We couldn’t show this timetable",
+      "body": "Something went wrong while loading it. Please try again.",
+      "retry": "Try again"
+    },
+    "version": {
+      "label": "Version",
+      "draft": "Draft from {date}",
+      "published": "Published version {number}",
+      "archived": "Older version {number}",
+      "statusDraft": "Draft",
+      "statusPublished": "Published",
+      "statusArchived": "Older version",
+      "draftNote": "This is a draft. Only timetable coordinators can see it until it is published.",
+      "archivedNote": "This is an older version. The published one is in the Version list.",
+      "unplaced": "{count, plural, one {# class} other {# classes}} could not be placed."
+    },
+    "view": {
+      "show": "Show",
+      "kind": {
+        "section": "Section",
+        "subgroup": "Lab group",
+        "faculty": "Teacher",
+        "room": "Room"
+      }
+    },
+    "grid": {
+      "caption": "Week timetable for {name}",
+      "day": "Day",
+      "free": "Free period",
+      "break": "{label}, {minutes} minutes",
+      "tag": {
+        "lecture": "",
+        "tutorial": "Tut",
+        "practical": "Lab"
+      },
+      "component": {
+        "lecture": "lecture",
+        "tutorial": "tutorial",
+        "practical": "lab"
+      },
+      "periods": "{first}–{last}",
+      "noRoom": "no room yet",
+      "slot": "{code} {title}, {component}. {details}. {day} {periods}, {start} to {end}.",
+      "phoneHint": "On a phone, the timetable is shown one day at a time."
+    },
+    "days": {
+      "short": {
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat",
+        "7": "Sun"
+      },
+      "long": {
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday",
+        "7": "Sunday"
+      }
+    },
+    "day": {
+      "label": "Day",
+      "today": "{day} (today)",
+      "none": "No classes on {day}."
+    },
+    "generate": {
+      "title": "Generate a timetable",
+      "description": "Slotwise places every class of the term so that no section, teacher or room is double-booked.",
+      "classes": "Classes",
+      "wholeTerm": "Every running class of the term",
+      "scopeOption": "{name} ({count, plural, one {# batch} other {# batches}})",
+      "time": "How long to search",
+      "time30": "Quick (30 seconds)",
+      "time60": "Normal (1 minute)",
+      "time180": "Thorough (3 minutes)",
+      "timeHint": "Searching longer can find a timetable with fewer gaps and late periods.",
+      "start": "Generate",
+      "queued": "Waiting to start…",
+      "running": "Generating… {progress}%",
+      "progress": "Generating the timetable",
+      "doneTitle": "Draft ready",
+      "doneBody": "{placed, plural, one {# class} other {# classes}} placed. {unplaced, plural, =0 {Every class has a place.} one {# class could not be placed.} other {# classes could not be placed.}}",
+      "open": "Open the draft",
+      "failedTitle": "The timetable was not generated",
+      "tryAgain": "Try again",
+      "back": "Back to timetables",
+      "draftNote": "The result is a draft. Nobody else sees it until you publish it.",
+      "lostTrack": "We lost track of this run. Open Timetables to see if the draft is there.",
+      "notAllowedTitle": "Only timetable coordinators can generate timetables",
+      "notAllowedBody": "Ask your institute admin if you need to.",
+      "resolveTitle": "Re-solve the rest",
+      "resolveDescription": "Locked classes stay where they are; Slotwise places everything else again. The result is a new draft."
+    },
+    "edit": {
+      "undo": "Undo",
+      "redo": "Redo",
+      "resolve": "Re-solve the rest",
+      "resolveHint": "Keeps locked classes where they are and places everything else again.",
+      "copy": "Make an editable copy",
+      "copyHint": "Published timetables don’t change. Edit a copy, then publish it.",
+      "copying": "Making a copy…",
+      "dragHint": "Drag a class to a highlighted period, or use Move. Changes save straight away; Undo takes them back.",
+      "phoneNote": "To change the timetable, use a tablet or computer.",
+      "move": "Move",
+      "moveLabel": "Move {code} for {who}",
+      "moveTitle": "Move {code} ({who}) to…",
+      "moveNone": "There is no free time for this class this week.",
+      "moveTo": "{day} {periods}",
+      "cancel": "Cancel",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "lockLabel": "Lock {code} for {who}",
+      "unlockLabel": "Unlock {code} for {who}",
+      "locked": "Locked",
+      "moved": "Moved {code} to {day} {periods}.",
+      "movedRoom": "Moved {code} to {day} {periods}, in room {room} because its room was taken.",
+      "lockedDone": "{code} locked. Re-solving keeps it here.",
+      "unlockedDone": "{code} unlocked.",
+      "undone": "Undone.",
+      "redone": "Redone.",
+      "nothingToUndo": "Nothing to undo.",
+      "nothingToRedo": "Nothing to redo.",
+      "refused": "{code} can’t go there:",
+      "validHere": "Can go here",
+      "invalidHere": "Can’t go here",
+      "failed": "That change wasn’t saved: {message}"
+    },
+    "problems": {
+      "locked": "{code} is locked. Unlock it to move it.",
+      "not_working_day": "{day} is not a teaching day.",
+      "outside_day": "It doesn’t fit before the end of {day}.",
+      "crosses_break": "A lab can’t run across {breakName}.",
+      "fixed_slot": "This time is kept free for {label}.",
+      "section_busy": "{who} already has {code} in {periods}.",
+      "faculty_busy": "{name} teaches {who} ({code}) in {periods}.",
+      "faculty_unavailable": "{name} is not available on {day} {periods}.",
+      "faculty_day_limit": "{name} would teach more than {max} periods on {day}.",
+      "busy_elsewhere": "Already booked in another timetable: {reason}.",
+      "no_free_room": "No suitable room is free on {day} {periods}."
+    },
+    "unplaced": {
+      "title": "Not placed ({count})",
+      "intro": "These classes have no period yet. Fix the cause, then re-solve or generate again.",
+      "reason": {
+        "no_free_slot": "No period where the section, the teacher and a room are all free.",
+        "faculty_unavailable": "The teacher is unavailable whenever it could go.",
+        "faculty_over_max": "It would go over the teacher’s daily or weekly limit.",
+        "no_suitable_room": "There is no room of the right type.",
+        "room_too_small": "The rooms of the right type are too small for this class.",
+        "lab_block_does_not_fit": "The lab block doesn’t fit between breaks on any day.",
+        "blocked_by_fixed_slot": "Fixed periods (mentoring, library…) block every option.",
+        "locked_conflict": "A locked class is in the way.",
+        "time_limit": "The search ran out of time before placing it.",
+        "other": "Something else blocks it."
+      },
+      "fix": {
+        "faculty": "Check teachers",
+        "rooms": "Check rooms",
+        "bell": "Check bell schedules",
+        "calendar": "Check fixed periods",
+        "generate": "Generate again with more time",
+        "unlock": "Unlock classes in this timetable, then re-solve."
+      },
+      "solverSays": "Details: {message}"
+    },
+    "publish": {
+      "publish": "Publish",
+      "publishing": "Publishing…",
+      "hint": "Everyone in these sections sees it straight away. You can undo.",
+      "hasUnplaced": "{count, plural, one {# class is} other {# classes are}} not placed yet. You can still publish.",
+      "published": "Published as version {number}. Students and teachers see it now.",
+      "undo": "Undo publishing",
+      "undoing": "Undoing…",
+      "undoneBack": "Publishing undone. Version {number} is published again. Your changes are in this draft.",
+      "undoneNone": "Publishing undone. Nothing is published now. Your changes are in this draft.",
+      "failed": "Not published: {message}",
+      "undoFailed": "Couldn’t undo: {message}",
+      "dismiss": "Close"
+    },
+    "export": {
+      "title": "Download or copy",
+      "pdf": "PDF",
+      "xlsx": "Excel",
+      "pdfLabel": "Download {name} as PDF",
+      "xlsxLabel": "Download {name} as Excel",
+      "csv": "Copy as CSV",
+      "csvLabel": "Copy {name} as CSV, to paste into a spreadsheet",
+      "copied": "Copied. Paste it into Excel or Google Sheets.",
+      "copyFailed": "This browser didn’t allow copying. Select the text below and copy it, or download Excel.",
+      "all": "Every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}}",
+      "allLabel": "Download every {kind, select, section {section} subgroup {lab group} faculty {teacher} other {room}} as Excel, one sheet each",
+      "failed": "The download didn’t work: {message}",
+      "csvBox": "{name} as CSV"
     }
   }
 }

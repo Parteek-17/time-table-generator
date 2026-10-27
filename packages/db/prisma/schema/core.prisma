@@ -123,6 +123,10 @@ model Institute {
   timetableScopeCohorts     TimetableScopeCohort[]
   importJobs                ImportJob[]
   importRows                ImportRow[]
+  timetableSnapshots        TimetableSnapshot[]
+  timetableVersions         TimetableVersion[]
+  timetableSlots            TimetableSlot[]
+  solveJobs                 SolveJob[]
 
   @@map("institutes")
 }
