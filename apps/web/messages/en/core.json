@@ -29,7 +29,61 @@
     "timetableSoon": "Your timetable will appear here once it’s published.",
     "setupTitle": "Set up your institute",
     "setupHint": "Enter what a timetable needs: programmes, the current term, sections, faculty, rooms and the bell schedule.",
-    "setupOpen": "Open setup"
+    "setupOpen": "Open setup",
+    "attentionTitle": "Needs attention",
+    "attentionSome": "{count, plural, one {# thing to fix} other {# things to fix}} before making a timetable.",
+    "attentionNone": "Nothing needs your attention right now.",
+    "setupPercent": "Setup {percent}% done",
+    "attention": {
+      "no_departments": "Add your departments",
+      "no_programmes": "Add your programmes",
+      "no_active_term": "Choose the current term",
+      "no_cohorts": "Add the batches studying this term",
+      "cohorts_without_sections": "{count, plural, one {# batch has} other {# batches have}} no sections yet",
+      "no_faculty": "Add your teachers",
+      "no_rooms": "Add your rooms",
+      "no_bell_schedule": "Set the bell schedule",
+      "readiness_issues": "{count, plural, one {# problem} other {# problems}} in \"Ready to generate?\""
+    },
+    "tasksTitle": "What would you like to do?",
+    "tasks": {
+      "setup": {
+        "title": "Setup progress",
+        "hint": "The 12 setup steps, with what is left"
+      },
+      "imports": {
+        "title": "Import from Excel",
+        "hint": "Bring in faculty, rooms, schemes and more from your sheets"
+      },
+      "readiness": {
+        "title": "Ready to generate?",
+        "hint": "7 checks, each problem with a fix button"
+      },
+      "generate": {
+        "title": "Generate a timetable",
+        "hint": "The solver places every class it can, in the background"
+      },
+      "timetables": {
+        "title": "Timetables",
+        "hint": "View, edit, publish and download"
+      },
+      "reschedule": {
+        "title": "Changes and make-ups",
+        "hint": "Holidays, events and make-up periods"
+      },
+      "exams": {
+        "title": "Exams",
+        "hint": "Date sheets, seating plans and invigilation"
+      },
+      "members": {
+        "title": "Members",
+        "hint": "Invite people and give them roles"
+      },
+      "today": {
+        "title": "My day",
+        "hint": "Your own classes today and this week"
+      }
+    }
   },
   "members": {
     "title": "Members",

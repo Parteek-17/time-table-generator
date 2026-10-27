@@ -1,5 +1,20 @@
-import { canSomewhere, isFlagOn, type InstituteDto, type MeResponse } from '@slotwise/shared';
-import { Alert, Button, Card, CardDescription, CardHeader, CardTitle } from '@slotwise/ui';
+import {
+  canSomewhere,
+  isFlagOn,
+  type Action,
+  type InstituteDto,
+  type MeResponse,
+  type SetupStateDto,
+} from '@slotwise/shared';
+import {
+  Alert,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  ProgressBar,
+} from '@slotwise/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -71,6 +86,25 @@ export default async function HomePage({
     !canSomewhere(authUser, 'exam.manage', place);
   if (isFlagOn('P5') && !joined && readsOnly) redirect('/today');
   const shellMe = await getMe();
+  const may = (action: Action) => canSomewhere(authUser, action, place);
+  const setupRes = canSetUp ? await api<SetupStateDto>('/setup') : null;
+  const setup = setupRes?.ok ? setupRes.data : null;
+  // One card per area this person may use, in the order a term's work happens.
+  const tasks = (
+    [
+      ['setup', '/setup', canSetUp],
+      ['imports', '/imports', may('import.run')],
+      ['readiness', '/readiness', may('readiness.view')],
+      ['generate', '/timetable/generate', may('timetable.edit')],
+      ['timetables', '/timetable', may('timetable.view')],
+      ['reschedule', '/reschedule', isFlagOn('P4') && may('timetable.edit')],
+      ['exams', '/exams', isFlagOn('P6') && may('exam.view')],
+      ['members', '/members', canManageMembers],
+      ['today', '/today', isFlagOn('P5')],
+    ] as const
+  )
+    .filter(([, , show]) => show)
+    .map(([key, href]) => ({ key, href }));
 
   return (
     <AppShell me={shellMe}>
@@ -89,35 +123,59 @@ export default async function HomePage({
         </ul>
       </div>
 
-      {canSetUp ? (
+      {setup ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t('setupTitle')}</CardTitle>
-            <CardDescription>{t('setupHint')}</CardDescription>
-            <Button asChild className="mt-2 self-start">
-              <Link href="/setup">{t('setupOpen')}</Link>
-            </Button>
+            <CardTitle>{t('attentionTitle')}</CardTitle>
+            <CardDescription>
+              {setup.attention.length
+                ? t('attentionSome', { count: setup.attention.reduce((n, a) => n + a.count, 0) })
+                : t('attentionNone')}
+            </CardDescription>
           </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <Link href="/setup" className="text-sm font-medium">
+                {t('setupPercent', { percent: setup.percent })}
+              </Link>
+              <ProgressBar
+                value={setup.percent}
+                label={t('setupPercent', { percent: setup.percent })}
+              />
+            </div>
+            {setup.attention.length ? (
+              <ul className="flex flex-col gap-1 text-sm">
+                {setup.attention.map((a) => (
+                  <li key={a.code}>
+                    <Link href={a.href} className="text-primary underline underline-offset-4">
+                      {t(`attention.${a.code}`, { count: a.count })}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </CardContent>
         </Card>
       ) : null}
 
-      {canManageMembers ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('members')}</CardTitle>
-            <CardDescription>{t('membersHint')}</CardDescription>
-            <Button asChild className="mt-2 self-start">
-              <Link href="/members">{t('members')}</Link>
-            </Button>
-          </CardHeader>
-        </Card>
-      ) : (
-        <Card>
-          <CardHeader>
-            <CardDescription className="text-base">{t('timetableSoon')}</CardDescription>
-          </CardHeader>
-        </Card>
-      )}
+      <section aria-labelledby="tasks-heading" className="flex flex-col gap-3">
+        <h2 id="tasks-heading" className="text-lg font-semibold">
+          {t('tasksTitle')}
+        </h2>
+        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {tasks.map((task) => (
+            <li key={task.href}>
+              <Link
+                href={task.href}
+                className="flex h-full flex-col gap-1 rounded-lg border p-4 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span className="font-semibold">{t(`tasks.${task.key}.title`)}</span>
+                <span className="text-sm text-muted-foreground">{t(`tasks.${task.key}.hint`)}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </AppShell>
   );
 }
