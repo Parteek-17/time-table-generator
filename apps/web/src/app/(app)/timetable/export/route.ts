@@ -1,21 +1,13 @@
-import {
-  API_JWT_AUDIENCE,
-  API_JWT_ISSUER,
-  INSTITUTE_SLUG_HEADER,
-  isFlagOn,
-} from '@slotwise/shared';
+import { isFlagOn } from '@slotwise/shared';
 import { TimetableExportQuery } from '@slotwise/shared/timetable';
-import { SignJWT } from 'jose';
-import { headers } from 'next/headers';
 import { auth } from '@/auth';
-import { env } from '@/lib/env';
+import { apiFile } from '@/lib/api';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 /**
  * `/timetable/export?version=&format=&kind=&id=`: passes a PDF or Excel download from the API
- * through to the browser. `api()` reads JSON only, so this signs the same short-lived token
- * itself (requests/2026-10-27-p2t-api-file-helper.md asks INT for an `apiFile()` in lib/api.ts).
+ * through to the browser.
  */
 export async function GET(request: Request): Promise<Response> {
   if (!isFlagOn('P2T')) return new Response('Not found', { status: 404 });
@@ -29,34 +21,14 @@ export async function GET(request: Request): Promise<Response> {
   if (!UUID.test(version) || !query.success) {
     return new Response('This download link is not complete.', { status: 400 });
   }
-  const [session, slug] = await Promise.all([auth(), (await headers()).get(INSTITUTE_SLUG_HEADER)]);
+  const session = await auth();
   if (!session?.user?.id) return Response.redirect(new URL('/sign-in', url), 303);
 
-  const token = await new SignJWT({})
-    .setProtectedHeader({ alg: 'HS256' })
-    .setSubject(session.user.id)
-    .setIssuer(API_JWT_ISSUER)
-    .setAudience(API_JWT_AUDIENCE)
-    .setIssuedAt()
-    .setExpirationTime('5m')
-    .sign(new TextEncoder().encode(env().API_JWT_SECRET));
   const params = new URLSearchParams({ format: query.data.format, kind: query.data.kind });
   if (query.data.id) params.set('id', query.data.id);
 
-  let res: Response;
-  try {
-    res = await fetch(`${env().API_URL}/timetable/versions/${version}/export?${params}`, {
-      headers: {
-        authorization: `Bearer ${token}`,
-        ...(slug ? { [INSTITUTE_SLUG_HEADER]: slug } : {}),
-      },
-      cache: 'no-store',
-    });
-  } catch {
-    return new Response('Slotwise can’t be reached right now. Please try again in a minute.', {
-      status: 503,
-    });
-  }
+  const res = await apiFile(`/timetable/versions/${version}/export?${params}`);
+  if (res.status === 503 && res.headers.get('content-type')?.startsWith('text/plain')) return res;
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { message?: unknown } | null;
     const message =
