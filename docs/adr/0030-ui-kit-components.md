@@ -39,6 +39,10 @@ its local copies; P2T keeps its own `days.*` for the rest of its screens.
 screens should still prefer a day-at-a-time list (P2T's `DayView`), which can use
 `SegmentedControl size="lg"` for the day buttons and `SlotCard` for the classes.
 
+**Segmented control at phone width.** One row of equal columns; a long label ("Lab group")
+wraps inside its button instead of one button dropping to a row of its own. Meant for two to
+about six options.
+
 **Forced colours** (Windows high contrast): the progress fill uses `Highlight`, the chosen
 segment gets an outline and cards get a `CanvasText` border, since background tints vanish.
 

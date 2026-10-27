@@ -61,6 +61,7 @@ describe('SegmentedControl', () => {
       />,
     );
     expect(html).toContain('aria-label="Monday, today"');
-    expect(html).toContain('h-11');
+    expect(html).toContain('min-h-11');
+    expect(html).toContain('grid-template-columns:repeat(1, minmax(0, 1fr))');
   });
 });

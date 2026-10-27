@@ -54,7 +54,7 @@ export function segmentedKeyTarget(
 /**
  * Pick one of a few options: a labelled group of toggle buttons (`aria-pressed`). Every button
  * is a normal tab stop; arrow keys, Home and End also move between them. The chosen one is
- * filled and bold, so it never relies on colour alone. Wraps on narrow screens.
+ * filled and bold, so it never relies on colour alone. Meant for two to about six options.
  */
 export function SegmentedControl<V extends string | number>({
   label,
@@ -89,7 +89,10 @@ export function SegmentedControl<V extends string | number>({
     <div
       role="group"
       aria-label={label}
-      className={cn('flex flex-wrap gap-1 rounded-lg border bg-background p-1', className)}
+      className={cn('grid gap-1 rounded-lg border bg-background p-1', className)}
+      // One row of equal buttons; on a narrow screen a long label wraps inside its button
+      // rather than one button dropping to a row of its own.
+      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((option, index) => {
         const pressed = option.value === value;
@@ -106,8 +109,8 @@ export function SegmentedControl<V extends string | number>({
             onClick={() => onChange(option.value)}
             onKeyDown={onKeyDown(index)}
             className={cn(
-              'min-w-fit flex-1 rounded-md px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
-              size === 'lg' ? 'h-11' : 'h-9',
+              'min-w-0 rounded-md px-1.5 py-1 text-sm leading-tight break-words transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
+              size === 'lg' ? 'min-h-11' : 'min-h-9',
               pressed
                 ? 'bg-primary font-semibold text-primary-foreground shadow-sm forced-colors:outline forced-colors:outline-2'
                 : 'font-medium hover:bg-muted',
