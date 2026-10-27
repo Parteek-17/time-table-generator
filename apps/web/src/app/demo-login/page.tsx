@@ -18,6 +18,8 @@ import { env } from '@/lib/env';
 import { demoSignIn } from './actions';
 
 export const metadata: Metadata = { title: 'Demo accounts' };
+// DEMO_LOGINS is read when the page is requested, not when it is built.
+export const dynamic = 'force-dynamic';
 
 export default async function DemoLoginPage({
   searchParams,
