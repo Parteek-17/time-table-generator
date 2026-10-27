@@ -21,9 +21,69 @@
     },
     "gallery": {
       "title": "UI gallery",
-      "description": "Every component of the design system, in light and dark. Development only.",
-      "comingSoon": "Coming soon",
-      "comingSoonBody": "The design system stream fills this page."
+      "description": "Every component of the design system, with sample data. Check it at phone width and in dark mode. Development only.",
+      "progress": {
+        "title": "Progress bar",
+        "label": "Setup {percent}% done",
+        "generating": "Generating the timetable",
+        "status": "Starting…"
+      },
+      "skeleton": {
+        "title": "Skeleton"
+      },
+      "segmented": {
+        "title": "Segmented control",
+        "show": "Show timetable for",
+        "section": "Section",
+        "subgroup": "Lab group",
+        "faculty": "Teacher",
+        "room": "Room",
+        "day": "Day"
+      },
+      "slotCard": {
+        "title": "Class card"
+      },
+      "grid": {
+        "title": "Week grid"
+      }
+    },
+    "timetable": {
+      "caption": "Week timetable for {name}",
+      "day": "Day",
+      "free": "Free period",
+      "break": "{label}, {minutes} minutes",
+      "tag": {
+        "tutorial": "Tut",
+        "practical": "Lab"
+      },
+      "component": {
+        "lecture": "lecture",
+        "tutorial": "tutorial",
+        "practical": "lab"
+      },
+      "noRoom": "no room yet",
+      "locked": "Locked",
+      "slot": "{code} {title}, {component}. {details}. {day} {periods}, {start} to {end}.{locked, select, yes { Locked.} other {}}"
+    },
+    "days": {
+      "short": {
+        "1": "Mon",
+        "2": "Tue",
+        "3": "Wed",
+        "4": "Thu",
+        "5": "Fri",
+        "6": "Sat",
+        "7": "Sun"
+      },
+      "long": {
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday",
+        "7": "Sunday"
+      }
     }
   }
 }
