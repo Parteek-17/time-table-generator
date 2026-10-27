@@ -14,7 +14,6 @@ import {
 } from './makeup';
 import { audienceStrength, makeUpRequestFrom } from './makeup-input';
 
-const NONE = { departmentId: null, programmeId: null, cohortId: null, sectionId: null };
 const place = {
   departmentId: 'cse',
   programmeId: 'p',
