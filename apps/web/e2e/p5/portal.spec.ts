@@ -130,3 +130,12 @@ test('a coordinator makes a notice-board link with a QR code; anyone can open it
   await expect(after.getByText('This link doesn’t work any more')).toBeVisible();
   await after.close();
 });
+
+test("a student's Today has the exam seat slot", async ({ page }) => {
+  await signIn(page, STUDENT);
+  await page.goto('/today');
+  // A seat within 14 days shows "Your next exam" at the top; otherwise the note at the end.
+  await expect(
+    page.getByRole('heading', { name: 'Your next exam' }).or(page.getByText('Exam seat')),
+  ).toBeVisible();
+});

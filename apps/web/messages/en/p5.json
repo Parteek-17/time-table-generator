@@ -50,8 +50,6 @@
       "classesCount": "{count, plural, =0 {No classes} one {# class} other {# classes}}",
       "changes": "Changes this week",
       "noChanges": "No changes in the next 7 days.",
-      "examSeat": "Exam seat",
-      "examSeatSoon": "Your exam hall and seat will appear here when the date sheet is out.",
       "previousDay": "Previous day",
       "nextDay": "Next day",
       "backToToday": "Back to today",
@@ -131,6 +129,19 @@
       "noClasses": "No classes",
       "goneTitle": "This link doesn’t work any more",
       "goneBody": "Ask your institute for the new link or QR code."
+    },
+    "exam": {
+      "title": "Exam seat",
+      "nextExam": "Your next exam",
+      "when": "{day}, {session} session, starts {time}",
+      "hall": "Hall",
+      "seat": "Seat",
+      "allExams": "All my exams",
+      "none": "No exams in the next {days} days.",
+      "soon": "Your exam hall and seat will appear here when the date sheet is out.",
+      "dutiesTitle": "Exam duties",
+      "dutiesHint": "See the halls and sessions you invigilate.",
+      "duties": "My exam duties"
     }
   }
 }
