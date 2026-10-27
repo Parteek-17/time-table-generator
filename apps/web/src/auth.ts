@@ -45,9 +45,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth(() => {
     providers.push(Google({ allowDangerousEmailAccountLinking: true }));
   }
 
+  const db = prisma();
   return {
-    // @auth/prisma-adapter's types target @prisma/client generally; ours is the same client.
-    adapter: PrismaAdapter(prisma()),
+    adapter: {
+      // @auth/prisma-adapter's types target @prisma/client generally; ours is the same client.
+      ...PrismaAdapter(db),
+      // A browser can hold a cookie for a session that no longer exists (expired, signed out
+      // elsewhere, database reset). The stock adapter's delete then throws "record not found"
+      // and signing in fails with error=Configuration; deleting nothing is fine.
+      async deleteSession(sessionToken: string) {
+        await db.session.deleteMany({ where: { sessionToken } });
+        return null;
+      },
+    },
     providers,
     // Stay signed in for about a semester; each visit (at most once a day) restarts the count.
     session: { strategy: 'database', maxAge: 180 * 24 * 60 * 60, updateAge: 24 * 60 * 60 },
