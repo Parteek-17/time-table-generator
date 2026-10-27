@@ -6,6 +6,7 @@
 import { BadRequestException } from '@nestjs/common';
 import type { TxClient } from '@slotwise/db';
 import type { Action, ListQuery, ResourceType } from '@slotwise/shared';
+import type { EventNameV1, EventPayloadV1 } from '@slotwise/shared/contracts';
 import type { z } from 'zod';
 import type { Tenant } from '../common/request-context';
 
@@ -32,6 +33,11 @@ export interface BaseRow {
 export interface EntityContext {
   tx: TxClient;
   tenant: Tenant;
+  /**
+   * Emits a contract event once the transaction has committed (never for a rolled-back
+   * write). Set by MasterDataService.run; contexts built elsewhere (imports) leave it out.
+   */
+  emit?<N extends EventNameV1>(name: N, payload: EventPayloadV1<N>): void;
 }
 
 export interface EntityDef<Input, Row extends BaseRow, Dto> {
@@ -56,8 +62,17 @@ export interface EntityDef<Input, Row extends BaseRow, Dto> {
   departmentOf(ctx: EntityContext, values: Input, existing?: Row): Promise<string | null>;
   /** Checks referenced ids belong to this institute, then maps input to Prisma data. */
   toData(ctx: EntityContext, input: Input, existing?: Row): Promise<Record<string, unknown>>;
-  /** Writes child or join rows (course branches, sub-groups, bell periods). */
-  afterWrite?(ctx: EntityContext, row: Row, input: Input, created: boolean): Promise<void>;
+  /**
+   * Writes child or join rows (course branches, sub-groups, bell periods). `before` is the
+   * stored row before an update.
+   */
+  afterWrite?(
+    ctx: EntityContext,
+    row: Row,
+    input: Input,
+    created: boolean,
+    before?: Row,
+  ): Promise<void>;
   /** The editable values of a stored row (also the base of its DTO). */
   toInput(row: Row): Input;
   /** Display-only extras for the DTO (codes, counts). */

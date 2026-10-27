@@ -2,12 +2,14 @@
  * Sessions, terms, cohort start-date windows, calendar windows, holidays, extra working
  * days and bell schedules. All institute-owned: institute admins manage them (ADR 0008).
  */
+import { randomUUID } from 'node:crypto';
 import type { Prisma } from '@slotwise/db';
 import {
   academicSessionSchema,
   bellScheduleSchema,
   calendarWindowSchema,
   extraWorkingDaySchema,
+  fixedSlotSchema,
   holidaySchema,
   sessionName,
   termCohortWindowSchema,
@@ -20,6 +22,8 @@ import {
   type CalendarWindowRow,
   type ExtraWorkingDayInput,
   type ExtraWorkingDayRow,
+  type FixedSlotInput,
+  type FixedSlotRow,
   type HolidayInput,
   type HolidayRow,
   type TermCohortWindowInput,
@@ -35,6 +39,7 @@ import {
   iso,
   isoOrNull,
   requireRefs,
+  type EntityContext,
   type EntityDef,
 } from '../masterdata/entity';
 
@@ -126,6 +131,9 @@ export const terms: EntityDef<TermInput, TermDb, TermRow> = {
     minTeachingDays: row.minTeachingDays,
     status: row.status,
   }),
+  async afterWrite(ctx, row, _input, _created, before) {
+    if (row.status === 'active' && before?.status !== 'active') emitActivated(ctx, row.id, null);
+  },
   extras: (row) => ({ sessionName: row.session.name, sessionStartYear: row.session.startYear }),
   // The (session, kind) unique names both columns; the one-active-term index only institute_id.
   duplicate: (target) =>
@@ -133,6 +141,22 @@ export const terms: EntityDef<TermInput, TermDb, TermRow> = {
       ? 'This session already has a term of this kind.'
       : 'Another term is already active. Close it first, then make this one active.',
 };
+
+/** `term.activated` (contract events.v1), sent after the transaction commits. */
+export function emitActivated(
+  { emit, tenant }: EntityContext,
+  termId: string,
+  previousTermId: string | null,
+): void {
+  emit?.('term.activated', {
+    eventId: randomUUID(),
+    occurredAt: new Date().toISOString(),
+    instituteId: tenant.institute.id,
+    actorUserId: tenant.user.id,
+    termId,
+    previousTermId,
+  });
+}
 
 const windowInclude = {
   programme: { select: { code: true, totalSemesters: true } },
@@ -285,6 +309,76 @@ export const extraWorkingDays: EntityDef<ExtraWorkingDayInput, ExtraDayDb, Extra
     ...scopeOf(row),
   }),
   duplicate: () => 'This day is already a working day.',
+};
+
+// ---- Fixed slots -------------------------------------------------------------------------
+
+const fixedSlotInclude = { faculty: true } satisfies Prisma.FixedSlotInclude;
+type FixedSlotDb = Prisma.FixedSlotGetPayload<{ include: typeof fixedSlotInclude }>;
+
+export const fixedSlots: EntityDef<FixedSlotInput, FixedSlotDb, FixedSlotRow> = {
+  name: 'fixed_slot',
+  path: 'fixed-slots',
+  manage: 'fixed_slot.manage',
+  resourceType: 'fixed_slot',
+  schema: fixedSlotSchema,
+  model: (tx) => tx.fixedSlot,
+  include: fixedSlotInclude,
+  orderBy: [{ weekday: 'asc' }, { startPeriodIndex: 'asc' }],
+  listWhere: (q) => (q.termId ? { termId: q.termId } : {}),
+  departmentOf: institute,
+  async toData({ tx }, input) {
+    await requireRefs([
+      ['termId', tx.term, input.termId, 'Choose a term.'],
+      ...scopeRefs(tx, input),
+      ...input.facultyIds.map(
+        (facultyId) =>
+          ['facultyIds', tx.faculty, facultyId, 'Choose teachers from the list.'] as const,
+      ),
+    ]);
+    // Days and periods come from the institute's bell schedule (CLAUDE.md "Things to avoid").
+    const bell = await tx.bellSchedule.findFirst({
+      where: { isDefault: true, deletedAt: null },
+      include: { periods: { orderBy: { index: 'asc' } } },
+    });
+    if (bell) {
+      if (!bell.workingDays.includes(input.weekday))
+        fieldError('weekday', 'This day is not a working day in the bell schedule.');
+      const last = bell.periods.at(-1)?.index ?? 0;
+      if (input.endPeriodIndex > last)
+        fieldError('endPeriodIndex', `The bell schedule has ${last} periods a day.`);
+    }
+    return {
+      termId: input.termId,
+      kind: input.kind,
+      label: input.label,
+      weekday: input.weekday,
+      startPeriodIndex: input.startPeriodIndex,
+      endPeriodIndex: input.endPeriodIndex,
+      ...scopeOf(input),
+    };
+  },
+  async afterWrite({ tx, tenant }, row, input) {
+    await tx.fixedSlotFaculty.deleteMany({ where: { fixedSlotId: row.id } });
+    await tx.fixedSlotFaculty.createMany({
+      data: [...new Set(input.facultyIds)].map((facultyId) => ({
+        instituteId: tenant.institute.id,
+        fixedSlotId: row.id,
+        facultyId,
+      })),
+    });
+  },
+  toInput: (row) => ({
+    termId: row.termId,
+    kind: row.kind,
+    label: row.label,
+    weekday: row.weekday,
+    startPeriodIndex: row.startPeriodIndex,
+    endPeriodIndex: row.endPeriodIndex,
+    facultyIds: row.faculty.map((f) => f.facultyId).sort(),
+    ...scopeOf(row),
+  }),
+  duplicate: () => 'This fixed slot already exists.',
 };
 
 // ---- Bell schedules ----------------------------------------------------------------------

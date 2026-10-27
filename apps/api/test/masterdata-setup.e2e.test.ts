@@ -95,7 +95,7 @@ describe('setup progress', () => {
       hasData: true,
       count: 2,
     });
-    expect(state.steps.filter((s) => !s.available).map((s) => s.id)).toEqual(['teaching', 'ready']);
+    expect(state.steps.every((s) => s.available)).toBe(true);
     expect(state).toMatchObject({ nextStep: 'profile', percent: 0, activeTermId: null });
     expect(state.attention.map((x) => x.code)).toEqual([
       'no_programmes',
@@ -120,7 +120,7 @@ describe('setup progress', () => {
       'todo',
     ]);
     expect(state.nextStep).toBe('schemes');
-    expect(state.percent).toBe(30); // 3 of 10 available steps
+    expect(state.percent).toBe(25); // 3 of 12 steps
     expect((await auditCount()) - before).toBe(3);
 
     // A fresh read resumes from what was saved; "todo" undoes a skip.

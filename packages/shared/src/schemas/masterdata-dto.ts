@@ -16,6 +16,7 @@ import type {
   ElectiveSectionInput,
   ExtraWorkingDayInput,
   FacultyInput,
+  FixedSlotInput,
   HolidayInput,
   InstituteProfileInput,
   ProgrammeInput,
@@ -25,7 +26,11 @@ import type {
   StudentInput,
   TermCohortWindowInput,
   TermInput,
+  TimetableScopeInput,
 } from './masterdata';
+import type { Component } from '../domain/constants';
+import type { AssignmentTargetKind } from '../domain/planning';
+import type { ReadinessResult } from '../domain/readiness';
 
 export interface RowMeta {
   id: string;
@@ -207,7 +212,8 @@ export interface SetupAttentionDto {
     | 'cohorts_without_sections'
     | 'no_faculty'
     | 'no_rooms'
-    | 'no_bell_schedule';
+    | 'no_bell_schedule'
+    | 'readiness_issues';
   count: number;
   href: string;
 }
@@ -292,4 +298,88 @@ export interface ImportRowsPageDto {
 export interface ImportTemplateFileDto {
   fileName: string;
   contentBase64: string;
+}
+
+// ---- Who teaches what, fixed slots, readiness, timetable scope (milestone 1e) ---------------
+
+export interface FixedSlotRow extends FixedSlotInput, RowMeta {}
+
+export interface TimetableScopeRow extends TimetableScopeInput, RowMeta {
+  createdByName: string | null;
+}
+
+/** A teacher in the grid's picker, with their load across every department this term. */
+export interface TeachingFacultyDto {
+  id: string;
+  name: string;
+  shortCode: string;
+  departmentId: string;
+  departmentCode: string;
+  /** Periods a week assigned this term (all departments). */
+  assigned: number;
+  max: number;
+  status: 'over' | 'under' | 'ok';
+}
+
+export interface TeachingCellDto {
+  target: AssignmentTargetKind;
+  targetId: string;
+  /** Section, sub-group or elective section name. */
+  targetName: string;
+  strength: number;
+  /** Main teacher, null = nobody yet. */
+  facultyId: string | null;
+  coTeacherIds: string[];
+}
+
+/** One course part (L, T or P) of the cohort's scheme and its cells. */
+export interface TeachingRowDto {
+  courseId: string;
+  courseCode: string;
+  courseTitle: string;
+  component: Component;
+  /** Periods a week of this part. */
+  periods: number;
+  cells: TeachingCellDto[];
+}
+
+export interface TeachingGridDto {
+  termId: string;
+  cohort: {
+    id: string;
+    displayCode: string;
+    semester: number;
+    departmentId: string;
+    /** Lateral-entry cohort sitting in another cohort's sections (no grid of its own). */
+    joinsDisplayCode: string | null;
+    joinsCohortId: string | null;
+  };
+  rows: TeachingRowDto[];
+  /** Subject mentor per course of the cohort (null = none). */
+  mentors: {
+    courseId: string;
+    courseCode: string;
+    courseTitle: string;
+    facultyId: string | null;
+  }[];
+  faculty: TeachingFacultyDto[];
+  cells: number;
+  missing: number;
+}
+
+/** A running cohort on the /teaching overview. */
+export interface TeachingCohortDto {
+  id: string;
+  displayCode: string;
+  semester: number;
+  departmentId: string;
+  sections: number;
+  cells: number;
+  missing: number;
+  joinsDisplayCode: string | null;
+}
+
+export interface ReadinessDto extends ReadinessResult {
+  term: { id: string; label: string } | null;
+  scope: { id: string; name: string } | null;
 }

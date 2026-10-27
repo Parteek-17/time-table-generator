@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { validateBellSchedule } from '../domain/bell';
 import { isIsoDate, toDayNumber } from '../domain/calendar';
-import { COURSE_TYPES, ROOM_TYPES } from '../domain/constants';
+import { COMPONENTS, COURSE_TYPES, ROOM_TYPES } from '../domain/constants';
 import { IMPORT_KINDS } from '../domain/imports';
 
 // ---- Building blocks ----------------------------------------------------------------
@@ -373,6 +373,42 @@ export const extraWorkingDaySchema = z
   .transform(normaliseScope);
 export type ExtraWorkingDayInput = z.infer<typeof extraWorkingDaySchema>;
 
+export const FIXED_SLOT_KINDS = [
+  'mentoring',
+  'minor_degree',
+  'honours',
+  'remedial',
+  'library',
+  'sports_ncc',
+  'other',
+] as const;
+
+/** Periods kept free of regular classes (mentoring, library, sports …). */
+export const fixedSlotSchema = z
+  .object({
+    termId: id,
+    kind: choose(FIXED_SLOT_KINDS),
+    label: text(80, 'Enter a label, e.g. Mentoring hour.'),
+    weekday,
+    startPeriodIndex: int(1, 16, 'the first period'),
+    endPeriodIndex: int(1, 16, 'the last period'),
+    /** Faculty who are busy in it (e.g. the mentors). */
+    facultyIds: ids,
+    ...scopeFields,
+  })
+  .superRefine((v, ctx) => {
+    checkScope(v, ctx);
+    if (v.endPeriodIndex < v.startPeriodIndex) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['endPeriodIndex'],
+        message: 'The last period is before the first period.',
+      });
+    }
+  })
+  .transform(normaliseScope);
+export type FixedSlotInput = z.infer<typeof fixedSlotSchema>;
+
 const minuteOfDay = int(0, 1440, 'the time');
 
 export const bellScheduleSchema = z
@@ -569,6 +605,38 @@ export const roomSchema = z.object({
   isAccessible: z.boolean().default(false),
 });
 export type RoomInput = z.infer<typeof roomSchema>;
+
+// ---- Who teaches what (milestone 1e) -------------------------------------------------------
+
+export const ASSIGNMENT_TARGETS = ['section', 'subgroup', 'elective_section'] as const;
+
+/** One cell of the teaching grid: who teaches this course part to this section or group. */
+export const teachingCellSchema = z.object({
+  courseId: id,
+  component: choose(COMPONENTS),
+  target: choose(ASSIGNMENT_TARGETS),
+  targetId: id,
+  /** Main teacher; null clears the cell. */
+  facultyId: optionalId,
+  coTeacherIds: ids,
+});
+export type TeachingCellInput = z.infer<typeof teachingCellSchema>;
+
+/** The faculty member students of a cohort go to for a course (null = none). */
+export const subjectMentorSchema = z.object({ courseId: id, facultyId: optionalId });
+export type SubjectMentorInput = z.infer<typeof subjectMentorSchema>;
+
+/** Which running cohorts one timetable covers (used by Phase 2's generate). */
+export const timetableScopeSchema = z.object({
+  termId: id,
+  name: text(60, 'Enter a name, e.g. Main.'),
+  notes: optionalText(500),
+  cohortIds: z.array(id).min(1, 'Tick at least one cohort.'),
+});
+export type TimetableScopeInput = z.infer<typeof timetableScopeSchema>;
+
+export const readinessQuerySchema = z.object({ scopeId: z.uuid().optional() });
+export type ReadinessQuery = z.infer<typeof readinessQuerySchema>;
 
 // ---- Actions -------------------------------------------------------------------------------
 
