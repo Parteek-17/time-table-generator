@@ -4,3 +4,20 @@
 // the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
 // requires; see docs/coordination/OWNERSHIP.md.
 // Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).
+
+/// An institute's plan (P7 billing, docs/adr/0090-plans-and-limits.md). One row per
+/// institute, created on `institute.created`. Plan codes and limits: packages/shared/src/platform.
+model InstituteSubscription {
+  id          String    @id @default(uuid()) @db.Uuid
+  instituteId String    @unique @map("institute_id") @db.Uuid
+  /// trial, college or university.
+  planCode    String    @map("plan_code")
+  /// Last day of the free trial; null for paid plans.
+  trialEndsOn DateTime? @map("trial_ends_on") @db.Date
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  @@map("institute_subscriptions")
+}
