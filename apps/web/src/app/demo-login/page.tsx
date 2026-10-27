@@ -51,7 +51,10 @@ export default async function DemoLoginPage({
         </Alert>
       ) : null}
       <ul className="grid gap-3 sm:grid-cols-2">
-        {DEMO_ACCOUNTS.map((a) => (
+        {DEMO_ACCOUNTS.filter(
+          // One institute on a plain address has no separate main site for platform pages.
+          (a) => !(a.role === 'platform' && process.env.SINGLE_INSTITUTE_SLUG),
+        ).map((a) => (
           <li key={a.email}>
             <Card>
               <CardHeader>

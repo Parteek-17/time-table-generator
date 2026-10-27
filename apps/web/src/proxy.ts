@@ -11,7 +11,12 @@ export function proxy(request: NextRequest) {
   // action redirect arrives with Host: localhost but keeps x-forwarded-host. Trusting it is
   // safe because the slug only selects an institute; the API still checks membership.
   const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
-  const slug = parseInstituteSlug(host, process.env.WEB_ROOT_DOMAIN ?? 'localhost');
+  // SINGLE_INSTITUTE_SLUG: one institute on a plain address (e.g. a free *.vercel.app demo
+  // where subdomains aren't available). Real subdomains still win.
+  const slug =
+    parseInstituteSlug(host, process.env.WEB_ROOT_DOMAIN ?? 'localhost') ??
+    process.env.SINGLE_INSTITUTE_SLUG ??
+    null;
   const headers = new Headers(request.headers);
   headers.delete(INSTITUTE_SLUG_HEADER);
   if (slug) headers.set(INSTITUTE_SLUG_HEADER, slug);
