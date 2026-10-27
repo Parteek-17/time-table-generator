@@ -6,14 +6,16 @@
 
 ## What
 
-1. Write the migration for `packages/db/prisma/schema/exams.prisma` (seven tables: `exams`,
+1. Write the migration for `packages/db/prisma/schema/exams.prisma` (eight tables: `exams`,
    `exam_sessions`, `exam_papers`, `exam_seat_needs`, `seating_plans`, `seat_assignments`,
-   `invigilation_duties`; two enums `exam_status`, `seating_plan_status`) plus the
-   back-relation lines on `Institute`, `Term`, `Course` and `Student`.
-2. Append the SQL below to that migration: RLS on all seven tables, one published seating plan
+   `invigilation_duties`, `invigilator_unavailability`; two enums `exam_status`,
+   `seating_plan_status`) plus the back-relation lines on `Institute`, `Term`, `Course`,
+   `Student` and `Faculty`.
+2. Append the SQL below to that migration: RLS on all eight tables, one published seating plan
    per session, the trigger that keeps a published plan's seats and duties unchanged, and
    value checks.
-3. Add the seven tables to `TENANT_TABLES_DELETE_ORDER`, before `students` and `courses`.
+3. Add the eight tables to `TENANT_TABLES_DELETE_ORDER`, before `students`, `faculty` and
+   `courses`.
 
 ## Why
 
@@ -34,6 +36,7 @@ in). Design: `docs/adr/0080-exams-date-sheet-and-seating.md`.
 +  'seating_plans',
 +  'seat_assignments',
 +  'invigilation_duties',
++  'invigilator_unavailability',
 +  'exam_papers',
 +  'exam_sessions',
 +  'exams',
@@ -54,7 +57,7 @@ DECLARE
 BEGIN
   FOREACH t IN ARRAY ARRAY[
     'exams', 'exam_sessions', 'exam_papers', 'exam_seat_needs',
-    'seating_plans', 'seat_assignments', 'invigilation_duties'
+    'seating_plans', 'seat_assignments', 'invigilation_duties', 'invigilator_unavailability'
   ]
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', t);

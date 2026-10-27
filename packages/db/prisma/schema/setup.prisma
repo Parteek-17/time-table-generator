@@ -917,6 +917,7 @@ model Faculty {
   assignments    TeachingAssignmentFaculty[]
   fixedSlots     FixedSlotFaculty[]
   mentorOf       SubjectMentor[]
+  examOffDuty    InvigilatorUnavailability[]
 
   @@unique([instituteId, employeeCode])
   @@unique([instituteId, shortCode])

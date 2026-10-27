@@ -86,3 +86,20 @@ export interface StoredSeatingProblems {
   unseated: SeatingPlanDto['unseated'];
   invigilationProblems: SeatingPlanDto['invigilationProblems'];
 }
+
+export const SetUnavailableInput = z.object({
+  /** Faculty who cannot invigilate in this session; replaces the earlier list. */
+  facultyIds: z.array(Id),
+});
+export type SetUnavailableInput = z.infer<typeof SetUnavailableInput>;
+
+/** One faculty member as a possible invigilator of a session. */
+export interface InvigilatorDto {
+  facultyId: string;
+  name: string;
+  available: boolean;
+  /** Codes of this session's papers they teach (never in those halls). */
+  teaches: string[];
+  /** Duties in the exam's other sessions. */
+  dutiesSoFar: number;
+}

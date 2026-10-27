@@ -1,6 +1,7 @@
 import type { TxClient } from '@slotwise/db';
 import type { SolverSeatingRequestV1 } from '@slotwise/shared/contracts';
 import { hallFromRoom, shortDate } from '@slotwise/shared/exams';
+import { invigilatorPool } from './invigilators';
 import { SeatingProblem } from './solver.client';
 
 export interface BuiltRequest {
@@ -96,7 +97,11 @@ export async function buildSeatingRequest(tx: TxClient, planId: string): Promise
       needsAccessibleSeat: needs.has(s.id),
     })),
     halls,
-    faculty: [],
+    faculty: await invigilatorPool(
+      tx,
+      { id: session.id, examId: exam.id, termId: exam.termId },
+      session.papers,
+    ),
     options: {
       reserveSeatsPerHall: exam.reserveSeatsPerHall,
       invigilators: {

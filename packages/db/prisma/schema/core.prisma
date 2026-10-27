@@ -134,6 +134,7 @@ model Institute {
   seatingPlans              SeatingPlan[]
   seatAssignments           SeatAssignment[]
   invigilationDuties        InvigilationDuty[]
+  invigilatorUnavailability InvigilatorUnavailability[]
 
   @@map("institutes")
 }

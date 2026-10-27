@@ -8,12 +8,12 @@
  * Needs the exam tables and Redis; skipped without the tables.
  */
 import type { INestApplication } from '@nestjs/common';
-import type { SolverSeatingRequestV1, SolverSeatingResponseV1 } from '@slotwise/shared/contracts';
+import type { SolverSeatingRequestV1 } from '@slotwise/shared/contracts';
 import type { SeatingPlanDto } from '@slotwise/shared/exams';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createTestApp, Fixtures, signToken } from '../../../test/helpers';
-import { examWorld, purgeExams } from '../exams.fixtures';
+import { examWorld, fakeSolve, purgeExams } from '../exams.fixtures';
 import { SeatingSolverClient } from './solver.client';
 
 const fx = new Fixtures();
@@ -45,53 +45,6 @@ function as(userId: string) {
   return {
     get: (path: string) => prep(http.get(path)),
     post: (path: string, body: object = {}) => prep(http.post(path)).send(body),
-  };
-}
-
-/** Seats everyone in hall order, front row first; no rules. */
-function fakeSolve(req: SolverSeatingRequestV1): SolverSeatingResponseV1 {
-  const halls = [...req.halls].sort((x, y) => x.order - y.order);
-  const students = [...req.students].sort((x, y) => x.rollNo.localeCompare(y.rollNo));
-  const seats: SolverSeatingResponseV1['seats'] = [];
-  for (const hall of halls) {
-    const columns = hall.benchesPerRow * hall.seatsPerBench;
-    for (let i = 0; i < hall.rows * columns && students.length > 0; i++) {
-      const s = students.shift()!;
-      const row = Math.floor(i / columns) + 1;
-      const column = (i % columns) + 1;
-      seats.push({
-        studentId: s.id,
-        paperId: s.paperId,
-        hallId: hall.id,
-        row,
-        column,
-        label: `${hall.code}-R${row}-C${column}`,
-      });
-    }
-  }
-  return {
-    version: 'solver-seating.v1',
-    requestId: req.requestId,
-    status: students.length ? 'INFEASIBLE' : 'FEASIBLE',
-    solveSeconds: 0.01,
-    seats,
-    unseated: students.map((s) => ({
-      studentId: s.id,
-      reason: 'not_enough_seats' as const,
-      message: `${s.rollNo} has no seat: the halls are full.`,
-    })),
-    halls: halls.map((h) => {
-      const mine = seats.filter((s) => s.hallId === h.id);
-      return {
-        hallId: h.id,
-        capacity: h.rows * h.benchesPerRow * h.seatsPerBench,
-        used: mine.length,
-        reserved: req.options.reserveSeatsPerHall,
-        paperIds: [...new Set(mine.map((s) => s.paperId))],
-        invigilatorIds: [],
-      };
-    }),
-    invigilationProblems: [],
   };
 }
 

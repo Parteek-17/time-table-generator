@@ -72,10 +72,11 @@ model ExamSession {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  institute    Institute     @relation(fields: [instituteId], references: [id])
-  exam         Exam          @relation(fields: [examId], references: [id], onDelete: Cascade)
+  institute    Institute                   @relation(fields: [instituteId], references: [id])
+  exam         Exam                        @relation(fields: [examId], references: [id], onDelete: Cascade)
   papers       ExamPaper[]
   seatingPlans SeatingPlan[]
+  unavailable  InvigilatorUnavailability[]
 
   @@unique([examId, date, label])
   @@index([instituteId])
@@ -200,4 +201,21 @@ model InvigilationDuty {
   @@index([facultyId])
   @@index([instituteId])
   @@map("invigilation_duties")
+}
+
+/// A faculty member who cannot invigilate in one exam session (leave, other duty …).
+model InvigilatorUnavailability {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  facultyId   String   @map("faculty_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute   @relation(fields: [instituteId], references: [id])
+  session   ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  faculty   Faculty     @relation(fields: [facultyId], references: [id])
+
+  @@unique([sessionId, facultyId])
+  @@index([instituteId])
+  @@map("invigilator_unavailability")
 }
