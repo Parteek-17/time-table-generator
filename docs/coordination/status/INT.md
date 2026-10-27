@@ -2,15 +2,18 @@
 
 ## Current milestone
 
-P1 merged into `main` on 2026-10-26 (`merge(p1): …`, 1b+ setup snapshot and 1c setup
-wizard). No migration: P1 changed no schema file. All checks, the full suite (API 58, sample-data
-tests now run with Redis) and the build pass.
+2026-10-27: P1 1d (Excel/CSV import) and P2T 2T-a…2T-e (timetable module, behind `FLAG_P2T`)
+merged into `main`. P2T merged ahead of UI and P2E under MERGE-ORDER's flag rule.
+Migrations `20261027000000_p2t_timetable` (P2T's tables + its RLS, publish and immutability
+SQL) and `20261027000100_import_rows_unchanged` (P1's request); `prisma migrate diff` is empty.
+`TENANT_TABLES_DELETE_ORDER` deletes timetable versions before slots: slots cascade with their
+version, and the draft-only trigger refuses deleting a published version's slots directly.
 
-**Rebase now: UI, P2E, P2T, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once `main`
-is pushed). New on `main`: P1's snapshot route, `ioredis` and `@playwright/test`, and the env
-loader in `packages/db`, so `pnpm db:seed` and the db tests now use a worktree's `.env.local`.
+**Rebase now: P1, P2E, P2T, UI, P4, P5, P6, P7** (`git fetch && git rebase origin/main` once
+`main` is pushed). Run `pnpm db:deploy` in your stream database; a P2T database built with
+`prisma db push` must be reset first (`pnpm db:reset` there) so the migrations apply.
 
-C0 merged on 2026-10-23.
+Earlier: P1 1b+/1c merged 2026-10-26, C0 on 2026-10-23.
 
 ## Done
 
@@ -24,6 +27,12 @@ C0 merged on 2026-10-23.
 - `stream-env`, `new-worktree`, stream databases, S3 storage service in compose.
 - 2026-10-26, P1's requests: Redis service in CI, home page card opens `/setup`,
   `packages/db/src/load-env.ts` loaded first by the seed, fixtures and db tests.
+- 2026-10-27: P2T's migration, env variables in `apps/api/.env.example` and stream-database
+  requests; P1's `unchanged` import action. Sign-in no longer fails with `error=Configuration`
+  when the browser holds a cookie for a session that no longer exists (`apps/web/src/auth.ts`).
+
+Still open: `p1-api-raw-upload` and `p2t-api-file-helper` (one file helper next to `api()`),
+`p2t-tenant-transaction-timeout`, `p2t-deterministic-sample-ids`, and the UI kit requests.
 
 ## Next
 
