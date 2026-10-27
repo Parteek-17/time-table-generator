@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthGuard } from './auth/auth.guard';
 import type { Env } from './config/env';
+import { AssistantModule } from './assistant/assistant.module';
 import { CoreModule } from './core/core.module';
 import { HealthController } from './health/health.controller';
 import { InstituteProvisioningModule } from './institute-provisioning/institute-provisioning.module';
@@ -28,6 +29,8 @@ export class AppModule {
         QueueModule,
         // institute-provisioning.v1 (POST /platform/institutes), used by P1 and P7.
         InstituteProvisioningModule,
+        // "Ask Slotwise" chat assistant.
+        AssistantModule,
         // Stream modules (apps/api/src/registry/modules/<stream>.ts).
         ...REGISTRY_MODULES,
       ],

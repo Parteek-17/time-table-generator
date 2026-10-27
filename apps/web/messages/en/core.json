@@ -117,5 +117,19 @@
     "audit": "Recent changes",
     "myAvailability": "My availability",
     "more": "More"
+  },
+  "assistant": {
+    "open": "Ask Slotwise",
+    "close": "Close",
+    "title": "Ask Slotwise",
+    "hint": "Questions about using Slotwise",
+    "hintEdit": "Questions, or ask me to move a class in a draft",
+    "empty": "Ask how to do something, e.g. \"How do I see my exam seat?\"",
+    "emptyEdit": "Ask how to do something, or e.g. \"Move CS301 for CS B from Monday P2 to Wednesday P4 in the draft.\"",
+    "label": "Your question",
+    "placeholder": "Type a question…",
+    "send": "Send",
+    "you": "You",
+    "thinking": "Thinking…"
   }
 }

@@ -3,14 +3,18 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { signOutAction } from '@/app/actions';
+import { api } from '@/lib/api';
 import type { Me } from '@/lib/me';
 import { navFor } from '@/registry/nav';
 import { AppNav, MobileMenu } from './app-nav';
+import { ChatWidget } from './assistant/chat-widget';
 
 /** Signed-in frame: header, role-aware navigation, main content. Phone first. */
 export async function AppShell({ me, children }: { me: Me; children: ReactNode }) {
   const [t, tNav] = await Promise.all([getTranslations('common'), getTranslations('nav')]);
   const groups = await navFor(me);
+  // "Ask Slotwise" shows only when the API has an assistant key.
+  const assistant = await api<{ enabled: boolean }>('/assistant');
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="relative border-b">
@@ -42,6 +46,9 @@ export async function AppShell({ me, children }: { me: Me; children: ReactNode }
           {children}
         </main>
       </div>
+      {assistant.ok && assistant.data.enabled ? (
+        <ChatWidget canEdit={me.may('timetable.edit')} />
+      ) : null}
     </div>
   );
 }

@@ -27,6 +27,11 @@ const envSchema = z.object({
     .enum(['true', 'false', '1', '0'])
     .default('false')
     .transform((v) => v === 'true' || v === '1'),
+  /** "Ask Slotwise" chat assistant (apps/api/src/assistant). Unset = assistant switched off. */
+  ANTHROPIC_API_KEY: z
+    .string()
+    .optional()
+    .transform((v) => v || undefined),
 });
 
 export type Env = z.infer<typeof envSchema>;

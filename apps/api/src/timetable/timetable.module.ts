@@ -39,5 +39,7 @@ import { TimetableViewService } from './timetable-view.service';
     TimetablePublishService,
     TimetableExportService,
   ],
+  // The chat assistant moves classes through the same checks as drag and drop.
+  exports: [TimetableEditService],
 })
 export class TimetableModule {}
