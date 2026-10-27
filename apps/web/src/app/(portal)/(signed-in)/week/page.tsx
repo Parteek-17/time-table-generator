@@ -11,7 +11,7 @@ import {
   formatDay,
   PortalProblem,
   PortalTabs,
-} from '../_components/portal-ui';
+} from '../../_components/portal-ui';
 
 export const metadata: Metadata = { title: 'Week' };
 

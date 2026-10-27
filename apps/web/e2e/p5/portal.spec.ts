@@ -54,3 +54,37 @@ test('Today works with the keyboard alone', async ({ page }) => {
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/week/);
 });
+
+test('a student signs in with roll number and the emailed code, no password', async ({ page }) => {
+  const since = Date.now();
+  await page.goto('/student-sign-in');
+  await page.getByLabel('Roll number').fill('demo-s001');
+  await page.getByRole('button', { name: 'Send me a code' }).click();
+  await expect(page.getByRole('status')).toContainText('We sent a 6-digit code');
+
+  let code = '';
+  await expect
+    .poll(
+      async () => {
+        const res = await fetch(
+          `${process.env.MAILPIT_URL ?? 'http://localhost:8025'}/api/v1/search?query=${encodeURIComponent(`to:${STUDENT}`)}`,
+        );
+        const latest = ((await res.json()) as { messages: { Subject: string; Created: string }[] })
+          .messages[0];
+        if (!latest || Date.parse(latest.Created) < since - 1000) return false;
+        code = /^(\d{6}) /.exec(latest.Subject)?.[1] ?? '';
+        return code.length === 6;
+      },
+      { message: 'code email in Mailpit', timeout: 30_000 },
+    )
+    .toBe(true);
+
+  await page.getByLabel('Code from the email').fill('000000' === code ? '111111' : '000000');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByText(/That code isn’t right/)).toBeVisible();
+
+  await page.getByLabel('Code from the email').fill(code);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page).toHaveURL(/\/today/);
+  await expect(page.getByText('Demo Student')).toBeVisible();
+});
