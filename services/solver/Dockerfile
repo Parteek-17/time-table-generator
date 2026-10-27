@@ -10,6 +10,9 @@ RUN uv sync --frozen --no-dev --no-install-project
 
 COPY src ./src
 RUN uv sync --frozen --no-dev
+# JSON Schemas the solve endpoints validate requests against.
+COPY contracts ./contracts
+ENV SOLVER_CONTRACTS_DIR=/app/contracts
 
 RUN useradd --create-home solver
 USER solver
