@@ -41,8 +41,20 @@ export class QueueService implements OnApplicationShutdown {
     return redisConnection(this.env.REDIS_URL);
   }
 
+  /**
+   * Test files run in parallel processes on one Redis, so each process gets its own key prefix:
+   * otherwise a worker in another file can take a job and run it with that file's mocks.
+   */
+  private get prefix(): string | undefined {
+    return this.env.NODE_ENV === 'test' ? `bull-test-${process.pid}` : undefined;
+  }
+
   queue<Data = unknown>(name: string, options: Omit<QueueOptions, 'connection'> = {}): Queue<Data> {
-    const queue = new Queue<Data>(name, { ...options, connection: this.connection });
+    const queue = new Queue<Data>(name, {
+      prefix: this.prefix,
+      ...options,
+      connection: this.connection,
+    });
     this.open.push(queue);
     return queue;
   }
@@ -53,6 +65,7 @@ export class QueueService implements OnApplicationShutdown {
     options: Omit<WorkerOptions, 'connection'> = {},
   ): Worker<Data, Result> {
     const worker = new Worker<Data, Result>(name, processor, {
+      prefix: this.prefix,
       ...options,
       connection: this.connection,
     });

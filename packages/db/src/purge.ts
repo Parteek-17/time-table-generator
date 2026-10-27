@@ -63,18 +63,23 @@ export async function purgeInstitute(
   options: { keepPhase0?: boolean; includeInstitute?: boolean } = {},
 ): Promise<void> {
   const phase0 = new Set(['invites', 'memberships', 'audit_logs', 'departments']);
-  await owner.$transaction(async (tx) => {
-    await tx.$executeRaw`UPDATE cohorts SET joins_cohort_id = NULL WHERE institute_id = ${instituteId}::uuid`;
-    for (const table of TENANT_TABLES_DELETE_ORDER) {
-      if (options.keepPhase0 && phase0.has(table)) continue;
-      // Table names come from the constant above, never from input.
-      await tx.$executeRawUnsafe(
-        `DELETE FROM "${table}" WHERE institute_id = $1::uuid`,
-        instituteId,
-      );
-    }
-    if (options.includeInstitute) {
-      await tx.$executeRaw`DELETE FROM institutes WHERE id = ${instituteId}::uuid`;
-    }
-  });
+  await owner.$transaction(
+    async (tx) => {
+      await tx.$executeRaw`UPDATE cohorts SET joins_cohort_id = NULL WHERE institute_id = ${instituteId}::uuid`;
+      for (const table of TENANT_TABLES_DELETE_ORDER) {
+        if (options.keepPhase0 && phase0.has(table)) continue;
+        // Table names come from the constant above, never from input.
+        await tx.$executeRawUnsafe(
+          `DELETE FROM "${table}" WHERE institute_id = $1::uuid`,
+          instituteId,
+        );
+      }
+      if (options.includeInstitute) {
+        await tx.$executeRaw`DELETE FROM institutes WHERE id = ${instituteId}::uuid`;
+      }
+      // One DELETE per tenant table (40+, timetables included) can pass Prisma's 5 s default on a
+      // slow host, which left test institutes behind.
+    },
+    { timeout: 60_000, maxWait: 10_000 },
+  );
 }
