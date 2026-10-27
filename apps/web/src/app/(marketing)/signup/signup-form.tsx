@@ -4,7 +4,7 @@ import { isValidSlug } from '@slotwise/shared';
 import { suggestSlug } from '@slotwise/shared/platform';
 import { Alert, Button, FieldError, Input, Label, NativeSelect } from '@slotwise/ui';
 import { useTranslations } from 'next-intl';
-import { useActionState, useEffect, useState, type ReactNode } from 'react';
+import { startTransition, useActionState, useEffect, useState, type ReactNode } from 'react';
 import { signupAction, slugAvailableAction, type SignupFormState } from './actions';
 
 export function SignupForm({ rootDomain }: { rootDomain: string }) {
@@ -71,7 +71,17 @@ export function SignupForm({ rootDomain }: { rootDomain: string }) {
         : t('slugHint');
 
   return (
-    <form action={action} className="relative flex flex-col gap-4" noValidate>
+    <form
+      onSubmit={(e) => {
+        // Not `action={...}`: React resets a form after its action, which would wipe what was
+        // typed when the API refuses it.
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => action(data));
+      }}
+      className="relative flex flex-col gap-4"
+      noValidate
+    >
       {state.status === 'error' && !state.fieldErrors ? (
         <Alert variant="destructive">{state.message}</Alert>
       ) : null}

@@ -5,7 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Slotwise: timetables for colleges',
+  title: 'Timetables for colleges',
   description:
     'Clash-free timetables, rescheduling and exam seating for colleges and universities.',
 };

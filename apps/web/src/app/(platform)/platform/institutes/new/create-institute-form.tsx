@@ -3,7 +3,7 @@
 import { DEFAULT_PLAN, PLAN_CODES, PLANS, suggestSlug } from '@slotwise/shared/platform';
 import { Alert, Button, Checkbox, FieldError, Input, Label, NativeSelect } from '@slotwise/ui';
 import { useTranslations } from 'next-intl';
-import { useActionState, useState, type ReactNode } from 'react';
+import { startTransition, useActionState, useState, type ReactNode } from 'react';
 import { createInstituteAction, type CreateInstituteState } from '../../actions';
 
 export function CreateInstituteForm() {
@@ -33,7 +33,17 @@ export function CreateInstituteForm() {
   });
 
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <form
+      onSubmit={(e) => {
+        // Not `action={...}`: React resets a form after its action, which would wipe what was
+        // typed when the API refuses it.
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startTransition(() => action(data));
+      }}
+      className="flex flex-col gap-4"
+      noValidate
+    >
       {state.status === 'done' && state.result ? (
         <Alert variant="success" role="status" className="flex flex-col gap-1">
           <strong>{t('createdTitle', { name: state.result.name })}</strong>
@@ -61,7 +71,7 @@ export function CreateInstituteForm() {
       )}
       {field(
         'slug',
-        tSignup('slug'),
+        t('address'),
         <Input
           id="slug"
           name="slug"

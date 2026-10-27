@@ -91,6 +91,7 @@
       "created": "Created {date}",
       "newTitle": "New institute",
       "newDescription": "Creates the institute and emails its first admin an invite.",
+      "address": "Slotwise address",
       "firstAdminName": "First admin's name",
       "firstAdminEmail": "First admin's email",
       "planLabel": "Plan",
