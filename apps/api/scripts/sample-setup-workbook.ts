@@ -16,6 +16,11 @@ import { buildTemplate } from '../src/imports/spreadsheet';
 
 type Row = Record<string, string | number>;
 
+const BRAND = 'FF1E3A8A';
+const BAND = 'FFEEF2FF';
+const LINE = { style: 'thin' as const, color: { argb: 'FFD1D5DB' } };
+const THIN = { top: LINE, left: LINE, bottom: LINE, right: LINE };
+
 const STEPS: { kind: ImportKindName; file: string; sheet: string; note: string; rows: Row[] }[] = [
   {
     kind: 'departments',
@@ -430,10 +435,17 @@ async function main(): Promise<void> {
   ]);
   start.mergeCells('A1:E1');
   start.mergeCells('A2:E2');
-  start.getRow(1).font = { bold: true, size: 14 };
-  start.getRow(2).alignment = { wrapText: true };
-  start.getRow(2).height = 34;
-  start.getRow(3).font = { bold: true };
+  start.getRow(1).font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+  start.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+  start.getRow(1).height = 30;
+  start.getCell('A1').alignment = { vertical: 'middle', indent: 1 };
+  start.getRow(2).alignment = { wrapText: true, vertical: 'top' };
+  start.getRow(2).height = 36;
+  start.getRow(3).eachCell((cell) => {
+    cell.font = { bold: true };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BAND } };
+    cell.border = THIN;
+  });
   STEPS.forEach((s, i) => {
     const r = start.addRow({
       n: i + 1,
@@ -444,7 +456,19 @@ async function main(): Promise<void> {
     });
     r.getCell('sheet').value = { text: s.sheet, hyperlink: `#'${s.sheet}'!A1` };
     r.getCell('sheet').font = { color: { argb: 'FF1D4ED8' }, underline: true };
+    r.eachCell((cell) => {
+      cell.border = THIN;
+      cell.alignment = { vertical: 'top', wrapText: true };
+    });
   });
+  const legend = start.addRow([]);
+  legend.getCell(1).value = '';
+  const key = start.addRow([
+    'Key: dark headers are the import columns; a yellow underline marks a required column; hover a header for what to type.',
+  ]);
+  start.mergeCells(`A${key.number}:E${key.number}`);
+  key.font = { italic: true, color: { argb: 'FF555555' } };
+  start.pageSetup = { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
 
   const ranges = new Map<string, string>();
   for (const step of STEPS) {
@@ -455,18 +479,35 @@ async function main(): Promise<void> {
       key: c.key,
       width: Math.max(12, c.label.length + 4, c.example.length + 2),
     }));
-    ws.getRow(1).font = { bold: true };
+    const header = ws.getRow(1);
+    header.height = 22;
     t.columns.forEach((c, i) => {
-      const cell = ws.getRow(1).getCell(i + 1);
+      const cell = header.getCell(i + 1);
       cell.note = `${c.required ? 'Required. ' : ''}${c.help}`;
-      if (c.required)
-        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BRAND } };
+      cell.alignment = { vertical: 'middle' };
+      cell.border = {
+        bottom: { style: 'medium', color: { argb: c.required ? 'FFF5B700' : BRAND } },
+      };
       ranges.set(
         `${step.kind}.${c.key}`,
         `'${step.sheet}'!$${colLetter(i + 1)}$2:$${colLetter(i + 1)}$500`,
       );
     });
-    for (const row of step.rows) ws.addRow(row);
+    step.rows.forEach((row, r) => {
+      const added = ws.addRow(row);
+      added.eachCell({ includeEmpty: true }, (cell, col) => {
+        if (col > t.columns.length) return;
+        cell.border = THIN;
+        if (r % 2 === 1) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: BAND } };
+      });
+    });
+    // Back to the overview, two columns right of the table.
+    const back = ws.getCell(1, t.columns.length + 2);
+    back.value = { text: '← Start here', hyperlink: "#'Start here'!A1" };
+    back.font = { color: { argb: 'FF1D4ED8' }, underline: true };
+    ws.pageSetup = { orientation: 'landscape', fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
     t.columns.forEach((c, i) => {
       const link = LINKS[step.kind]?.[c.key];
       const formula = link
