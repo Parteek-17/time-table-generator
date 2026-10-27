@@ -30,9 +30,17 @@ Earlier: P1 1b+/1c merged 2026-10-26, C0 on 2026-10-23.
 - 2026-10-27: P2T's migration, env variables in `apps/api/.env.example` and stream-database
   requests; P1's `unchanged` import action. Sign-in no longer fails with `error=Configuration`
   when the browser holds a cookie for a session that no longer exists (`apps/web/src/auth.ts`).
+- 2026-10-27, later: `api()` takes a `raw` Blob (uploads) and `apiFile()` returns a file
+  Response (downloads); P1's upload and P2T's export route use them, so only `lib/api.ts` mints
+  API tokens. `withTenant()` / `PrismaService.tenant()` take `{ timeout, maxWait }`; P2T's
+  `tenantLong()` uses it. `PDF_BROWSER_PATH` in `.env.example`, Chromium note in deployment.md.
+  Worktrees P1, P2T and P2E rebased onto `main`; `slotwise_p2t` reset onto the migrations.
+  Test isolation: under NODE_ENV=test `QueueService` prefixes BullMQ keys per process, so a
+  worker in another test file can't take a job; `purgeInstitute()` allows 60 s.
 
-Still open: `p1-api-raw-upload` and `p2t-api-file-helper` (one file helper next to `api()`),
-`p2t-tenant-transaction-timeout`, `p2t-deterministic-sample-ids`, and the UI kit requests.
+Still open: `p2t-deterministic-sample-ids` (changes every demo id, so it needs a database reset
+and rebuilt fixtures, which shifts P2E's and P2T's fixture tests; do it with those streams), and
+the UI kit requests.
 
 ## Next
 

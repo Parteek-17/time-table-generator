@@ -156,6 +156,8 @@ or daily backups.
    `services/solver/Dockerfile`, health check `/health`. Keep it **private** (no public
    domain); the API will call it over Railway's private network in Phase 2.
 4. **Redis** (needed from Phase 2): add Railway's Redis and pass `REDIS_URL` to the api.
+5. **Timetable PDFs** (Phase 2): the api needs Chromium (e.g. `apt-get install chromium` in its
+   image) or `PDF_BROWSER_PATH` pointing at Chrome/Edge; without it PDF downloads answer 503.
 
 Render works the same way: a "Web Service" per Dockerfile, with the same variables.
 
