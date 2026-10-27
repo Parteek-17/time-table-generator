@@ -2,6 +2,7 @@
 
 import time
 
+from .invigilation import HallNeed, assign_invigilators
 from .models import HallSummary, Seat, SeatingRequest, SeatingResponse, Unseated
 from .seat import seat_students
 
@@ -23,6 +24,13 @@ def solve(request: SeatingRequest) -> SeatingResponse:
             result.placements, key=lambda p: (p.grid.hall.order, p.grid.hall.code, p.row, p.column)
         )
     ]
+    needs = [
+        HallNeed(g.hall.id, g.hall.code, len(g.taken), frozenset(g.taken.values()))
+        for g in result.grids
+        if g.taken
+    ]
+    # No faculty in the request = skip invigilation (solver-seating.v1).
+    invigilators, problems = assign_invigilators(request, needs) if request.faculty else ({}, [])
     halls = []
     for grid in result.grids:
         paper_ids = sorted(set(grid.taken.values()))
@@ -33,7 +41,7 @@ def solve(request: SeatingRequest) -> SeatingResponse:
                 used=len(grid.taken),
                 reserved=grid.reserve,
                 paper_ids=paper_ids,
-                invigilator_ids=[],
+                invigilator_ids=invigilators.get(grid.hall.id, []),
             )
         )
     unseated = [
@@ -47,5 +55,5 @@ def solve(request: SeatingRequest) -> SeatingResponse:
         seats=seats,
         unseated=unseated,
         halls=halls,
-        invigilation_problems=[],
+        invigilation_problems=problems,
     )
