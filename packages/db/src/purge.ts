@@ -10,6 +10,10 @@ export const TENANT_TABLES_DELETE_ORDER = [
   'institute_subscriptions',
   'import_rows',
   'import_jobs',
+  'notification_deliveries',
+  'make_ups',
+  'cancellations',
+  'disruptions',
   // Versions before slots: their slots go with them (ON DELETE CASCADE), which the
   // draft-only trigger allows. Deleting a published version's slots first would be refused.
   'timetable_versions',
