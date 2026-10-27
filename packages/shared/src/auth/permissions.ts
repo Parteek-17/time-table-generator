@@ -35,6 +35,11 @@ export const ACTIONS = [
   /** Start an Excel/CSV import. Each row is checked again with the action for its kind. */
   'import.run',
   'readiness.view',
+  // Phase 6: exams (date sheets, seating, invigilation)
+  /** Read date sheets, seating plans and duty charts. */
+  'exam.view',
+  /** Exams, date sheets, seating plans, invigilation and publishing them. */
+  'exam.manage',
 ] as const;
 export type Action = (typeof ACTIONS)[number];
 
@@ -48,6 +53,8 @@ export const INSTITUTE_WIDE_READS: readonly Action[] = [
   'timetable.view',
   'masterdata.view',
   'readiness.view',
+  // Date sheets and seating cover the whole institute.
+  'exam.view',
 ];
 
 /**
@@ -65,6 +72,7 @@ const READ_ONLY: readonly Action[] = [
   'department.view',
   'timetable.view',
   'masterdata.view',
+  'exam.view',
 ];
 
 /** Role → actions. Where an action applies is decided by the membership's scope. */
@@ -99,7 +107,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Action[]>> = {
     'import.run',
     'readiness.view',
   ],
-  exam_coordinator: READ_ONLY,
+  exam_coordinator: [...READ_ONLY, 'exam.manage'],
   faculty: [...READ_ONLY, 'faculty.availability.edit'],
   student: ['institute.view', 'timetable.view'],
 };

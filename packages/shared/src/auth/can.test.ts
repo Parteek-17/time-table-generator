@@ -309,3 +309,30 @@ describe('canSomewhere() and assignableRoles()', () => {
     expect(assignableRoles(instituteAdminA, cse)).not.toContain('platform_admin');
   });
 });
+
+describe('can() — exam_coordinator', () => {
+  const examA = user({
+    role: 'exam_coordinator',
+    scopeType: 'institute',
+    scopeId: INST_A,
+    instituteId: INST_A,
+  });
+  const coordinatorCse = user({
+    role: 'timetable_coordinator',
+    scopeType: 'department',
+    scopeId: CSE,
+    instituteId: INST_A,
+  });
+  const instA = { type: 'institute', instituteId: INST_A } as const;
+
+  it('manages exams in their own institute only', () => {
+    expect(can(examA, 'exam.manage', instA)).toBe(true);
+    expect(can(examA, 'exam.manage', { type: 'institute', instituteId: INST_B })).toBe(false);
+  });
+
+  it('is the exam role: a hod and a timetable coordinator may read exams but not manage them', () => {
+    expect(can(hodCse, 'exam.manage', instA)).toBe(false);
+    expect(can(coordinatorCse, 'exam.manage', instA)).toBe(false);
+    expect(can(hodCse, 'exam.view', instA)).toBe(true);
+  });
+});

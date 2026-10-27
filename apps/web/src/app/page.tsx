@@ -63,12 +63,12 @@ export default async function HomePage({
   const canManageMembers = canSomewhere(authUser, 'member.view', place);
   const canSetUp = canSomewhere(authUser, 'masterdata.view', place);
   // Students and teachers land on "Today" (CLAUDE.md "Role-shaped home screens"): anyone who
-  // can't edit timetables, run imports or manage members. Add exam permissions here when P6
-  // lands, so exam coordinators keep this home screen.
+  // can't edit timetables, run imports, manage exams or manage members.
   const readsOnly =
     !canManageMembers &&
     !canSomewhere(authUser, 'timetable.edit', place) &&
-    !canSomewhere(authUser, 'import.run', place);
+    !canSomewhere(authUser, 'import.run', place) &&
+    !canSomewhere(authUser, 'exam.manage', place);
   if (isFlagOn('P5') && !joined && readsOnly) redirect('/today');
   const shellMe = await getMe();
 
