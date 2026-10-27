@@ -9,8 +9,13 @@ def without_time(r: dict) -> dict:
     return {k: v for k, v in r.items() if k != "solveSeconds"}
 
 
+# 30 s, not 10: the improvement loop must beat the greedy start even when other programs
+# leave the solver a third of a 2-core laptop (10 s then gives the greedy score, 202).
+DEMO_LIMIT = 30
+
+
 def test_demo_fixture_solves() -> None:
-    r = solve_ok(demo_request(timeLimitSeconds=10))
+    r = solve_ok(demo_request(timeLimitSeconds=DEMO_LIMIT))
     # The sample data has 16 sessions with no suitable room on purpose (CONTRACTS.md);
     # the greedy fixture placed 394 of 414.
     assert Counter(reasons(r))["no_suitable_room"] == 16
@@ -18,7 +23,8 @@ def test_demo_fixture_solves() -> None:
     # Milestone 3: every other unplaced session has a specific reason, not "other".
     assert "other" not in reasons(r)
     assert all(u["message"] and u["involved"]["courseIds"] for u in r["unplaced"])
-    assert r["solveSeconds"] <= 12
+    # CP-SAT can stop a little after its wall-clock limit on a loaded machine.
+    assert r["solveSeconds"] <= DEMO_LIMIT * 1.05
     # The greedy starting timetable scores 202; the improvement loop must beat it.
     assert r["score"]["total"] < 202
     assert [b["constraint"] for b in r["score"]["breakdown"]] == [
