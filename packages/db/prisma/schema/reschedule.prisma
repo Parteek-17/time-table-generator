@@ -129,3 +129,35 @@ model MakeUp {
   @@index([instituteId, termId, date])
   @@map("make_ups")
 }
+
+enum NotificationStatus {
+  sent
+  failed
+
+  @@map("notification_status")
+}
+
+/// One notification sent (or tried) to one person on one channel. Unique per idempotency key,
+/// so a repeated request or a re-delivered job never sends twice (notify.v1).
+model NotificationDelivery {
+  id             String             @id @default(uuid()) @db.Uuid
+  instituteId    String             @map("institute_id") @db.Uuid
+  /// NotificationRequestV1.idempotencyKey, e.g. "p4.makeUpBooked:<makeUpId>".
+  idempotencyKey String             @map("idempotency_key")
+  templateKey    String             @map("template_key")
+  /// email (push, WhatsApp, SMS later).
+  channel        String
+  /// Where it went: the email address.
+  recipient      String
+  /// The person's login, if they have one (no foreign key: audit-style reference).
+  userId         String?            @map("user_id") @db.Uuid
+  status         NotificationStatus
+  attempts       Int                @default(1)
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  @@unique([instituteId, idempotencyKey, channel, recipient])
+  @@map("notification_deliveries")
+}

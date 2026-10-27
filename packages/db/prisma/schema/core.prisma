@@ -130,6 +130,7 @@ model Institute {
   disruptions               Disruption[]
   cancellations             Cancellation[]
   makeUps                   MakeUp[]
+  notificationDeliveries    NotificationDelivery[]
 
   @@map("institutes")
 }

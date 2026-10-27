@@ -66,3 +66,14 @@ export const RecipientsResponseV1 = z.object({
 
 Permission: callable only by members who may `timetable.edit` somewhere in the institute (the
 coordinator whose change caused the notification), never by students or faculty.
+
+## Addendum (2026-10-28): who calls it
+
+P4 now calls this route from its notify worker, signed as the user whose action caused the
+notification (`actorUserId` of the event). `notify.requested` from other streams carries no user
+(notify.v1 has no actor field), so those are not delivered yet. Proposed with this request: INT
+adds a service identity (e.g. a `system` token the API accepts only from itself) or a
+`requestedByUserId` field in a `notify.v2`. P4's adapter is
+`apps/api/src/notify/recipients.source.ts`; until the route exists it answers 404 and notify
+sends nothing (logged once). P4's local copy of the schemas is
+`packages/shared/src/reschedule/recipients.ts`, deleted once the contract file lands.
