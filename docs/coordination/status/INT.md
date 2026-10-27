@@ -2,6 +2,11 @@
 
 ## Current milestone
 
+2026-10-27, night: merged P5 M2 (roll-number sign-in; migration `20261027000200_p5_portal_login_codes`)
+and P7 M1 (platform institutes, sign-up, plans; INT's provisioning service replaces P1's mock;
+migration `20261027000300_p7_platform`). Shared 242, UI 20, db 17, API 145, lint, typecheck pass.
+Next to merge: P4 (`p4/reschedule`, M1–M4b) and P6 (`p6/seating`, M1–M4).
+
 2026-10-27, evening (local `main`, not pushed): merged UI kit, P2E M1–M5, P5 M1 (Today/week,
 `FLAG_P5`) and P1 1e. No schema changes. Lint, typecheck, UI 20, shared 227, db 17 and ruff pass.
 Re-run on a quiet machine (2026-10-27): shared 227, UI 20, db 17, API 127 (13 files) and the
