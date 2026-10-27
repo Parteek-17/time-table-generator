@@ -1,8 +1,10 @@
 # syntax=docker/dockerfile:1
 # Build from the repository root:  docker build -f apps/api/Dockerfile -t slotwise-api .
 FROM node:24.19.0-slim
-RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
+# chromium: printing timetable and exam PDFs (puppeteer-core).
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates chromium \
   && rm -rf /var/lib/apt/lists/*
+ENV PDF_BROWSER_PATH=/usr/bin/chromium
 RUN npm install -g pnpm@10.34.7
 WORKDIR /repo
 
