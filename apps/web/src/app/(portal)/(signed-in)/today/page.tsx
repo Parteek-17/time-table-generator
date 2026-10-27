@@ -105,7 +105,7 @@ export default async function TodayPage({
         {t('seeWeek')}
       </Link>
       <Link
-        href="/calendar"
+        href="/add-to-calendar"
         className="inline-flex min-h-11 items-center self-start text-primary underline underline-offset-4"
       >
         {t('addToCalendar')}

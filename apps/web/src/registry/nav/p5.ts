@@ -13,7 +13,7 @@ const nav: NavSource = async (me) => {
   const items = [
     { href: '/today', label: t('today') },
     { href: '/week', label: t('week') },
-    { href: '/calendar', label: t('calendar') },
+    { href: '/add-to-calendar', label: t('calendar') },
   ];
   if (me.may('timetable.publish')) items.push({ href: '/share', label: t('share') });
   return [{ label: t('group'), items }];
