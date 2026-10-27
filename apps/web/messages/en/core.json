@@ -101,7 +101,9 @@
     "google": "Continue with Google",
     "invalidEmail": "Enter a valid email address.",
     "errorVerification": "That sign-in link has expired or was already used. Ask for a new one below.",
-    "errorDefault": "We couldn’t sign you in. Please try again."
+    "errorDefault": "We couldn’t sign you in. Please try again.",
+    "student": "Student?",
+    "studentLink": "Sign in with your roll number"
   },
   "checkEmail": {
     "title": "Check your email",

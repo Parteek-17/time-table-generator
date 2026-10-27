@@ -1,6 +1,7 @@
-import type { InstituteDto } from '@slotwise/shared';
+import { isFlagOn, type InstituteDto } from '@slotwise/shared';
 import { Alert, Card, CardContent, CardDescription, CardHeader } from '@slotwise/ui';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
@@ -42,6 +43,14 @@ export default async function SignInPage({
             </Alert>
           ) : null}
           <SignInForm redirectTo={redirectTo} googleEnabled={googleSignInEnabled()} />
+          {slug && isFlagOn('P5') ? (
+            <p className="text-sm text-muted-foreground">
+              {t('student')}{' '}
+              <Link href="/student-sign-in" className="text-primary underline underline-offset-4">
+                {t('studentLink')}
+              </Link>
+            </p>
+          ) : null}
         </CardContent>
       </Card>
     </PageShell>
