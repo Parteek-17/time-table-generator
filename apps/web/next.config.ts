@@ -9,7 +9,8 @@ const nextConfig: NextConfig = {
   // Prisma loads its query engine from disk; keep it out of the bundle.
   serverExternalPackages: ['@prisma/client', '@slotwise/db'],
   // Institutes live on subdomains: demo.localhost:3000 in dev.
-  allowedDevOrigins: ['*.localhost'],
+  // *.trycloudflare.com: a Cloudflare quick tunnel for live demos (docs/demo-tunnel.md).
+  allowedDevOrigins: ['*.localhost', '*.trycloudflare.com'],
   poweredByHeader: false,
 };
 
