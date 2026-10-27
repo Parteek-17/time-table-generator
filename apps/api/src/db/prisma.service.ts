@@ -1,5 +1,11 @@
 import { Inject, Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { PrismaClient, withTenant, type TenantContext, type TxClient } from '@slotwise/db';
+import {
+  PrismaClient,
+  withTenant,
+  type TenantContext,
+  type TenantTxOptions,
+  type TxClient,
+} from '@slotwise/db';
 import { ENV, type Env } from '../config/env';
 
 @Injectable()
@@ -20,8 +26,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   /** Runs fn in one transaction with row-level security set for this tenant. */
-  tenant<T>(ctx: TenantContext, fn: (tx: TxClient) => Promise<T>): Promise<T> {
-    return withTenant(this, ctx, fn);
+  tenant<T>(
+    ctx: TenantContext,
+    fn: (tx: TxClient) => Promise<T>,
+    options?: TenantTxOptions,
+  ): Promise<T> {
+    return withTenant(this, ctx, fn, options);
   }
 
   /**

@@ -37,13 +37,17 @@ export async function withTenant<T>(
   prisma: PrismaClient,
   ctx: TenantContext,
   fn: (tx: TxClient) => Promise<T>,
+  /** Prisma's limits, in ms (defaults: 5000 and 2000). Raise `timeout` for writes of hundreds of rows. */
+  options?: TenantTxOptions,
 ): Promise<T> {
   return prisma.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT set_config('app.institute_id', ${ctx.instituteId ?? ''}, true),
                               set_config('app.user_id', ${ctx.userId ?? ''}, true)`;
     return fn(tx);
-  });
+  }, options);
 }
+
+export type TenantTxOptions = { timeout?: number; maxWait?: number };
 
 export function createPrismaClient(url?: string): PrismaClient {
   return new PrismaClient(url ? { datasources: { db: { url } } } : undefined);
