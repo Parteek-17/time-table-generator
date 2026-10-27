@@ -8,6 +8,119 @@
       "description": "Date sheets, seating plans and invigilation duties.",
       "comingSoon": "Coming soon",
       "comingSoonBody": "This part of Slotwise is being built. Nothing to do here yet."
+    },
+    "page": {
+      "title": "Exams",
+      "description": "Date sheets, seating plans and invigilation duties."
+    },
+    "mine": {
+      "seatsTitle": "My exam seats",
+      "noSeats": "No exam seats yet. They appear here as soon as the seating plan is published.",
+      "hall": "Hall",
+      "seat": "Seat",
+      "rowSeat": "Row {row}, seat {column}",
+      "rowHint": "Row 1 is at the front; seats count from the left as you face the front.",
+      "dutiesTitle": "My invigilation duties",
+      "noDuties": "No invigilation duties yet.",
+      "notLinkedTitle": "We couldn’t find your exams",
+      "notLinkedBody": "Your sign-in isn’t linked to a student or teacher record at this institute yet. Ask your institute admin to add your email to your record."
+    },
+    "list": {
+      "title": "All exams",
+      "empty": "No exams yet.",
+      "noDates": "No dates yet",
+      "papers": "{count, plural, one {# paper} other {# papers}}"
+    },
+    "newExam": {
+      "noTerms": "Add a term first (Terms), then come back to plan its exams.",
+      "name": "New exam",
+      "namePlaceholder": "e.g. End-semester exams, Dec 2026",
+      "term": "Term",
+      "create": "Create",
+      "creating": "Creating…"
+    },
+    "sheet": {
+      "notFound": "We couldn’t find this exam",
+      "description": "{sessions, plural, one {# session} other {# sessions}}, {papers, plural, one {# paper} other {# papers}}",
+      "back": "All exams",
+      "problemsTitle": "{count, plural, one {One clash to fix} other {# clashes to fix}}",
+      "empty": "No sessions yet. Add the first one below.",
+      "students": "{count, plural, one {# student} other {# students}}",
+      "seating": "Seating",
+      "noPapers": "No papers in this session yet.",
+      "clash": "clash",
+      "remove": "Remove",
+      "removeSession": "Remove the {session} session",
+      "removePaper": "Remove {code} from the date sheet"
+    },
+    "addSession": {
+      "title": "Add a session",
+      "date": "Date",
+      "label": "Session",
+      "start": "Starts",
+      "end": "Ends",
+      "add": "Add session",
+      "adding": "Adding…"
+    },
+    "addPaper": {
+      "title": "Add a paper",
+      "allOnSheet": "Every course taught this term is on the date sheet.",
+      "course": "Course",
+      "session": "Session",
+      "sections": "Sections writing it",
+      "add": "Add paper",
+      "adding": "Adding…"
+    },
+    "seating": {
+      "notFound": "We couldn’t find this exam session",
+      "description": "{exam} · {papers} · {students, plural, one {# student} other {# students}}",
+      "back": "Date sheet",
+      "none": "No seating plan yet.",
+      "failed": "Building the seating plan failed. Please try again.",
+      "planTitle": "Seating plan",
+      "published": "Published",
+      "draft": "Not published yet",
+      "seated": "{seated} of {students} students have a seat.",
+      "unseatedTitle": "{count, plural, one {One student has no seat} other {# students have no seat}}",
+      "andMore": "…and {count} more.",
+      "hallsCaption": "Halls in this plan",
+      "hall": "Hall",
+      "used": "Seats used",
+      "papers": "Papers",
+      "invigilators": "Invigilators",
+      "usedOf": "{used} of {capacity} ({reserved} kept free)",
+      "noInvigilator": "None yet",
+      "downloads": "Print or download",
+      "doc": {
+        "hall-chart": "Seating chart for each hall",
+        "notice": "Where to sit (notice board)",
+        "attendance": "Attendance sheets",
+        "duties": "Invigilation duties"
+      }
+    },
+    "build": {
+      "title": "Build the seating plan",
+      "halls": "Halls to use: {seats} exam seats for {students} students.",
+      "accessible": "step-free",
+      "noRooms": "No room has exam seats yet. In Rooms, set rows, seats per row and exam seats per bench.",
+      "tooFew": "There are fewer seats than students. Tick more halls, or some students will have no seat.",
+      "build": "Build seating plan",
+      "building": "Building…",
+      "wait": "This usually takes a few seconds. You can leave this page; the plan will be here."
+    },
+    "publish": {
+      "publish": "Publish",
+      "publishing": "Publishing…",
+      "hint": "Students and teachers see their seats and duties once it is published.",
+      "hintProblems": "Some students have no seat yet. You can publish now and fix it with a new plan."
+    },
+    "unavailable": {
+      "title": "Invigilators ({away} of {total} unavailable)",
+      "hint": "Tick teachers who cannot invigilate this session. The next seating plan leaves them out.",
+      "duties": "{count, plural, =0 {no duties yet} one {# duty so far} other {# duties so far}}",
+      "teaches": "teaches {codes}",
+      "save": "Save",
+      "saved": "Saved. Build the seating plan again to use it."
     }
   }
 }

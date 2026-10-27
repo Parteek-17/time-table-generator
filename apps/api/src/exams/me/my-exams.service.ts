@@ -4,7 +4,7 @@ import { todayIn, type MyExamsDto } from '@slotwise/shared/exams';
 import type { Tenant } from '../../common/request-context';
 import { PrismaService } from '../../db/prisma.service';
 
-const EMPTY: MyExamsDto = { role: null, name: null, rollNo: null, seats: [], duties: [] };
+const EMPTY: MyExamsDto = { shows: null, name: null, rollNo: null, seats: [], duties: [] };
 const iso = (d: Date) => d.toISOString().slice(0, 10);
 
 /**
@@ -39,7 +39,7 @@ export class MyExamsService {
             duties.map((d) => d.hallId),
           );
           return {
-            role: 'faculty',
+            shows: 'duties',
             name: faculty.name,
             rollNo: null,
             seats: [],
@@ -82,7 +82,7 @@ export class MyExamsService {
         ]);
         const title = new Map(papers.map((p) => [p.id, p.course.title]));
         return {
-          role: 'student',
+          shows: 'seats',
           name: student.name,
           rollNo: student.universityRollNo ?? student.classRollNo,
           duties: [],

@@ -136,7 +136,7 @@ describe('publishing, downloads and my exams', () => {
   live('nobody sees a seat before it is published', async () => {
     ids.first = await build();
     const mine = (await as(u.student.id).get('/exams/me')).body as MyExamsDto;
-    expect(mine).toMatchObject({ role: 'student', rollNo: '24A1', seats: [] });
+    expect(mine).toMatchObject({ shows: 'seats', rollNo: '24A1', seats: [] });
   });
 
   live('publishing emits one event; publishing another archives the first', async () => {
@@ -180,7 +180,7 @@ describe('publishing, downloads and my exams', () => {
 
   live('a student finds their seat; a teacher finds their duty', async () => {
     const mine = (await as(u.student.id).get('/exams/me')).body as MyExamsDto;
-    expect(mine.role).toBe('student');
+    expect(mine.shows).toBe('seats');
     expect(mine.seats).toHaveLength(1);
     expect(mine.seats[0]).toMatchObject({
       date: '2099-12-01',
@@ -192,7 +192,7 @@ describe('publishing, downloads and my exams', () => {
     expect(mine.seats[0]!.seatLabel).toMatch(/^(G1|F1)-R\d-C\d$/);
 
     const duty = (await as(u.teacher.id).get('/exams/me')).body as MyExamsDto;
-    expect(duty.role).toBe('faculty');
+    expect(duty.shows).toBe('duties');
     expect(duty.name).toBe('Mr. Chopra');
     expect(duty.duties.map((d) => [d.date, d.hallCode])).toEqual([['2099-12-01', 'G1']]);
   });

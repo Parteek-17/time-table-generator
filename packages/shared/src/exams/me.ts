@@ -29,8 +29,11 @@ export interface MyDutyDto {
 }
 
 export interface MyExamsDto {
-  /** Who we found: a student (by sign-in email) or a teacher (by linked login); null if neither. */
-  role: 'student' | 'faculty' | null;
+  /**
+   * What to show: seats for a student (found by sign-in email), duties for a teacher (found by
+   * linked login), null when the sign-in is linked to neither.
+   */
+  shows: 'seats' | 'duties' | null;
   name: string | null;
   /** Students only. */
   rollNo: string | null;
