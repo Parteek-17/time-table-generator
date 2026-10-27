@@ -9,6 +9,12 @@ import type { PrismaClient } from '@prisma/client';
 export const TENANT_TABLES_DELETE_ORDER = [
   'import_rows',
   'import_jobs',
+  // Versions before slots: their slots go with them (ON DELETE CASCADE), which the
+  // draft-only trigger allows. Deleting a published version's slots first would be refused.
+  'timetable_versions',
+  'timetable_slots',
+  'timetable_solve_jobs',
+  'timetable_snapshots',
   'timetable_scope_cohorts',
   'timetable_scopes',
   'subject_mentors',
