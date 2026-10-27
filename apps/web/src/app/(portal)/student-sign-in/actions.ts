@@ -11,7 +11,6 @@ import {
   type OtpRequestResult,
   type OtpVerifyResult,
 } from '@slotwise/shared/portal';
-import { redirect } from 'next/navigation';
 import { EMAIL_PROVIDER } from '@/auth';
 import { api } from '@/lib/api';
 import { prisma } from '@/lib/prisma';
@@ -24,6 +23,8 @@ export interface StudentSignInState {
   error?: string;
   /** True right after a new code was sent (for the "sent again" note). */
   resent?: boolean;
+  /** Set once the code is right: the browser opens it (full page load) to finish signing in. */
+  signInUrl?: string;
 }
 
 function firstIssue(error: { issues: { message: string }[] }): string {
@@ -49,8 +50,10 @@ async function sendCode(rollNumber: unknown, resent: boolean): Promise<StudentSi
 /**
  * Hands a verified student to Auth.js: a random single-use token stored the way its email
  * provider stores sign-in links, then its own callback creates the session (ADR 0070).
+ * Returns the callback address for the browser to open as a full page load: a server-action
+ * redirect goes through the client router, and the session cookie got lost on the way.
  */
-async function startSession(email: string): Promise<never> {
+async function startSession(prev: StudentSignInState, email: string): Promise<StudentSignInState> {
   const secret = process.env.AUTH_SECRET;
   if (!secret) throw new Error('AUTH_SECRET is not set');
   const token = randomBytes(32).toString('hex');
@@ -61,13 +64,16 @@ async function startSession(email: string): Promise<never> {
       expires: new Date(Date.now() + OTP_RULES.ticketSeconds * 1000),
     },
   });
-  redirect(
-    `/api/auth/callback/${EMAIL_PROVIDER}?${new URLSearchParams({
+  return {
+    ...prev,
+    error: undefined,
+    resent: false,
+    signInUrl: `/api/auth/callback/${EMAIL_PROVIDER}?${new URLSearchParams({
       callbackUrl: '/today',
       token,
       email,
     })}`,
-  );
+  };
 }
 
 export async function studentSignIn(
@@ -82,5 +88,5 @@ export async function studentSignIn(
   if (!body.success) return { ...prev, resent: false, error: firstIssue(body.error) };
   const res = await api<OtpVerifyResult>(OTP_VERIFY_ROUTE, { method: 'POST', body: body.data });
   if (!res.ok) return { ...prev, resent: false, error: res.message };
-  return startSession(res.data.email);
+  return startSession(prev, res.data.email);
 }

@@ -10,16 +10,22 @@ test('a student opens Today and reaches the week in one more tap', async ({ page
   await page.goto('/today');
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByText('Demo Student')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Today' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'Today', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
   await expect(page.getByRole('heading', { name: 'Classes' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Changes this week' })).toBeVisible();
 
   await page
     .getByRole('navigation', { name: 'My timetable' })
-    .getByRole('link', { name: 'Week' })
+    .getByRole('link', { name: 'Week', exact: true })
     .click();
   await expect(page).toHaveURL(/\/week/);
-  await expect(page.getByRole('link', { name: 'Week' })).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'Week', exact: true })).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
 
   await page.getByRole('link', { name: /Next week/ }).click();
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Week of');
@@ -46,7 +52,9 @@ test('Today works with the keyboard alone', async ({ page }) => {
   await page.keyboard.press('Tab');
   for (let i = 0; i < 8; i += 1) {
     if (
-      await page.getByRole('link', { name: 'Week' }).evaluate((el) => el === document.activeElement)
+      await page
+        .getByRole('link', { name: 'Week', exact: true })
+        .evaluate((el) => el === document.activeElement)
     )
       break;
     await page.keyboard.press('Tab');

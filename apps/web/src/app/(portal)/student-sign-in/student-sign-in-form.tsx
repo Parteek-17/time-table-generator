@@ -2,7 +2,7 @@
 
 import { Button, FieldError, Input, Label } from '@slotwise/ui';
 import { useTranslations } from 'next-intl';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { studentSignIn, type StudentSignInState } from './actions';
 
 /** Two short steps on one screen: roll number, then the code from the email. */
@@ -11,6 +11,11 @@ export function StudentSignInForm() {
   const [state, action, pending] = useActionState<StudentSignInState, FormData>(studentSignIn, {
     step: 'roll',
   });
+
+  // The code was right: a full page load to Auth.js's callback, which sets the session cookie.
+  useEffect(() => {
+    if (state.signInUrl) window.location.assign(state.signInUrl);
+  }, [state.signInUrl]);
 
   if (state.step === 'roll') {
     return (
@@ -67,8 +72,13 @@ export function StudentSignInForm() {
         </p>
         {state.error ? <FieldError id="code-error">{state.error}</FieldError> : null}
       </div>
-      <Button type="submit" name="intent" value="verify" disabled={pending}>
-        {pending ? t('checking') : t('signIn')}
+      <Button
+        type="submit"
+        name="intent"
+        value="verify"
+        disabled={pending || Boolean(state.signInUrl)}
+      >
+        {pending || state.signInUrl ? t('checking') : t('signIn')}
       </Button>
       <div className="flex flex-wrap gap-2">
         <Button type="submit" name="intent" value="resend" variant="outline" disabled={pending}>
