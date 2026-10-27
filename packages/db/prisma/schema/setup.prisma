@@ -355,6 +355,7 @@ model Course {
   electiveSections    ElectiveSection[]
   teachingAssignments TeachingAssignment[]
   subjectMentors      SubjectMentor[]
+  examPapers          ExamPaper[]
 
   @@unique([schemeVersionId, code])
   @@index([schemeVersionId, semester])
@@ -434,6 +435,7 @@ model Term {
   disruptions         Disruption[]
   cancellations       Cancellation[]
   makeUps             MakeUp[]
+  exams               Exam[]
 
   @@unique([sessionId, kind])
   @@index([instituteId])
@@ -867,6 +869,7 @@ model Student {
 
   electives StudentElective[]
   loginCodes PortalLoginCode[]
+  examSeatNeeds ExamSeatNeed[]
 
   @@unique([instituteId, classRollNo])
   @@index([instituteId])
@@ -918,6 +921,7 @@ model Faculty {
   assignments    TeachingAssignmentFaculty[]
   fixedSlots     FixedSlotFaculty[]
   mentorOf       SubjectMentor[]
+  examOffDuty    InvigilatorUnavailability[]
 
   @@unique([instituteId, employeeCode])
   @@unique([instituteId, shortCode])

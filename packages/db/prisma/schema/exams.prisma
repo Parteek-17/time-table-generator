@@ -4,3 +4,218 @@
 // the matching back-relation line (`timetables Timetable[]`) on the other model, which Prisma
 // requires; see docs/coordination/OWNERSHIP.md.
 // Every tenant table needs institute_id + an RLS policy (docs/adr/0002-tenancy-and-rls.md).
+//
+// Design: docs/adr/0080-exams-date-sheet-and-seating.md. An exam (e.g. "End-semester exams,
+// Dec 2026") has sessions (date + Morning/Evening); papers are written in a session by the
+// students of the listed sections. A seating plan is built per session by the solver (from a
+// background job); seats and duties copy the codes they print (roll number, hall, paper) so a
+// published plan never changes when master data is edited later. Master-data ids on seats and
+// duties are plain uuids (no foreign keys) for the same reason.
+
+enum ExamStatus {
+  draft
+  published
+  archived
+
+  @@map("exam_status")
+}
+
+enum SeatingPlanStatus {
+  queued
+  running
+  ready
+  failed
+  published
+  archived
+
+  @@map("seating_plan_status")
+}
+
+/// An exam series of a term: mid-semester, end-semester, re-appear …
+model Exam {
+  id                     String     @id @default(uuid()) @db.Uuid
+  instituteId            String     @map("institute_id") @db.Uuid
+  termId                 String     @map("term_id") @db.Uuid
+  /// e.g. "End-semester exams, Dec 2026"
+  name                   String
+  status                 ExamStatus @default(draft)
+  /// Seats per hall kept empty for late changes.
+  reserveSeatsPerHall    Int        @default(0) @map("reserve_seats_per_hall")
+  /// One more invigilator per this many students in a hall.
+  studentsPerInvigilator Int        @default(30) @map("students_per_invigilator")
+  /// At least this many invigilators per hall.
+  minInvigilatorsPerHall Int        @default(1) @map("min_invigilators_per_hall")
+  createdAt              DateTime   @default(now()) @map("created_at")
+  updatedAt              DateTime   @updatedAt @map("updated_at")
+  deletedAt              DateTime?  @map("deleted_at")
+
+  institute Institute     @relation(fields: [instituteId], references: [id])
+  term      Term          @relation(fields: [termId], references: [id])
+  sessions  ExamSession[]
+
+  @@index([instituteId])
+  @@index([termId])
+  @@map("exams")
+}
+
+/// One sitting of an exam: a date and a session (Morning / Evening).
+model ExamSession {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  examId      String   @map("exam_id") @db.Uuid
+  date        DateTime @db.Date
+  /// e.g. "Morning"
+  label       String
+  /// Minutes from midnight.
+  startMinute Int      @map("start_minute")
+  endMinute   Int      @map("end_minute")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  institute    Institute                   @relation(fields: [instituteId], references: [id])
+  exam         Exam                        @relation(fields: [examId], references: [id], onDelete: Cascade)
+  papers       ExamPaper[]
+  seatingPlans SeatingPlan[]
+  unavailable  InvigilatorUnavailability[]
+
+  @@unique([examId, date, label])
+  @@index([instituteId])
+  @@map("exam_sessions")
+}
+
+/// A paper on the date sheet: a course written in a session by the students of some sections.
+model ExamPaper {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  /// Copied from the session, so a course is on an exam's date sheet only once.
+  examId      String   @map("exam_id") @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  courseId    String   @map("course_id") @db.Uuid
+  /// Sections whose students write it.
+  sectionIds  String[] @map("section_ids") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  institute Institute   @relation(fields: [instituteId], references: [id])
+  session   ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  course    Course      @relation(fields: [courseId], references: [id])
+
+  @@unique([examId, courseId])
+  @@index([sessionId])
+  @@index([instituteId])
+  @@map("exam_papers")
+}
+
+/// A student who needs a ground-floor / front seat in every exam (wheelchair, injury …).
+model ExamSeatNeed {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  studentId   String   @map("student_id") @db.Uuid
+  /// Shown to the exam coordinator only, e.g. "Wheelchair".
+  note        String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+  student   Student   @relation(fields: [studentId], references: [id])
+
+  @@unique([instituteId, studentId])
+  @@map("exam_seat_needs")
+}
+
+/// The seating plan of one exam session, built by the solver in a background job.
+model SeatingPlan {
+  id           String            @id @default(uuid()) @db.Uuid
+  instituteId  String            @map("institute_id") @db.Uuid
+  sessionId    String            @map("session_id") @db.Uuid
+  status       SeatingPlanStatus @default(queued)
+  /// Rooms offered as halls, in fill order.
+  hallIds      String[]          @map("hall_ids") @db.Uuid
+  /// solver-seating.v1 status (OPTIMAL, FEASIBLE, INFEASIBLE, TIMEOUT), once solved.
+  solverStatus String?           @map("solver_status")
+  /// { unseated, invigilationProblems } from the solver response.
+  problems     Json              @default("{}")
+  /// Per-hall summary from the solver response.
+  halls        Json              @default("[]")
+  /// Plain-language error when the job failed.
+  error        String?
+  /// User id (no foreign key: audit-style reference).
+  createdById  String            @map("created_by_id") @db.Uuid
+  publishedAt  DateTime?         @map("published_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  institute Institute          @relation(fields: [instituteId], references: [id])
+  session   ExamSession        @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  seats     SeatAssignment[]
+  duties    InvigilationDuty[]
+
+  @@index([sessionId])
+  @@index([instituteId])
+  @@map("seating_plans")
+}
+
+/// One student's seat in a plan.
+model SeatAssignment {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  planId      String   @map("plan_id") @db.Uuid
+  studentId   String   @map("student_id") @db.Uuid
+  rollNo      String   @map("roll_no")
+  paperId     String   @map("paper_id") @db.Uuid
+  paperCode   String   @map("paper_code")
+  hallId      String   @map("hall_id") @db.Uuid
+  hallCode    String   @map("hall_code")
+  /// 1-based, front row first.
+  row         Int
+  /// 1-based seat column from the left.
+  column      Int
+  /// e.g. "G16-R3-C2"
+  label       String
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute   @relation(fields: [instituteId], references: [id])
+  plan      SeatingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, studentId])
+  @@unique([planId, hallId, row, column])
+  @@index([studentId])
+  @@index([instituteId])
+  @@map("seat_assignments")
+}
+
+/// A faculty member supervising a hall in a session.
+model InvigilationDuty {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  planId      String   @map("plan_id") @db.Uuid
+  facultyId   String   @map("faculty_id") @db.Uuid
+  facultyName String   @map("faculty_name")
+  hallId      String   @map("hall_id") @db.Uuid
+  hallCode    String   @map("hall_code")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute   @relation(fields: [instituteId], references: [id])
+  plan      SeatingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, facultyId])
+  @@index([facultyId])
+  @@index([instituteId])
+  @@map("invigilation_duties")
+}
+
+/// A faculty member who cannot invigilate in one exam session (leave, other duty …).
+model InvigilatorUnavailability {
+  id          String   @id @default(uuid()) @db.Uuid
+  instituteId String   @map("institute_id") @db.Uuid
+  sessionId   String   @map("session_id") @db.Uuid
+  facultyId   String   @map("faculty_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  institute Institute   @relation(fields: [instituteId], references: [id])
+  session   ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  faculty   Faculty     @relation(fields: [facultyId], references: [id])
+
+  @@unique([sessionId, facultyId])
+  @@index([instituteId])
+  @@map("invigilator_unavailability")
+}

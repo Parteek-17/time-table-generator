@@ -133,6 +133,14 @@ model Institute {
   cancellations             Cancellation[]
   makeUps                   MakeUp[]
   notificationDeliveries    NotificationDelivery[]
+  exams                     Exam[]
+  examSessions              ExamSession[]
+  examPapers                ExamPaper[]
+  examSeatNeeds             ExamSeatNeed[]
+  seatingPlans              SeatingPlan[]
+  seatAssignments           SeatAssignment[]
+  invigilationDuties        InvigilationDuty[]
+  invigilatorUnavailability InvigilatorUnavailability[]
 
   @@map("institutes")
 }

@@ -1,19 +1,18 @@
 """POST /v1/seating/solve.
 
 Contract: solver-seating.v1 (packages/shared/src/contracts/solver-seating.v1.ts, JSON Schema
-in services/solver/contracts/seating_v1.schema.json).
+in services/solver/contracts/seating_v1.schema.json). Stateless: JSON in, JSON out. The API
+calls it from a background job, never inside a user's request.
 """
 
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
+
+from .models import SeatingRequest, SeatingResponse
+from .solve import solve
 
 router = APIRouter(prefix="/v1/seating", tags=["seating"])
 
 
-@router.post("/solve", status_code=501)
-def solve_seating() -> JSONResponse:
-    # TODO(phase-6): accept SolverSeatingRequestV1 and build the seating plan.
-    return JSONResponse(
-        status_code=501,
-        content={"error": "not_implemented", "message": "Exam seating arrives in Phase 6."},
-    )
+@router.post("/solve", response_model=SeatingResponse, response_model_by_alias=True)
+def solve_seating(request: SeatingRequest) -> SeatingResponse:
+    return solve(request)
