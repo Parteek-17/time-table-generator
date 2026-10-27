@@ -3,15 +3,16 @@
 ## Current milestone
 
 Kit — ProgressBar, Skeleton, SegmentedControl, SlotCard, TimetableGrid: done (branch `ui/kit`,
-from `main` at 271f570). `@slotwise/ui` lint, typecheck and 20 unit tests pass. Not yet checked
-by eye in a browser (no dev server started on this laptop): open `/ui` at 400px, light and
-dark, before merging.
+from `main` at 271f570). `@slotwise/ui` lint, typecheck and 20 unit tests pass. `/ui` checked in the
+browser at 400px, light and dark (2026-10-27): no page-wide scroll, the grid scrolls in its own
+box, focus rings visible, clicks and arrow keys work.
 
 ## Done
 
 - `ProgressBar` (`role="progressbar"`, value text, optional polite status line, `minVisible`),
   `Skeleton` (`aria-hidden`, no pulse under reduced motion), `SegmentedControl` (`aria-pressed`
-  buttons, arrows/Home/End, bold + filled when chosen, `size="lg"` 44px).
+  buttons in one row of equal columns, arrows/Home/End, bold + filled when chosen,
+  `size="lg"` 44px).
 - `SlotCard`, `TimetableGrid`: same props as P2T's local copies; strings in `ui.json`
   (`ui.timetable.*`, `ui.days.*`); the card's sentence also says "Locked."
 - `/ui` gallery (development only, flag `UI`) with every component and a fictional week.
@@ -41,7 +42,6 @@ periods; it is a different widget (many toggles, not one choice) and stays as it
 
 ## Next
 
-- Check `/ui` in a browser at 400px, light and dark.
 - Requests from P4, P5 and P6 as they come.
 
 ## Blocked by
