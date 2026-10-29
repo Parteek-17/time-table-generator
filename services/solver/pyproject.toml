@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Stateless timetable and exam-seating solver (OR-Tools CP-SAT arrives in Phase 2)."
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "fastapi==0.156.8",
+    "fastapi==0.162.0",
     "jsonschema==4.26.0",
     "ortools==9.15.6755",
     "uvicorn==0.54.0",
