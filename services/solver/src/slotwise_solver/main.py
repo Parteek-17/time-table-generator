@@ -16,6 +16,6 @@ app.include_router(timetable_router)
 app.include_router(seating_router)
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])  # HEAD: uptime monitors
 def health() -> dict[str, str]:
     return {"status": "ok"}
