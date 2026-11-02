@@ -46,7 +46,7 @@ jobs:
       TURBO_TELEMETRY_DISABLED: '1'
       NEXT_TELEMETRY_DISABLED: '1'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           # check:ownership diffs the branch against the base branch.
           fetch-depth: 0
@@ -82,7 +82,7 @@ jobs:
       run:
         working-directory: services/solver
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v6
         with:
           version: '0.13.4'
