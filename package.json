@@ -30,8 +30,8 @@
     "fixtures:build": "pnpm --filter @slotwise/db fixtures:build"
   },
   "devDependencies": {
-    "prettier": "3.9.10",
-    "turbo": "2.11.10",
+    "prettier": "3.10.1",
+    "turbo": "2.11.13",
     "typescript": "6.0.3"
   }
 }
